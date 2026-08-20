@@ -1,0 +1,37 @@
+{
+  "id": "dart-practice-pwa",
+  "name": "Dart Practice",
+  "short_name": "DartPractice",
+  "description": "Precision darts training routine tracker & Outshot AI guide.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "orientation": "portrait",
+  "categories": ["sports", "utilities", "games"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512 any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "DartBot Match",
+      "short_name": "DartBot",
+      "description": "Play 501/301 against AI DartBot",
+      "url": "/",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "170 Outshot AI",
+      "short_name": "Outshot AI",
+      "description": "Check checkout routes and finishes",
+      "url": "/",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192" }]
+    }
+  ]
+}

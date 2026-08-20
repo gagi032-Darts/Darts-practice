@@ -1,0 +1,74 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile information and metadata",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "The unique Firebase Auth user ID"
+        },
+        "username": {
+          "type": "string",
+          "description": "Display name of the user"
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address"
+        },
+        "avatarEmoji": {
+          "type": "string",
+          "description": "Player avatar emoji"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Account creation timestamp"
+        },
+        "lastSyncedAt": {
+          "type": "string",
+          "description": "Last synced timestamp"
+        }
+      },
+      "required": ["uid", "username", "createdAt"]
+    },
+    "UserSyncData": {
+      "title": "UserSyncData",
+      "description": "User match logs, practice session history, and daily dart stats",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "The unique Firebase Auth user ID"
+        },
+        "profile": {
+          "type": "object",
+          "description": "User profile object"
+        },
+        "history": {
+          "type": "array",
+          "description": "List of practice and match sessions"
+        },
+        "dailyRecords": {
+          "type": "object",
+          "description": "Daily record map"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update timestamp"
+        }
+      },
+      "required": ["uid", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile documents"
+    },
+    "/userData/{userId}": {
+      "schema": "UserSyncData",
+      "description": "User sync data documents"
+    }
+  }
+}
