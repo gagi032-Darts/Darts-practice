@@ -736,8 +736,57 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
   const handleUndo = () => {
     if (matchHistoryRef.current.length === 0 || isBotThrowing) return;
     sound.tap();
-    const lastRecord = matchHistoryRef.current[matchHistoryRef.current.length - 1];
-    const newHistory = matchHistoryRef.current.slice(0, -1);
+
+    // In bot match mode, if it's currently player's turn, the last record was the bot's throw
+    // and before that was the player's throw that prompted it.
+    // We want to undo the entire round back to before the player's mistaken throw.
+    const history = matchHistoryRef.current;
+    if (history.length === 0) return;
+
+    const lastRecord = history[history.length - 1];
+
+    if (matchMode === 'bot') {
+      // If the last record was by bot (meaning bot took its turn after player),
+      // we need to undo BOTH bot's turn and player's preceding turn so player can re-enter.
+      if (lastRecord.thrower === 'bot' && history.length >= 2 && history[history.length - 2].thrower === 'player') {
+        const playerRecord = history[history.length - 2];
+        const newHistory = history.slice(0, -2);
+        matchHistoryRef.current = newHistory;
+        setMatchHistory(newHistory);
+
+        // Revert Bot stats & score
+        botScoreRef.current = lastRecord.startScore;
+        setBotScore(lastRecord.startScore);
+        setBotTotalVisits((prev) => Math.max(0, prev - 1));
+        setBotTotalDarts((prev) => Math.max(0, prev - lastRecord.darts.length));
+        setBotTotalPoints((prev) => Math.max(0, prev - lastRecord.pointsScored));
+        const newBotLegDarts = Math.max(0, botLegDartsRef.current - lastRecord.darts.length);
+        botLegDartsRef.current = newBotLegDarts;
+        setBotLegDarts(newBotLegDarts);
+
+        // Revert Player stats & score
+        playerScoreRef.current = playerRecord.startScore;
+        setPlayerScore(playerRecord.startScore);
+        const dartsThrownInVisit =
+          playerRecord.darts && playerRecord.darts.length > 0
+            ? (playerRecord.darts[0].startsWith('1d') ? 1 : playerRecord.darts[0].startsWith('2d') ? 2 : playerRecord.darts[0].startsWith('3d') ? 3 : 3)
+            : 3;
+        setPlayerTotalVisits((prev) => Math.max(0, prev - 1));
+        setPlayerTotalDarts((prev) => Math.max(0, prev - dartsThrownInVisit));
+        setPlayerTotalPoints((prev) => Math.max(0, prev - playerRecord.pointsScored));
+        const newPlayerLegDarts = Math.max(0, playerLegDartsRef.current - dartsThrownInVisit);
+        playerLegDartsRef.current = newPlayerLegDarts;
+        setPlayerLegDarts(newPlayerLegDarts);
+        storage.recordDartsThrown(-dartsThrownInVisit);
+
+        setActiveThrower('player');
+        setAnnouncement(null);
+        return;
+      }
+    }
+
+    // Standard single-visit undo fallback (solo mode or first throw)
+    const newHistory = history.slice(0, -1);
     matchHistoryRef.current = newHistory;
     setMatchHistory(newHistory);
 
