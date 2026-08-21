@@ -1118,7 +1118,7 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
   }
 
   return (
-    <div className="w-full max-w-lg mx-auto flex flex-col flex-1 space-y-1.5 sm:space-y-2 select-none justify-between">
+    <div className="w-full max-w-lg mx-auto flex flex-col space-y-2 sm:space-y-2.5 select-none">
       {/* Sleek Integrated Top Header & Match Scoreline Bar */}
       <div className="bg-[#121519] border border-[#232930] rounded-xl px-2.5 py-1.5 flex items-center justify-between shadow-xs text-xs font-mono">
         {/* Left: Exit + Match Mode */}
@@ -1298,7 +1298,7 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
           {legHistoryRows.length === 0 ? (
             <div className="text-center text-[10px] text-neutral-600 py-0.5">Leg start</div>
           ) : (
-            legHistoryRows.slice(-2).map((row) => (
+            legHistoryRows.slice(-3).map((row) => (
               <div
                 key={row.roundIndex}
                 className="grid grid-cols-3 text-center text-[11px] font-mono py-0.5 rounded bg-[#181d22]/80 border border-[#20272f] leading-none"
@@ -1354,7 +1354,7 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
 
       {/* 5-Column Darts Keypad matching screenshots */}
       {!legWinBanner && !matchWinner && (
-        <div className={`mt-auto pt-1 sm:pt-1.5 transition-opacity ${activeThrower !== 'player' ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+        <div className={`transition-opacity ${activeThrower !== 'player' ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
           <DartsMatchKeypad
             value={inputValue}
             onChange={setInputValue}
