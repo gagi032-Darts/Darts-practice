@@ -245,6 +245,18 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
   const botLegsRef = useRef<number>(0);
   const matchHistoryRef = useRef<VisitRecord[]>([]);
   const completedLegsRef = useRef<LegStats[]>([]);
+  const soloVisitsScrollRef = useRef<HTMLDivElement | null>(null);
+  const botVisitsScrollRef = useRef<HTMLDivElement | null>(null);
+
+  // Auto-scroll visit history list to bottom on new visits so latest 2 are in view, but fully scrollable
+  useEffect(() => {
+    if (soloVisitsScrollRef.current) {
+      soloVisitsScrollRef.current.scrollTop = soloVisitsScrollRef.current.scrollHeight;
+    }
+    if (botVisitsScrollRef.current) {
+      botVisitsScrollRef.current.scrollTop = botVisitsScrollRef.current.scrollHeight;
+    }
+  }, [matchHistory, currentLeg, activeThrower]);
 
   const levelInfo = getDartBotLevelInfo(botLevel);
 
@@ -1142,10 +1154,10 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
   const botLegPoints = botLegVisits.reduce((sum, v) => sum + (v.isBust ? 0 : v.pointsScored), 0);
   const botLegAvg = botLegDarts > 0 ? Number(((botLegPoints / botLegDarts) * 3).toFixed(2)) : botAvg;
 
-  // Build rounds for the 3-column visit tracker table (compact display)
+  // Build rounds for the 3-column visit tracker table (showing only the latest 2 visits)
   const maxVisitsInLeg = Math.max(playerLegVisits.length, botLegVisits.length);
-  const minRowsToDisplay = Math.max(2, maxVisitsInLeg);
-  const displayRows: {
+  const totalRounds = Math.max(1, maxVisitsInLeg);
+  const allRows: {
     roundIndex: number;
     dartNumber: number;
     playerScore?: number;
@@ -1158,10 +1170,10 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
     botIsCheckout?: boolean;
   }[] = [];
 
-  for (let i = 0; i < minRowsToDisplay; i++) {
+  for (let i = 0; i < totalRounds; i++) {
     const p = playerLegVisits[i];
     const b = botLegVisits[i];
-    displayRows.push({
+    allRows.push({
       roundIndex: i + 1,
       dartNumber: (i + 1) * 3,
       playerScore: p ? (p.isBust ? 0 : p.pointsScored) : undefined,
@@ -1176,23 +1188,23 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
   }
 
   return (
-    <div className="w-full max-w-md sm:max-w-lg mx-auto flex flex-col space-y-1.5 sm:space-y-2 select-none">
+    <div className="w-full max-w-md sm:max-w-lg mx-auto flex flex-col space-y-1 select-none">
       {/* Sleek Integrated Top Header & Match Scoreline Bar */}
-      <div className="bg-[#121519] border border-[#232930] rounded-xl px-2.5 py-1 flex items-center justify-between shadow-xs text-xs font-mono">
+      <div className="bg-[#121519] border border-[#232930] rounded-xl px-2 py-0.5 flex items-center justify-between shadow-xs text-[11px] font-mono">
         {/* Left: Exit + Match Mode */}
         <div className="flex items-center gap-1.5">
           <button
             type="button"
             onClick={() => setInSetup(true)}
-            className="flex items-center gap-1 text-[11px] font-bold text-neutral-400 hover:text-white px-2 py-0.5 rounded-lg bg-[#1a1e24] border border-[#28303a] transition-all active:scale-95 cursor-pointer"
+            className="flex items-center gap-1 text-[10px] font-bold text-neutral-400 hover:text-white px-1.5 py-0.5 rounded-lg bg-[#1a1e24] border border-[#28303a] transition-all active:scale-95 cursor-pointer"
           >
-            <RotateCcw className="w-3 h-3" />
+            <RotateCcw className="w-2.5 h-2.5" />
             <span>Exit</span>
           </button>
           <div className="flex items-center gap-1 font-bold">
-            <span className="text-white font-black text-xs sm:text-sm">{startingScore}</span>
+            <span className="text-white font-black text-xs">{startingScore}</span>
             <span className="text-neutral-500">·</span>
-            <span className="text-neutral-300 text-[11px] sm:text-xs">
+            <span className="text-neutral-300 text-[10px] sm:text-xs">
               {matchMode === 'bot' ? `L${currentLeg} (F${legsToWin})` : `L${currentLeg}`}
             </span>
           </div>
@@ -1200,15 +1212,15 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
 
         {/* Center: Legs Scoreline [ 0 S/L 0 ] or Solo Leg Counter */}
         {matchMode === 'bot' ? (
-          <div className="bg-[#1a1f26] border border-[#2c3540] rounded-lg px-2.5 py-0.5 flex items-center gap-2 font-bold shadow-xs">
-            <span className="text-sm sm:text-base text-emerald-400 leading-none">{playerLegs}</span>
-            <span className="text-[9px] tracking-wider text-neutral-400 font-sans uppercase">S/L</span>
-            <span className="text-sm sm:text-base text-rose-400 leading-none">{botLegs}</span>
+          <div className="bg-[#1a1f26] border border-[#2c3540] rounded-lg px-2 py-0.5 flex items-center gap-1.5 font-bold shadow-xs">
+            <span className="text-xs sm:text-sm text-emerald-400 leading-none">{playerLegs}</span>
+            <span className="text-[8px] tracking-wider text-neutral-400 font-sans uppercase">S/L</span>
+            <span className="text-xs sm:text-sm text-rose-400 leading-none">{botLegs}</span>
           </div>
         ) : (
-          <div className="bg-[#1a1f26] border border-[#2c3540] rounded-lg px-2 py-0.5 flex items-center gap-1 font-bold shadow-xs text-[11px]">
+          <div className="bg-[#1a1f26] border border-[#2c3540] rounded-lg px-2 py-0.5 flex items-center gap-1 font-bold shadow-xs text-[10px]">
             <span className="text-emerald-400 font-black text-xs">{playerLegs}</span>
-            <span className="text-neutral-300 text-[11px]">/ {legsToWin} Legs</span>
+            <span className="text-neutral-300 text-[10px]">/ {legsToWin} Legs</span>
           </div>
         )}
 
@@ -1220,7 +1232,7 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
             title="Match Ledger"
             className="p-1 rounded-lg bg-[#1a1e24] hover:bg-[#222830] text-neutral-400 hover:text-white border border-[#28303a] transition-all active:scale-95 cursor-pointer"
           >
-            <History className="w-3.5 h-3.5" />
+            <History className="w-3 h-3" />
           </button>
           <button
             type="button"
@@ -1228,7 +1240,7 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
             title="Settings"
             className="p-1 rounded-lg bg-[#1a1e24] hover:bg-[#222830] text-neutral-400 hover:text-white border border-[#28303a] transition-all active:scale-95 cursor-pointer"
           >
-            <Sliders className="w-3.5 h-3.5" />
+            <Sliders className="w-3 h-3" />
           </button>
         </div>
       </div>
@@ -1237,25 +1249,25 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
       {matchMode === 'solo' ? (
         <>
           {/* SOLO 1-PLAYER SCOREBOARD (matching 301 Solo Practice from Guide) */}
-          <div className="bg-[#121519] border border-[#232930] rounded-xl p-2 sm:p-2.5 text-center shadow-md relative overflow-hidden flex flex-col justify-between min-h-[110px] sm:min-h-[125px]">
+          <div className="bg-[#121519] border border-[#232930] rounded-xl p-1.5 sm:p-2 text-center shadow-md relative overflow-hidden flex flex-col justify-between min-h-[90px] sm:min-h-[105px]">
           {/* Header Badges */}
-          <div className="flex items-center justify-between text-xs font-bold text-neutral-400 mb-0.5">
-            <div className="flex items-center gap-1.5">
-              <span className="flex items-center gap-1 uppercase tracking-wider text-emerald-400 font-black text-xs">
-                <User className="w-3.5 h-3.5" /> {activeAccount.name || 'YOU'}
+          <div className="flex items-center justify-between text-[11px] font-bold text-neutral-400 mb-0.5">
+            <div className="flex items-center gap-1">
+              <span className="flex items-center gap-1 uppercase tracking-wider text-emerald-400 font-black text-[11px]">
+                <User className="w-3 h-3" /> {activeAccount.name || 'YOU'}
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-neutral-850 border border-neutral-750 text-neutral-300 font-mono text-[10px]">
+              <span className="px-1.5 py-0.2 rounded-full bg-neutral-850 border border-neutral-750 text-neutral-300 font-mono text-[9px]">
                 Leg #{currentLeg} {legsToWin > 1 ? `(F${legsToWin})` : ''}
               </span>
             </div>
 
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1">
               {playerLegs > 0 && (
-                <span className="flex items-center gap-0.5 text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-800/80 px-2 py-0.5 rounded-full text-[10px]">
-                  <CheckCircle2 className="w-3 h-3" /> {playerLegs} Won
+                <span className="flex items-center gap-0.5 text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-800/80 px-1.5 py-0.2 rounded-full text-[9px]">
+                  <CheckCircle2 className="w-2.5 h-2.5" /> {playerLegs} Won
                 </span>
               )}
-              <span className="text-neutral-400 text-xs font-mono">
+              <span className="text-neutral-400 text-[10px] font-mono">
                 Dart #{playerLegDarts + 1}
               </span>
             </div>
@@ -1264,7 +1276,7 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
           {/* Big Remaining Score Display */}
           <div className="my-0.5 flex flex-col items-center justify-center">
             <div
-              className={`text-4xl sm:text-5xl font-mono font-black tracking-tight leading-none drop-shadow-md ${
+              className={`text-3xl sm:text-4xl font-mono font-black tracking-tight leading-none drop-shadow-md ${
                 playerScore <= 170 ? 'text-emerald-400' : 'text-white'
               }`}
             >
@@ -1274,20 +1286,20 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
 
           {/* Suggested Checkout Guide (if on finish) */}
           {playerCheckout ? (
-            <div className="bg-emerald-950/60 border border-emerald-800/70 rounded-lg p-1 flex items-center justify-between px-2 text-xs">
-              <div className="flex items-center gap-1 font-bold text-emerald-400 text-[11px]">
-                <Sparkles className="w-3 h-3" />
+            <div className="bg-emerald-950/60 border border-emerald-800/70 rounded-lg p-0.5 flex items-center justify-between px-1.5 text-[10px]">
+              <div className="flex items-center gap-1 font-bold text-emerald-400 text-[10px]">
+                <Sparkles className="w-2.5 h-2.5" />
                 <span>Checkout:</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-mono font-bold text-white bg-emerald-900/80 px-1.5 py-0.5 rounded border border-emerald-700 text-xs">
+              <div className="flex items-center gap-1">
+                <span className="font-mono font-bold text-white bg-emerald-900/80 px-1 py-0.2 rounded border border-emerald-700 text-[10px]">
                   {playerCheckout}
                 </span>
                 {onOpenCheckoutAi && (
                   <button
                     type="button"
                     onClick={() => onOpenCheckoutAi(playerScore)}
-                    className="text-[10px] text-emerald-300 underline hover:text-white transition-colors cursor-pointer"
+                    className="text-[9px] text-emerald-300 underline hover:text-white transition-colors cursor-pointer"
                   >
                     AI Guide
                   </button>
@@ -1296,49 +1308,52 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
             </div>
           ) : (
             <div className="h-3 flex items-center justify-center">
-              <span className="text-[10px] text-neutral-500 font-medium leading-none">Scoring Mode</span>
+              <span className="text-[9px] text-neutral-500 font-medium leading-none">Scoring Mode</span>
             </div>
           )}
 
           {/* Bottom Live Stats Strip */}
-          <div className="border-t border-[#232930] pt-1 mt-1 grid grid-cols-4 gap-1.5 text-center text-xs font-mono">
-            <div className="bg-[#181d22] p-1 rounded-lg border border-[#20272f]">
-              <span className="text-[9px] text-neutral-400 block font-sans uppercase font-bold">Leg Avg</span>
-              <b className="text-white text-xs">{playerLegAvg.toFixed(1)}</b>
+          <div className="border-t border-[#232930] pt-0.5 mt-0.5 grid grid-cols-4 gap-1 text-center text-[10px] font-mono">
+            <div className="bg-[#181d22] p-0.5 rounded border border-[#20272f]">
+              <span className="text-[8px] text-neutral-400 block font-sans uppercase font-bold">Leg Avg</span>
+              <b className="text-white text-[10px]">{playerLegAvg.toFixed(1)}</b>
             </div>
-            <div className="bg-[#181d22] p-1 rounded-lg border border-[#20272f]">
-              <span className="text-[9px] text-neutral-400 block font-sans uppercase font-bold">Match Avg</span>
-              <b className="text-emerald-400 text-xs">{playerAvg.toFixed(1)}</b>
+            <div className="bg-[#181d22] p-0.5 rounded border border-[#20272f]">
+              <span className="text-[8px] text-neutral-400 block font-sans uppercase font-bold">Match Avg</span>
+              <b className="text-emerald-400 text-[10px]">{playerAvg.toFixed(1)}</b>
             </div>
-            <div className="bg-[#181d22] p-1 rounded-lg border border-[#20272f]">
-              <span className="text-[9px] text-neutral-400 block font-sans uppercase font-bold">First 9</span>
-              <b className="text-cyan-400 text-xs">{playerFirst9Avg.toFixed(1)}</b>
+            <div className="bg-[#181d22] p-0.5 rounded border border-[#20272f]">
+              <span className="text-[8px] text-neutral-400 block font-sans uppercase font-bold">First 9</span>
+              <b className="text-cyan-400 text-[10px]">{playerFirst9Avg.toFixed(1)}</b>
             </div>
-            <div className="bg-[#181d22] p-1 rounded-lg border border-[#20272f]">
-              <span className="text-[9px] text-neutral-400 block font-sans uppercase font-bold">Double %</span>
-              <b className="text-amber-400 text-xs">{playerDblPct.toFixed(1)}%</b>
+            <div className="bg-[#181d22] p-0.5 rounded border border-[#20272f]">
+              <span className="text-[8px] text-neutral-400 block font-sans uppercase font-bold">Double %</span>
+              <b className="text-amber-400 text-[10px]">{playerDblPct.toFixed(1)}%</b>
             </div>
           </div>
         </div>
 
-        {/* Solo Visit History Table */}
-        <div className="bg-[#121519] border border-[#232930] rounded-xl p-1.5 shadow-xs">
+        {/* Solo Visit History Table (Scrollable, showing latest 2 visits by default) */}
+        <div className="bg-[#121519] border border-[#232930] rounded-xl p-1 shadow-xs">
           {/* Table Header */}
-          <div className="grid grid-cols-3 text-center text-[10px] font-bold text-neutral-400 border-b border-[#232930] pb-0.5 leading-none uppercase tracking-wider">
+          <div className="grid grid-cols-3 text-center text-[9px] font-bold text-neutral-400 border-b border-[#232930] pb-0.5 leading-none uppercase tracking-wider">
             <span className="text-neutral-400 font-semibold">ROUND</span>
             <span className="text-emerald-400 font-black">VISIT SCORE</span>
             <span className="text-cyan-400 font-black">POINTS LEFT</span>
           </div>
 
           {/* Visits List */}
-          <div className="space-y-0.5 pt-1 max-h-[58px] sm:max-h-[70px] overflow-y-auto pr-0.5">
-            {displayRows.map((row) => (
+          <div
+            ref={soloVisitsScrollRef}
+            className="space-y-0.5 pt-0.5 max-h-[50px] sm:max-h-[54px] overflow-y-auto overscroll-contain pr-0.5"
+          >
+            {allRows.map((row) => (
               <div
                 key={row.roundIndex}
-                className="grid grid-cols-3 items-center text-center text-xs font-mono py-0.5 px-1 rounded bg-[#181d22]/90 border border-[#20272f] shadow-xs"
+                className="grid grid-cols-3 items-center text-center text-[11px] font-mono py-0.5 px-1 rounded bg-[#181d22]/90 border border-[#20272f] shadow-xs"
               >
                 <div className="flex items-center justify-center">
-                  <span className="text-[10px] text-neutral-400 font-bold px-1.5 py-0.2 rounded bg-[#101317] border border-[#232930]">
+                  <span className="text-[9px] text-neutral-400 font-bold px-1 py-0.2 rounded bg-[#101317] border border-[#232930]">
                     R{row.roundIndex} <span className="text-neutral-500 font-normal">· {row.dartNumber}d</span>
                   </span>
                 </div>
@@ -1346,16 +1361,16 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
                 <div className="flex items-center justify-center">
                   {row.playerScore !== undefined ? (
                     row.playerIsBust ? (
-                      <span className="font-bold text-rose-400 text-[10px] px-1 py-0.2 bg-rose-950/60 rounded border border-rose-800/50">
+                      <span className="font-bold text-rose-400 text-[9px] px-1 py-0.2 bg-rose-950/60 rounded border border-rose-800/50">
                         BUST
                       </span>
                     ) : row.playerIsCheckout ? (
-                      <span className="font-black text-emerald-400 text-xs bg-emerald-950/70 px-1 py-0.2 rounded border border-emerald-700">
+                      <span className="font-black text-emerald-400 text-[11px] bg-emerald-950/70 px-1 py-0.2 rounded border border-emerald-700">
                         🎯 {row.playerScore} (CHECKOUT)
                       </span>
                     ) : (
                       <span
-                        className={`font-black text-xs sm:text-sm ${
+                        className={`font-black text-xs ${
                           row.playerScore === 180
                             ? 'text-amber-300 font-mono scale-105'
                             : row.playerScore >= 100
@@ -1373,7 +1388,7 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
 
                 <div className="flex items-center justify-center">
                   {row.playerEndScore !== undefined ? (
-                    <span className="font-black text-xs text-cyan-300 font-mono">
+                    <span className="font-black text-[11px] text-cyan-300 font-mono">
                       {row.playerEndScore}
                     </span>
                   ) : (
@@ -1388,20 +1403,20 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
       ) : (
         /* 2-PLAYER VS BOT SCORE CARDS */
         <>
-          <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
+          <div className="grid grid-cols-2 gap-1.5">
             {/* PLAYER 1 / YOU */}
             <div
-              className={`rounded-xl p-2 sm:p-2.5 transition-all relative overflow-hidden flex flex-col justify-between min-h-[105px] sm:min-h-[120px] ${
+              className={`rounded-xl p-1.5 sm:p-2 transition-all relative overflow-hidden flex flex-col justify-between min-h-[88px] sm:min-h-[102px] ${
                 activeThrower === 'player' && !legWinBanner && !matchWinner
                   ? 'bg-[#121519] border-2 border-emerald-500 shadow-md ring-1 ring-emerald-500/20'
                   : 'bg-[#121519] border border-[#232930] opacity-85'
               }`}
             >
               {/* Card Top: Active Play Triangle & Player Number */}
-              <div className="flex items-center justify-between text-xs font-bold text-neutral-400 leading-none">
-                <div className="flex items-center gap-1.5 text-white min-w-0">
+              <div className="flex items-center justify-between text-[11px] font-bold text-neutral-400 leading-none">
+                <div className="flex items-center gap-1 text-white min-w-0">
                   {activeThrower === 'player' && (
-                    <span className="text-emerald-400 text-xs animate-pulse font-black">▶</span>
+                    <span className="text-emerald-400 text-[10px] animate-pulse font-black">▶</span>
                   )}
                   <PlayerAvatar
                     photoUrl={activeAccount.photoUrl}
@@ -1409,11 +1424,11 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
                     name={activeAccount.name}
                     size="sm"
                   />
-                  <span className="text-xs sm:text-sm text-white font-bold truncate max-w-[70px] sm:max-w-[100px]">
+                  <span className="text-xs text-white font-bold truncate max-w-[65px] sm:max-w-[90px]">
                     {activeAccount.name || 'YOU'}
                   </span>
                 </div>
-                <span className="text-[10px] font-mono text-emerald-400 font-bold px-1.5 py-0.5 rounded bg-emerald-950/60 border border-emerald-800/40">
+                <span className="text-[9px] font-mono text-emerald-400 font-bold px-1 py-0.2 rounded bg-emerald-950/60 border border-emerald-800/40">
                   {playerLegDarts}d
                 </span>
               </div>
@@ -1421,7 +1436,7 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
               {/* Bold Large Score */}
               <div className="text-center my-0.5">
                 <span
-                  className={`text-4xl sm:text-5xl font-black font-mono tracking-tight block leading-none drop-shadow-sm ${
+                  className={`text-3xl sm:text-4xl font-black font-mono tracking-tight block leading-none drop-shadow-sm ${
                     playerScore <= 170 ? 'text-emerald-400' : 'text-white'
                   }`}
                 >
@@ -1429,49 +1444,49 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
                 </span>
 
                 {/* Tactical Outshot Route directly below score */}
-                <div className="h-4 flex items-center justify-center mt-0.5">
+                <div className="h-3.5 flex items-center justify-center mt-0.5">
                   {playerCheckout ? (
                     <button
                       type="button"
                       onClick={() => onOpenCheckoutAi && onOpenCheckoutAi(playerScore)}
-                      className="text-[11px] font-bold font-mono text-emerald-300 hover:text-emerald-200 truncate cursor-pointer leading-none bg-emerald-950/60 border border-emerald-800/50 px-1.5 py-0.5 rounded"
+                      className="text-[10px] font-bold font-mono text-emerald-300 hover:text-emerald-200 truncate cursor-pointer leading-none bg-emerald-950/60 border border-emerald-800/50 px-1 py-0.2 rounded"
                     >
                       {playerCheckout}
                     </button>
                   ) : (
-                    <span className="text-[10px] text-neutral-500 font-medium leading-none">Scoring</span>
+                    <span className="text-[9px] text-neutral-500 font-medium leading-none">Scoring</span>
                   )}
                 </div>
               </div>
 
               {/* Bottom Avg: Leg Avg / Match Avg */}
-              <div className="border-t border-[#232930] pt-1 text-center text-[10px] sm:text-xs font-mono text-neutral-300 leading-none">
-                Avg. <b className="text-white text-xs">{playerLegAvg.toFixed(1)}</b> / <span className="text-neutral-400">{playerAvg.toFixed(1)}</span>
+              <div className="border-t border-[#232930] pt-0.5 text-center text-[9px] sm:text-[10px] font-mono text-neutral-300 leading-none">
+                Avg. <b className="text-white text-[10px]">{playerLegAvg.toFixed(1)}</b> / <span className="text-neutral-400">{playerAvg.toFixed(1)}</span>
               </div>
             </div>
 
             {/* PLAYER 2 / BOT */}
             <div
-              className={`rounded-xl p-2 sm:p-2.5 transition-all relative overflow-hidden flex flex-col justify-between min-h-[105px] sm:min-h-[120px] ${
+              className={`rounded-xl p-1.5 sm:p-2 transition-all relative overflow-hidden flex flex-col justify-between min-h-[88px] sm:min-h-[102px] ${
                 activeThrower === 'bot' && !legWinBanner && !matchWinner
                   ? 'bg-[#121519] border-2 border-emerald-500 shadow-md ring-1 ring-emerald-500/20'
                   : 'bg-[#121519] border border-[#232930] opacity-85'
               }`}
             >
               {/* Card Top: Active Play Triangle & Player Number */}
-              <div className="flex items-center justify-between text-xs font-bold text-neutral-400 leading-none">
-                <div className="flex items-center gap-1.5 text-white">
+              <div className="flex items-center justify-between text-[11px] font-bold text-neutral-400 leading-none">
+                <div className="flex items-center gap-1 text-white">
                   {activeThrower === 'bot' && (
-                    <span className="text-emerald-400 text-xs animate-pulse font-black">▶</span>
+                    <span className="text-emerald-400 text-[10px] animate-pulse font-black">▶</span>
                   )}
-                  <div className="w-5 h-5 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center text-[10px] font-black text-neutral-300">
+                  <div className="w-4 h-4 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center text-[9px] font-black text-neutral-300">
                     2
                   </div>
-                  <span className="text-xs sm:text-sm text-neutral-300 font-bold truncate max-w-[70px] sm:max-w-[100px]">
+                  <span className="text-xs text-neutral-300 font-bold truncate max-w-[65px] sm:max-w-[90px]">
                     {levelInfo.name}
                   </span>
                 </div>
-                <span className="text-[10px] font-mono text-rose-400 font-bold px-1.5 py-0.5 rounded bg-rose-950/60 border border-rose-800/40">
+                <span className="text-[9px] font-mono text-rose-400 font-bold px-1 py-0.2 rounded bg-rose-950/60 border border-rose-800/40">
                   {botLegDarts}d
                 </span>
               </div>
@@ -1479,7 +1494,7 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
               {/* Bold Large Score */}
               <div className="text-center my-0.5">
                 <span
-                  className={`text-4xl sm:text-5xl font-black font-mono tracking-tight block leading-none drop-shadow-sm ${
+                  className={`text-3xl sm:text-4xl font-black font-mono tracking-tight block leading-none drop-shadow-sm ${
                     botScore <= 170 ? 'text-rose-400' : 'text-white'
                   }`}
                 >
@@ -1487,57 +1502,60 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
                 </span>
 
                 {/* Tactical Outshot Route directly below score */}
-                <div className="h-4 flex items-center justify-center mt-0.5">
+                <div className="h-3.5 flex items-center justify-center mt-0.5">
                   {isBotThrowing ? (
-                    <span className="text-[11px] text-rose-400 font-bold animate-pulse leading-none">Throwing...</span>
+                    <span className="text-[10px] text-rose-400 font-bold animate-pulse leading-none">Throwing...</span>
                   ) : botCheckout ? (
-                    <span className="text-[11px] font-bold font-mono text-rose-300 truncate leading-none bg-rose-950/60 border border-rose-800/50 px-1.5 py-0.5 rounded">
+                    <span className="text-[10px] font-bold font-mono text-rose-300 truncate leading-none bg-rose-950/60 border border-rose-800/50 px-1 py-0.2 rounded">
                       {botCheckout}
                     </span>
                   ) : (
-                    <span className="text-[10px] text-neutral-500 font-medium leading-none">Scoring</span>
+                    <span className="text-[9px] text-neutral-500 font-medium leading-none">Scoring</span>
                   )}
                 </div>
               </div>
 
               {/* Bottom Avg: Leg Avg / Match Avg */}
-              <div className="border-t border-[#232930] pt-1 text-center text-[10px] sm:text-xs font-mono text-neutral-300 leading-none">
-                Avg. <b className="text-white text-xs">{botLegAvg.toFixed(1)}</b> / <span className="text-neutral-400">{botAvg.toFixed(1)}</span>
+              <div className="border-t border-[#232930] pt-0.5 text-center text-[9px] sm:text-[10px] font-mono text-neutral-300 leading-none">
+                Avg. <b className="text-white text-[10px]">{botLegAvg.toFixed(1)}</b> / <span className="text-neutral-400">{botAvg.toFixed(1)}</span>
               </div>
             </div>
           </div>
 
-          {/* 3-Column Compact Visit History Table */}
-          <div className="bg-[#121519] border border-[#232930] rounded-xl p-1.5 shadow-xs">
+          {/* 3-Column Compact Visit History Table (Scrollable, showing latest 2 visits by default) */}
+          <div className="bg-[#121519] border border-[#232930] rounded-xl p-1 shadow-xs">
             {/* Table Header */}
-            <div className="grid grid-cols-3 text-center text-[10px] font-bold text-neutral-400 border-b border-[#232930] pb-0.5 leading-none uppercase tracking-wider">
+            <div className="grid grid-cols-3 text-center text-[9px] font-bold text-neutral-400 border-b border-[#232930] pb-0.5 leading-none uppercase tracking-wider">
               <span className="text-emerald-400 font-black">YOU (VISIT)</span>
               <span className="text-neutral-400 font-semibold">ROUND</span>
               <span className="text-rose-400 font-black">{levelInfo.name}</span>
             </div>
 
-            {/* Visits List */}
-            <div className="space-y-0.5 pt-1 max-h-[58px] sm:max-h-[70px] overflow-y-auto pr-0.5">
-              {displayRows.map((row) => (
+            {/* Visits List (Scrollable, default scrolled to bottom) */}
+            <div
+              ref={botVisitsScrollRef}
+              className="space-y-0.5 pt-0.5 max-h-[50px] sm:max-h-[54px] overflow-y-auto overscroll-contain pr-0.5"
+            >
+              {allRows.map((row) => (
                 <div
                   key={row.roundIndex}
-                  className="grid grid-cols-3 items-center text-center text-xs font-mono py-0.5 px-1 rounded bg-[#181d22]/90 border border-[#20272f] shadow-xs"
+                  className="grid grid-cols-3 items-center text-center text-[11px] font-mono py-0.5 px-1 rounded bg-[#181d22]/90 border border-[#20272f] shadow-xs"
                 >
                   {/* YOU VISIT SCORE */}
                   <div className="flex items-center justify-center gap-1">
                     {row.playerScore !== undefined ? (
                       row.playerIsBust ? (
-                        <span className="font-bold text-rose-400 text-[10px] px-1 py-0.2 bg-rose-950/60 rounded border border-rose-800/50">
+                        <span className="font-bold text-rose-400 text-[9px] px-1 py-0.2 bg-rose-950/60 rounded border border-rose-800/50">
                           BUST
                         </span>
                       ) : row.playerIsCheckout ? (
-                        <span className="font-black text-emerald-400 text-xs bg-emerald-950/70 px-1 py-0.2 rounded border border-emerald-700">
+                        <span className="font-black text-emerald-400 text-[11px] bg-emerald-950/70 px-1 py-0.2 rounded border border-emerald-700">
                           🎯 {row.playerScore}
                         </span>
                       ) : (
                         <div className="flex items-baseline gap-1">
                           <span
-                            className={`font-black text-xs sm:text-sm ${
+                            className={`font-black text-xs ${
                               row.playerScore === 180
                                 ? 'text-amber-300 font-mono scale-105'
                                 : row.playerScore >= 100
@@ -1548,7 +1566,7 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
                             {row.playerScore}
                           </span>
                           {row.playerEndScore !== undefined && (
-                            <span className="text-[9px] text-neutral-400 font-sans">
+                            <span className="text-[8px] text-neutral-400 font-sans">
                               ({row.playerEndScore})
                             </span>
                           )}
@@ -1561,7 +1579,7 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
 
                   {/* ROUND / DARTS BADGE */}
                   <div className="flex items-center justify-center">
-                    <span className="text-[10px] text-neutral-400 font-bold px-1.5 py-0.2 rounded bg-[#101317] border border-[#232930]">
+                    <span className="text-[9px] text-neutral-400 font-bold px-1 py-0.2 rounded bg-[#101317] border border-[#232930]">
                       R{row.roundIndex} <span className="text-neutral-500 font-normal">· {row.dartNumber}d</span>
                     </span>
                   </div>
@@ -1570,17 +1588,17 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
                   <div className="flex items-center justify-center gap-1">
                     {row.botScore !== undefined ? (
                       row.botIsBust ? (
-                        <span className="font-bold text-rose-400 text-[10px] px-1 py-0.2 bg-rose-950/60 rounded border border-rose-800/50">
+                        <span className="font-bold text-rose-400 text-[9px] px-1 py-0.2 bg-rose-950/60 rounded border border-rose-800/50">
                           BUST
                         </span>
                       ) : row.botIsCheckout ? (
-                        <span className="font-black text-rose-400 text-xs bg-rose-950/70 px-1 py-0.2 rounded border border-rose-700">
+                        <span className="font-black text-rose-400 text-[11px] bg-rose-950/70 px-1 py-0.2 rounded border border-rose-700">
                           🎯 {row.botScore}
                         </span>
                       ) : (
                         <div className="flex items-baseline gap-1">
                           <span
-                            className={`font-black text-xs sm:text-sm ${
+                            className={`font-black text-xs ${
                               row.botScore === 180
                                 ? 'text-amber-300 font-mono scale-105'
                                 : row.botScore >= 100
@@ -1591,7 +1609,7 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
                             {row.botScore}
                           </span>
                           {row.botEndScore !== undefined && (
-                            <span className="text-[9px] text-neutral-400 font-sans">
+                            <span className="text-[8px] text-neutral-400 font-sans">
                               ({row.botEndScore})
                             </span>
                           )}
