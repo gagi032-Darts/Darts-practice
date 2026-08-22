@@ -1333,7 +1333,7 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
           </div>
         </div>
 
-        {/* Solo Visit History Table (Scrollable, showing latest 2 visits by default) */}
+        {/* Solo Visit History Table (Scrollable, showing 5 visits in view) */}
         <div className="bg-[#121519] border border-[#232930] rounded-xl p-1.5 shadow-xs">
           {/* Table Header */}
           <div className="grid grid-cols-3 text-center text-[10px] font-bold text-neutral-400 border-b border-[#232930] pb-1 leading-none uppercase tracking-wider">
@@ -1345,7 +1345,7 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
           {/* Visits List */}
           <div
             ref={soloVisitsScrollRef}
-            className="space-y-1 pt-1 max-h-[64px] sm:max-h-[72px] overflow-y-auto overscroll-contain pr-1"
+            className="space-y-1 pt-1 max-h-[140px] sm:max-h-[155px] overflow-y-auto overscroll-contain pr-1"
           >
             {allRows.map((row) => (
               <div
@@ -1522,7 +1522,7 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
             </div>
           </div>
 
-          {/* 3-Column Compact Visit History Table (Scrollable, showing latest 2 visits by default) */}
+          {/* 3-Column Compact Visit History Table (Scrollable, showing 5 visits in view) */}
           <div className="bg-[#121519] border border-[#232930] rounded-xl p-1.5 shadow-xs">
             {/* Table Header */}
             <div className="grid grid-cols-3 text-center text-[10px] font-bold text-neutral-400 border-b border-[#232930] pb-1 leading-none uppercase tracking-wider">
@@ -1534,7 +1534,7 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
             {/* Visits List (Scrollable, default scrolled to bottom) */}
             <div
               ref={botVisitsScrollRef}
-              className="space-y-1 pt-1 max-h-[64px] sm:max-h-[72px] overflow-y-auto overscroll-contain pr-1"
+              className="space-y-1 pt-1 max-h-[140px] sm:max-h-[155px] overflow-y-auto overscroll-contain pr-1"
             >
               {allRows.map((row) => (
                 <div
