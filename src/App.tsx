@@ -302,7 +302,7 @@ export default function App() {
       )}
 
       {/* Main Content Area */}
-      <main className={`flex-1 ${view === 'game' ? 'px-2 py-1.5 sm:px-4 sm:py-3 pb-3 sm:pb-6' : 'px-3 py-2.5 sm:px-6 sm:py-6 pb-12 sm:pb-8'} max-w-4xl mx-auto w-full flex flex-col justify-start`}>
+      <main className={`flex-1 ${view === 'game' ? 'px-2 py-1 sm:px-4 sm:py-2 pb-1.5 sm:pb-3' : 'px-3 py-2.5 sm:px-6 sm:py-6 pb-12 sm:pb-8'} max-w-4xl mx-auto w-full flex flex-col justify-start`}>
         {view === 'home' && (
           <HomeScreen
             onSelectGame={startGame}
@@ -453,10 +453,12 @@ export default function App() {
         </div>
       )}
 
-      {/* Subtle Footer */}
-      <footer className="text-center text-[11px] text-neutral-600 py-3 border-t border-neutral-900">
-        Dart Practice · Precision Training System
-      </footer>
+      {/* Subtle Footer (shown only outside active gameplay) */}
+      {view !== 'game' && (
+        <footer className="text-center text-[11px] text-neutral-600 py-3 border-t border-neutral-900">
+          Dart Practice · Precision Training System
+        </footer>
+      )}
     </div>
   );
 }

@@ -1218,10 +1218,10 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
       </div>
 
       {/* Side-by-side Player Score Cards */}
-      <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
+      <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
         {/* PLAYER 1 / YOU */}
         <div
-          className={`rounded-xl p-2 sm:p-2.5 transition-all relative overflow-hidden flex flex-col justify-between ${
+          className={`rounded-2xl p-2.5 sm:p-3 transition-all relative overflow-hidden flex flex-col justify-between ${
             activeThrower === 'player' && !legWinBanner && !matchWinner
               ? 'bg-[#121519] border-2 border-emerald-500 shadow-md ring-1 ring-emerald-500/30'
               : 'bg-[#121519] border border-[#232930] opacity-85'
@@ -1249,9 +1249,9 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
           </div>
 
           {/* Bold Compact Score */}
-          <div className="text-center my-0.5">
+          <div className="text-center my-1 sm:my-1.5">
             <span
-              className={`text-3xl sm:text-4xl font-black font-mono tracking-tight block leading-none ${
+              className={`text-4xl sm:text-5xl font-black font-mono tracking-tight block leading-none ${
                 playerScore <= 170 ? 'text-emerald-400' : 'text-white'
               }`}
             >
@@ -1259,7 +1259,7 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
             </span>
 
             {/* Tactical Outshot Route directly below score */}
-            <div className="h-4 flex items-center justify-center mt-0.5">
+            <div className="h-4 flex items-center justify-center mt-1">
               {playerCheckout ? (
                 <button
                   type="button"
@@ -1282,7 +1282,7 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
 
         {/* PLAYER 2 / BOT */}
         <div
-          className={`rounded-xl p-2 sm:p-2.5 transition-all relative overflow-hidden flex flex-col justify-between ${
+          className={`rounded-2xl p-2.5 sm:p-3 transition-all relative overflow-hidden flex flex-col justify-between ${
             activeThrower === 'bot' && !legWinBanner && !matchWinner
               ? 'bg-[#121519] border-2 border-emerald-500 shadow-md ring-1 ring-emerald-500/30'
               : 'bg-[#121519] border border-[#232930] opacity-85'
@@ -1305,9 +1305,9 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
           </div>
 
           {/* Bold Compact Score */}
-          <div className="text-center my-0.5">
+          <div className="text-center my-1 sm:my-1.5">
             <span
-              className={`text-3xl sm:text-4xl font-black font-mono tracking-tight block leading-none ${
+              className={`text-4xl sm:text-5xl font-black font-mono tracking-tight block leading-none ${
                 botScore <= 170 ? 'text-rose-400' : 'text-white'
               }`}
             >
@@ -1315,7 +1315,7 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
             </span>
 
             {/* Tactical Outshot Route directly below score */}
-            <div className="h-4 flex items-center justify-center mt-0.5">
+            <div className="h-4 flex items-center justify-center mt-1">
               {isBotThrowing ? (
                 <span className="text-[11px] text-rose-400 font-bold animate-pulse leading-none">Throwing...</span>
               ) : botCheckout ? (
@@ -1336,7 +1336,7 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
       </div>
 
       {/* 3-Column Ultra-Slim Recent Visit History Mini-Strip */}
-      <div className="bg-[#121519] border border-[#232930] rounded-xl px-2 py-1 shadow-xs">
+      <div className="bg-[#121519] border border-[#232930] rounded-2xl px-2 py-1 shadow-xs">
         <div className="grid grid-cols-3 text-center text-[9px] font-bold text-neutral-400 border-b border-[#232930] pb-0.5 leading-none">
           <span>YOU</span>
           <span className="text-neutral-500">DARTS</span>
