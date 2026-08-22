@@ -1189,12 +1189,19 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
           </div>
         </div>
 
-        {/* Center: Legs Scoreline [ 0 S/L 0 ] */}
-        <div className="bg-[#1a1f26] border border-[#2c3540] rounded-lg px-2.5 py-0.5 flex items-center gap-2 font-bold shadow-xs">
-          <span className="text-sm text-emerald-400 leading-none">{playerLegs}</span>
-          <span className="text-[9px] tracking-wider text-neutral-400 font-sans uppercase">S/L</span>
-          <span className="text-sm text-rose-400 leading-none">{botLegs}</span>
-        </div>
+        {/* Center: Legs Scoreline [ 0 S/L 0 ] or Solo Leg Counter */}
+        {matchMode === 'bot' ? (
+          <div className="bg-[#1a1f26] border border-[#2c3540] rounded-lg px-2.5 py-0.5 flex items-center gap-2 font-bold shadow-xs">
+            <span className="text-sm text-emerald-400 leading-none">{playerLegs}</span>
+            <span className="text-[9px] tracking-wider text-neutral-400 font-sans uppercase">S/L</span>
+            <span className="text-sm text-rose-400 leading-none">{botLegs}</span>
+          </div>
+        ) : (
+          <div className="bg-[#1a1f26] border border-[#2c3540] rounded-lg px-2.5 py-0.5 flex items-center gap-1.5 font-bold shadow-xs text-xs">
+            <span className="text-emerald-400 font-black">{playerLegs}</span>
+            <span className="text-neutral-400 text-[10px]">/ {legsToWin} Legs Won</span>
+          </div>
+        )}
 
         {/* Right: Actions */}
         <div className="flex items-center gap-1">
@@ -1217,153 +1224,246 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
         </div>
       </div>
 
-      {/* Side-by-side Player Score Cards */}
-      <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
-        {/* PLAYER 1 / YOU */}
-        <div
-          className={`rounded-2xl p-2.5 sm:p-3 transition-all relative overflow-hidden flex flex-col justify-between ${
-            activeThrower === 'player' && !legWinBanner && !matchWinner
-              ? 'bg-[#121519] border-2 border-emerald-500 shadow-md ring-1 ring-emerald-500/30'
-              : 'bg-[#121519] border border-[#232930] opacity-85'
-          }`}
-        >
-          {/* Card Top: Active Play Triangle & Player Number */}
-          <div className="flex items-center justify-between text-[11px] font-bold text-neutral-400 leading-none">
-            <div className="flex items-center gap-1.5 text-white min-w-0">
-              {activeThrower === 'player' && (
-                <span className="text-emerald-400 text-[10px] animate-pulse">▶</span>
-              )}
-              <PlayerAvatar
-                photoUrl={activeAccount.photoUrl}
-                avatarEmoji={activeAccount.avatarEmoji}
-                name={activeAccount.name}
-                size="xs"
-              />
-              <span className="text-[11px] text-white font-bold truncate max-w-[80px]">
-                {activeAccount.name || 'YOU'}
+      {/* Scoreboard Layout: Solo (1-player) vs Bot (2-player) */}
+      {matchMode === 'solo' ? (
+        /* SOLO 1-PLAYER SCOREBOARD (matching 301 Solo Practice from Guide) */
+        <div className="bg-[#121519] border border-[#232930] rounded-2xl sm:rounded-3xl p-3 sm:p-4 text-center shadow-xl relative overflow-hidden flex flex-col justify-between">
+          {/* Header Badges */}
+          <div className="flex items-center justify-between text-xs font-bold text-neutral-400 mb-1">
+            <div className="flex items-center gap-2">
+              <span className="flex items-center gap-1.5 uppercase tracking-wider text-emerald-400 font-black">
+                <User className="w-4 h-4" /> {activeAccount.name || 'YOU'}
+              </span>
+              <span className="px-2 py-0.5 rounded-full bg-neutral-850 border border-neutral-750 text-neutral-300 font-mono text-[11px]">
+                Leg #{currentLeg} {legsToWin > 1 ? `(First to ${legsToWin})` : ''}
               </span>
             </div>
-            <span className="text-[10px] font-mono text-emerald-400 font-bold">
-              {playerLegDarts}d
-            </span>
+
+            <div className="flex items-center gap-2">
+              {playerLegs > 0 && (
+                <span className="flex items-center gap-1 text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-800/80 px-2 py-0.5 rounded-full text-[11px]">
+                  <CheckCircle2 className="w-3 h-3" /> {playerLegs} Leg{playerLegs > 1 ? 's' : ''} Won
+                </span>
+              )}
+              <span className="text-neutral-400 text-xs font-mono">
+                Dart #{playerLegDarts + 1}
+              </span>
+            </div>
           </div>
 
-          {/* Bold Compact Score */}
-          <div className="text-center my-1 sm:my-1.5">
-            <span
-              className={`text-4xl sm:text-5xl font-black font-mono tracking-tight block leading-none ${
+          {/* Big Remaining Score Display */}
+          <div className="my-1 sm:my-2 flex flex-col items-center justify-center">
+            <div
+              className={`text-6xl sm:text-8xl font-mono font-black tracking-tight leading-none drop-shadow-md ${
                 playerScore <= 170 ? 'text-emerald-400' : 'text-white'
               }`}
             >
               {playerScore}
-            </span>
-
-            {/* Tactical Outshot Route directly below score */}
-            <div className="h-4 flex items-center justify-center mt-1">
-              {playerCheckout ? (
-                <button
-                  type="button"
-                  onClick={() => onOpenCheckoutAi && onOpenCheckoutAi(playerScore)}
-                  className="text-[11px] sm:text-xs font-bold font-mono text-emerald-300 hover:text-emerald-200 truncate cursor-pointer leading-none"
-                >
-                  {playerCheckout}
-                </button>
-              ) : (
-                <span className="text-[9px] text-neutral-500 font-medium leading-none">Scoring</span>
-              )}
             </div>
+            <span className="text-[11px] sm:text-xs text-neutral-400 font-bold uppercase tracking-widest mt-1">
+              Points Remaining
+            </span>
           </div>
 
-          {/* Bottom Avg: Leg Avg / Match Avg */}
-          <div className="border-t border-[#232930] pt-1 text-center text-[9px] sm:text-[10px] font-mono text-neutral-400 leading-none">
-            Avg. <b className="text-white">{playerLegAvg.toFixed(1)}</b>/{playerAvg.toFixed(1)}
+          {/* Suggested Checkout Guide (if on finish) */}
+          {playerCheckout ? (
+            <div className="mt-2 bg-emerald-950/60 border border-emerald-800/70 rounded-xl p-2 flex items-center justify-between px-3 text-xs">
+              <div className="flex items-center gap-1.5 font-bold text-emerald-400">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Checkout Route:</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="font-mono font-bold text-white bg-emerald-900/80 px-2 py-0.5 rounded border border-emerald-700">
+                  {playerCheckout}
+                </span>
+                {onOpenCheckoutAi && (
+                  <button
+                    type="button"
+                    onClick={() => onOpenCheckoutAi(playerScore)}
+                    className="text-[10px] text-emerald-300 underline hover:text-white transition-colors cursor-pointer"
+                  >
+                    AI Guide
+                  </button>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="h-4 flex items-center justify-center mt-1">
+              <span className="text-[10px] text-neutral-500 font-medium leading-none">Scoring Mode</span>
+            </div>
+          )}
+
+          {/* Bottom Live Stats Strip */}
+          <div className="border-t border-[#232930] pt-2 mt-2 grid grid-cols-4 gap-1.5 text-center text-xs font-mono">
+            <div className="bg-[#181d22] p-1.5 rounded-lg border border-[#20272f]">
+              <span className="text-[9px] text-neutral-400 block font-sans uppercase">Leg Avg</span>
+              <b className="text-white text-xs sm:text-sm">{playerLegAvg.toFixed(1)}</b>
+            </div>
+            <div className="bg-[#181d22] p-1.5 rounded-lg border border-[#20272f]">
+              <span className="text-[9px] text-neutral-400 block font-sans uppercase">Match Avg</span>
+              <b className="text-emerald-400 text-xs sm:text-sm">{playerAvg.toFixed(1)}</b>
+            </div>
+            <div className="bg-[#181d22] p-1.5 rounded-lg border border-[#20272f]">
+              <span className="text-[9px] text-neutral-400 block font-sans uppercase">First 9</span>
+              <b className="text-cyan-400 text-xs sm:text-sm">{playerFirst9Avg.toFixed(1)}</b>
+            </div>
+            <div className="bg-[#181d22] p-1.5 rounded-lg border border-[#20272f]">
+              <span className="text-[9px] text-neutral-400 block font-sans uppercase">Double %</span>
+              <b className="text-amber-400 text-xs sm:text-sm">{playerDblPct.toFixed(1)}%</b>
+            </div>
           </div>
         </div>
-
-        {/* PLAYER 2 / BOT */}
-        <div
-          className={`rounded-2xl p-2.5 sm:p-3 transition-all relative overflow-hidden flex flex-col justify-between ${
-            activeThrower === 'bot' && !legWinBanner && !matchWinner
-              ? 'bg-[#121519] border-2 border-emerald-500 shadow-md ring-1 ring-emerald-500/30'
-              : 'bg-[#121519] border border-[#232930] opacity-85'
-          }`}
-        >
-          {/* Card Top: Active Play Triangle & Player Number */}
-          <div className="flex items-center justify-between text-[11px] font-bold text-neutral-400 leading-none">
-            <div className="flex items-center gap-1 text-white">
-              {activeThrower === 'bot' && (
-                <span className="text-emerald-400 text-[10px] animate-pulse">▶</span>
-              )}
-              <span className="font-black text-xs">2</span>
-              <span className="text-[10px] text-neutral-400 font-semibold ml-0.5 truncate max-w-[70px]">
-                {matchMode === 'bot' ? levelInfo.name : 'BOT'}
-              </span>
-            </div>
-            <span className="text-[10px] font-mono text-rose-400 font-bold">
-              {botLegDarts}d
-            </span>
-          </div>
-
-          {/* Bold Compact Score */}
-          <div className="text-center my-1 sm:my-1.5">
-            <span
-              className={`text-4xl sm:text-5xl font-black font-mono tracking-tight block leading-none ${
-                botScore <= 170 ? 'text-rose-400' : 'text-white'
+      ) : (
+        /* 2-PLAYER VS BOT SCORE CARDS */
+        <>
+          <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
+            {/* PLAYER 1 / YOU */}
+            <div
+              className={`rounded-2xl p-2.5 sm:p-3 transition-all relative overflow-hidden flex flex-col justify-between ${
+                activeThrower === 'player' && !legWinBanner && !matchWinner
+                  ? 'bg-[#121519] border-2 border-emerald-500 shadow-md ring-1 ring-emerald-500/30'
+                  : 'bg-[#121519] border border-[#232930] opacity-85'
               }`}
             >
-              {botScore}
-            </span>
-
-            {/* Tactical Outshot Route directly below score */}
-            <div className="h-4 flex items-center justify-center mt-1">
-              {isBotThrowing ? (
-                <span className="text-[11px] text-rose-400 font-bold animate-pulse leading-none">Throwing...</span>
-              ) : botCheckout ? (
-                <span className="text-[11px] sm:text-xs font-bold font-mono text-rose-300 truncate leading-none">
-                  {botCheckout}
+              {/* Card Top: Active Play Triangle & Player Number */}
+              <div className="flex items-center justify-between text-[11px] font-bold text-neutral-400 leading-none">
+                <div className="flex items-center gap-1.5 text-white min-w-0">
+                  {activeThrower === 'player' && (
+                    <span className="text-emerald-400 text-[10px] animate-pulse">▶</span>
+                  )}
+                  <PlayerAvatar
+                    photoUrl={activeAccount.photoUrl}
+                    avatarEmoji={activeAccount.avatarEmoji}
+                    name={activeAccount.name}
+                    size="xs"
+                  />
+                  <span className="text-[11px] text-white font-bold truncate max-w-[80px]">
+                    {activeAccount.name || 'YOU'}
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono text-emerald-400 font-bold">
+                  {playerLegDarts}d
                 </span>
-              ) : (
-                <span className="text-[9px] text-neutral-500 font-medium leading-none">Scoring</span>
-              )}
+              </div>
+
+              {/* Bold Compact Score */}
+              <div className="text-center my-1 sm:my-1.5">
+                <span
+                  className={`text-4xl sm:text-5xl font-black font-mono tracking-tight block leading-none ${
+                    playerScore <= 170 ? 'text-emerald-400' : 'text-white'
+                  }`}
+                >
+                  {playerScore}
+                </span>
+
+                {/* Tactical Outshot Route directly below score */}
+                <div className="h-4 flex items-center justify-center mt-1">
+                  {playerCheckout ? (
+                    <button
+                      type="button"
+                      onClick={() => onOpenCheckoutAi && onOpenCheckoutAi(playerScore)}
+                      className="text-[11px] sm:text-xs font-bold font-mono text-emerald-300 hover:text-emerald-200 truncate cursor-pointer leading-none"
+                    >
+                      {playerCheckout}
+                    </button>
+                  ) : (
+                    <span className="text-[9px] text-neutral-500 font-medium leading-none">Scoring</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Bottom Avg: Leg Avg / Match Avg */}
+              <div className="border-t border-[#232930] pt-1 text-center text-[9px] sm:text-[10px] font-mono text-neutral-400 leading-none">
+                Avg. <b className="text-white">{playerLegAvg.toFixed(1)}</b>/{playerAvg.toFixed(1)}
+              </div>
+            </div>
+
+            {/* PLAYER 2 / BOT */}
+            <div
+              className={`rounded-2xl p-2.5 sm:p-3 transition-all relative overflow-hidden flex flex-col justify-between ${
+                activeThrower === 'bot' && !legWinBanner && !matchWinner
+                  ? 'bg-[#121519] border-2 border-emerald-500 shadow-md ring-1 ring-emerald-500/30'
+                  : 'bg-[#121519] border border-[#232930] opacity-85'
+              }`}
+            >
+              {/* Card Top: Active Play Triangle & Player Number */}
+              <div className="flex items-center justify-between text-[11px] font-bold text-neutral-400 leading-none">
+                <div className="flex items-center gap-1 text-white">
+                  {activeThrower === 'bot' && (
+                    <span className="text-emerald-400 text-[10px] animate-pulse">▶</span>
+                  )}
+                  <span className="font-black text-xs">2</span>
+                  <span className="text-[10px] text-neutral-400 font-semibold ml-0.5 truncate max-w-[70px]">
+                    {levelInfo.name}
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono text-rose-400 font-bold">
+                  {botLegDarts}d
+                </span>
+              </div>
+
+              {/* Bold Compact Score */}
+              <div className="text-center my-1 sm:my-1.5">
+                <span
+                  className={`text-4xl sm:text-5xl font-black font-mono tracking-tight block leading-none ${
+                    botScore <= 170 ? 'text-rose-400' : 'text-white'
+                  }`}
+                >
+                  {botScore}
+                </span>
+
+                {/* Tactical Outshot Route directly below score */}
+                <div className="h-4 flex items-center justify-center mt-1">
+                  {isBotThrowing ? (
+                    <span className="text-[11px] text-rose-400 font-bold animate-pulse leading-none">Throwing...</span>
+                  ) : botCheckout ? (
+                    <span className="text-[11px] sm:text-xs font-bold font-mono text-rose-300 truncate leading-none">
+                      {botCheckout}
+                    </span>
+                  ) : (
+                    <span className="text-[9px] text-neutral-500 font-medium leading-none">Scoring</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Bottom Avg: Leg Avg / Match Avg */}
+              <div className="border-t border-[#232930] pt-1 text-center text-[9px] sm:text-[10px] font-mono text-neutral-400 leading-none">
+                Avg. <b className="text-white">{botLegAvg.toFixed(1)}</b>/{botAvg.toFixed(1)}
+              </div>
             </div>
           </div>
 
-          {/* Bottom Avg: Leg Avg / Match Avg */}
-          <div className="border-t border-[#232930] pt-1 text-center text-[9px] sm:text-[10px] font-mono text-neutral-400 leading-none">
-            Avg. <b className="text-white">{botLegAvg.toFixed(1)}</b>/{botAvg.toFixed(1)}
+          {/* 3-Column Ultra-Slim Recent Visit History Mini-Strip */}
+          <div className="bg-[#121519] border border-[#232930] rounded-2xl px-2 py-1 shadow-xs">
+            <div className="grid grid-cols-3 text-center text-[9px] font-bold text-neutral-400 border-b border-[#232930] pb-0.5 leading-none">
+              <span>YOU</span>
+              <span className="text-neutral-500">DARTS</span>
+              <span>{levelInfo.name}</span>
+            </div>
+
+            <div className="space-y-0.5 pt-0.5">
+              {legHistoryRows.length === 0 ? (
+                <div className="text-center text-[10px] text-neutral-600 py-0.5">Leg start</div>
+              ) : (
+                legHistoryRows.slice(-3).map((row) => (
+                  <div
+                    key={row.roundIndex}
+                    className="grid grid-cols-3 text-center text-[11px] font-mono py-0.5 rounded bg-[#181d22]/80 border border-[#20272f] leading-none"
+                  >
+                    <span className={`font-bold ${row.playerIsBust ? 'text-rose-400' : 'text-white'}`}>
+                      {row.playerScore !== undefined ? (row.playerIsBust ? 'BUST' : row.playerScore) : '—'}
+                    </span>
+                    <span className="text-neutral-500 font-bold text-[10px]">{row.dartNumber}d</span>
+                    <span className={`font-bold ${row.botIsBust ? 'text-rose-400' : 'text-neutral-300'}`}>
+                      {row.botScore !== undefined ? (row.botIsBust ? 'BUST' : row.botScore) : '—'}
+                    </span>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
-        </div>
-      </div>
-
-      {/* 3-Column Ultra-Slim Recent Visit History Mini-Strip */}
-      <div className="bg-[#121519] border border-[#232930] rounded-2xl px-2 py-1 shadow-xs">
-        <div className="grid grid-cols-3 text-center text-[9px] font-bold text-neutral-400 border-b border-[#232930] pb-0.5 leading-none">
-          <span>YOU</span>
-          <span className="text-neutral-500">DARTS</span>
-          <span>{matchMode === 'bot' ? levelInfo.name : 'BOT'}</span>
-        </div>
-
-        <div className="space-y-0.5 pt-0.5">
-          {legHistoryRows.length === 0 ? (
-            <div className="text-center text-[10px] text-neutral-600 py-0.5">Leg start</div>
-          ) : (
-            legHistoryRows.slice(-3).map((row) => (
-              <div
-                key={row.roundIndex}
-                className="grid grid-cols-3 text-center text-[11px] font-mono py-0.5 rounded bg-[#181d22]/80 border border-[#20272f] leading-none"
-              >
-                <span className={`font-bold ${row.playerIsBust ? 'text-rose-400' : 'text-white'}`}>
-                  {row.playerScore !== undefined ? (row.playerIsBust ? 'BUST' : row.playerScore) : '—'}
-                </span>
-                <span className="text-neutral-500 font-bold text-[10px]">{row.dartNumber}d</span>
-                <span className={`font-bold ${row.botIsBust ? 'text-rose-400' : 'text-neutral-300'}`}>
-                  {row.botScore !== undefined ? (row.botIsBust ? 'BUST' : row.botScore) : '—'}
-                </span>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
+        </>
+      )}
 
       {/* Turn Banner / Winner Notification */}
       {legWinBanner ? (
