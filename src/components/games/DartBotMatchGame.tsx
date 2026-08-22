@@ -1142,27 +1142,36 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
   const botLegPoints = botLegVisits.reduce((sum, v) => sum + (v.isBust ? 0 : v.pointsScored), 0);
   const botLegAvg = botLegDarts > 0 ? Number(((botLegPoints / botLegDarts) * 3).toFixed(2)) : botAvg;
 
-  // Build rounds for the 3-column table
+  // Build rounds for the 3-column visit tracker table
   const maxVisitsInLeg = Math.max(playerLegVisits.length, botLegVisits.length);
-  const legHistoryRows: {
+  const minRowsToDisplay = Math.max(4, maxVisitsInLeg);
+  const displayRows: {
     roundIndex: number;
     dartNumber: number;
     playerScore?: number;
+    playerEndScore?: number;
     botScore?: number;
+    botEndScore?: number;
     playerIsBust?: boolean;
     botIsBust?: boolean;
+    playerIsCheckout?: boolean;
+    botIsCheckout?: boolean;
   }[] = [];
 
-  for (let i = 0; i < maxVisitsInLeg; i++) {
+  for (let i = 0; i < minRowsToDisplay; i++) {
     const p = playerLegVisits[i];
     const b = botLegVisits[i];
-    legHistoryRows.push({
+    displayRows.push({
       roundIndex: i + 1,
       dartNumber: (i + 1) * 3,
       playerScore: p ? (p.isBust ? 0 : p.pointsScored) : undefined,
+      playerEndScore: p?.endScore,
       botScore: b ? (b.isBust ? 0 : b.pointsScored) : undefined,
+      botEndScore: b?.endScore,
       playerIsBust: p?.isBust,
       botIsBust: b?.isBust,
+      playerIsCheckout: p?.isCheckout,
+      botIsCheckout: b?.isCheckout,
     });
   }
 
@@ -1226,8 +1235,9 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
 
       {/* Scoreboard Layout: Solo (1-player) vs Bot (2-player) */}
       {matchMode === 'solo' ? (
-        /* SOLO 1-PLAYER SCOREBOARD (matching 301 Solo Practice from Guide) */
-        <div className="bg-[#121519] border border-[#232930] rounded-2xl sm:rounded-3xl p-4 sm:p-5 text-center shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[190px] sm:min-h-[220px]">
+        <>
+          {/* SOLO 1-PLAYER SCOREBOARD (matching 301 Solo Practice from Guide) */}
+          <div className="bg-[#121519] border border-[#232930] rounded-2xl sm:rounded-3xl p-4 sm:p-5 text-center shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[190px] sm:min-h-[220px]">
           {/* Header Badges */}
           <div className="flex items-center justify-between text-xs sm:text-sm font-bold text-neutral-400 mb-1">
             <div className="flex items-center gap-2">
@@ -1313,6 +1323,71 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Solo Visit History Table */}
+        <div className="bg-[#121519] border border-[#232930] rounded-2xl p-2.5 sm:p-3 shadow-md">
+          {/* Table Header */}
+          <div className="grid grid-cols-3 text-center text-xs font-bold text-neutral-400 border-b border-[#232930] pb-1.5 leading-none uppercase tracking-wider">
+            <span className="text-neutral-400 font-semibold">ROUND</span>
+            <span className="text-emerald-400 font-black">VISIT SCORE</span>
+            <span className="text-cyan-400 font-black">POINTS LEFT</span>
+          </div>
+
+          {/* Visits List */}
+          <div className="space-y-1.5 pt-2 max-h-[175px] sm:max-h-[210px] overflow-y-auto pr-0.5">
+            {displayRows.map((row) => (
+              <div
+                key={row.roundIndex}
+                className="grid grid-cols-3 items-center text-center text-xs sm:text-sm font-mono py-1.5 px-2 rounded-xl bg-[#181d22]/90 border border-[#20272f] shadow-xs"
+              >
+                <div className="flex items-center justify-center">
+                  <span className="text-[11px] text-neutral-400 font-bold px-2 py-0.5 rounded-full bg-[#101317] border border-[#232930]">
+                    R{row.roundIndex} <span className="text-neutral-500 font-normal">· {row.dartNumber}d</span>
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-center">
+                  {row.playerScore !== undefined ? (
+                    row.playerIsBust ? (
+                      <span className="font-bold text-rose-400 text-xs px-1.5 py-0.5 bg-rose-950/60 rounded border border-rose-800/50">
+                        BUST
+                      </span>
+                    ) : row.playerIsCheckout ? (
+                      <span className="font-black text-emerald-400 text-xs sm:text-sm bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-700">
+                        🎯 {row.playerScore} (CHECKOUT)
+                      </span>
+                    ) : (
+                      <span
+                        className={`font-black text-sm sm:text-base ${
+                          row.playerScore === 180
+                            ? 'text-amber-300 font-mono scale-105'
+                            : row.playerScore >= 100
+                            ? 'text-emerald-400'
+                            : 'text-white'
+                        }`}
+                      >
+                        {row.playerScore}
+                      </span>
+                    )
+                  ) : (
+                    <span className="text-neutral-600 font-bold text-sm">—</span>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-center">
+                  {row.playerEndScore !== undefined ? (
+                    <span className="font-black text-sm text-cyan-300 font-mono">
+                      {row.playerEndScore}
+                    </span>
+                  ) : (
+                    <span className="text-neutral-600 font-bold text-sm">—</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        </>
       ) : (
         /* 2-PLAYER VS BOT SCORE CARDS */
         <>
@@ -1435,33 +1510,102 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
             </div>
           </div>
 
-          {/* 3-Column Recent Visit History Mini-Strip */}
-          <div className="bg-[#121519] border border-[#232930] rounded-2xl px-3 py-1.5 shadow-xs">
-            <div className="grid grid-cols-3 text-center text-[10px] font-bold text-neutral-400 border-b border-[#232930] pb-1 leading-none uppercase tracking-wider">
-              <span>YOU</span>
-              <span className="text-neutral-500">DARTS</span>
-              <span>{levelInfo.name}</span>
+          {/* 3-Column Expanded Visit History Table */}
+          <div className="bg-[#121519] border border-[#232930] rounded-2xl p-2.5 sm:p-3 shadow-md">
+            {/* Table Header */}
+            <div className="grid grid-cols-3 text-center text-xs font-bold text-neutral-400 border-b border-[#232930] pb-1.5 leading-none uppercase tracking-wider">
+              <span className="text-emerald-400 font-black">YOU (VISIT)</span>
+              <span className="text-neutral-400 font-semibold">ROUND</span>
+              <span className="text-rose-400 font-black">{levelInfo.name}</span>
             </div>
 
-            <div className="space-y-1 pt-1">
-              {legHistoryRows.length === 0 ? (
-                <div className="text-center text-xs text-neutral-600 py-1">Leg start</div>
-              ) : (
-                legHistoryRows.slice(-3).map((row) => (
-                  <div
-                    key={row.roundIndex}
-                    className="grid grid-cols-3 text-center text-xs sm:text-sm font-mono py-1 rounded-xl bg-[#181d22]/80 border border-[#20272f] leading-none"
-                  >
-                    <span className={`font-bold ${row.playerIsBust ? 'text-rose-400' : 'text-white'}`}>
-                      {row.playerScore !== undefined ? (row.playerIsBust ? 'BUST' : row.playerScore) : '—'}
-                    </span>
-                    <span className="text-neutral-500 font-bold text-xs">{row.dartNumber}d</span>
-                    <span className={`font-bold ${row.botIsBust ? 'text-rose-400' : 'text-neutral-300'}`}>
-                      {row.botScore !== undefined ? (row.botIsBust ? 'BUST' : row.botScore) : '—'}
+            {/* Visits List */}
+            <div className="space-y-1.5 pt-2 max-h-[175px] sm:max-h-[210px] overflow-y-auto pr-0.5">
+              {displayRows.map((row) => (
+                <div
+                  key={row.roundIndex}
+                  className="grid grid-cols-3 items-center text-center text-xs sm:text-sm font-mono py-1.5 px-2 rounded-xl bg-[#181d22]/90 border border-[#20272f] shadow-xs"
+                >
+                  {/* YOU VISIT SCORE */}
+                  <div className="flex items-center justify-center gap-1">
+                    {row.playerScore !== undefined ? (
+                      row.playerIsBust ? (
+                        <span className="font-bold text-rose-400 text-xs px-1.5 py-0.5 bg-rose-950/60 rounded border border-rose-800/50">
+                          BUST
+                        </span>
+                      ) : row.playerIsCheckout ? (
+                        <span className="font-black text-emerald-400 text-xs sm:text-sm bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-700">
+                          🎯 {row.playerScore}
+                        </span>
+                      ) : (
+                        <div className="flex items-baseline gap-1">
+                          <span
+                            className={`font-black text-sm sm:text-base ${
+                              row.playerScore === 180
+                                ? 'text-amber-300 font-mono scale-105'
+                                : row.playerScore >= 100
+                                ? 'text-emerald-400'
+                                : 'text-white'
+                            }`}
+                          >
+                            {row.playerScore}
+                          </span>
+                          {row.playerEndScore !== undefined && (
+                            <span className="text-[10px] text-neutral-400 font-sans">
+                              ({row.playerEndScore})
+                            </span>
+                          )}
+                        </div>
+                      )
+                    ) : (
+                      <span className="text-neutral-600 font-bold text-sm">—</span>
+                    )}
+                  </div>
+
+                  {/* ROUND / DARTS BADGE */}
+                  <div className="flex items-center justify-center">
+                    <span className="text-[11px] text-neutral-400 font-bold px-2 py-0.5 rounded-full bg-[#101317] border border-[#232930]">
+                      R{row.roundIndex} <span className="text-neutral-500 font-normal">· {row.dartNumber}d</span>
                     </span>
                   </div>
-                ))
-              )}
+
+                  {/* BOT VISIT SCORE */}
+                  <div className="flex items-center justify-center gap-1">
+                    {row.botScore !== undefined ? (
+                      row.botIsBust ? (
+                        <span className="font-bold text-rose-400 text-xs px-1.5 py-0.5 bg-rose-950/60 rounded border border-rose-800/50">
+                          BUST
+                        </span>
+                      ) : row.botIsCheckout ? (
+                        <span className="font-black text-rose-400 text-xs sm:text-sm bg-rose-950/70 px-1.5 py-0.5 rounded border border-rose-700">
+                          🎯 {row.botScore}
+                        </span>
+                      ) : (
+                        <div className="flex items-baseline gap-1">
+                          <span
+                            className={`font-black text-sm sm:text-base ${
+                              row.botScore === 180
+                                ? 'text-amber-300 font-mono scale-105'
+                                : row.botScore >= 100
+                                ? 'text-rose-300'
+                                : 'text-neutral-200'
+                            }`}
+                          >
+                            {row.botScore}
+                          </span>
+                          {row.botEndScore !== undefined && (
+                            <span className="text-[10px] text-neutral-400 font-sans">
+                              ({row.botEndScore})
+                            </span>
+                          )}
+                        </div>
+                      )
+                    ) : (
+                      <span className="text-neutral-600 font-bold text-sm">—</span>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </>
