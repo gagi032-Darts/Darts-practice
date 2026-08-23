@@ -118,10 +118,7 @@ export const PracticeGuideModal: React.FC<PracticeGuideModalProps> = ({
                   2-Hour Darts Practice Routine
                 </h4>
                 <p className="text-neutral-400 text-xs mt-1">
-                  A structured 2-hour practice routine inspired by Andy Cornwall's practice breakdown.
-                </p>
-                <p className="text-neutral-400 text-xs mt-1">
-                  The routine is divided into short, focused sections covering warm-up, scoring, finishing, single numbers, and X01.
+                  A structured 2-hour practice routine divided into short, focused sections covering warm-up, scoring, finishing, single numbers, and match play.
                 </p>
               </div>
 
@@ -176,7 +173,7 @@ export const PracticeGuideModal: React.FC<PracticeGuideModalProps> = ({
                   <div className="pt-2 flex items-start justify-between gap-2">
                     <div>
                       <b className="text-white text-xs sm:text-sm block">Finishing — 20 min</b>
-                      <p className="text-neutral-400">Choose one of the three 20-minute finishing games.</p>
+                      <p className="text-neutral-400">Choose one: 121 in 9 (checkpoint in 3 darts), 121 in 12 (checkpoint in 6 darts), or Catch 40.</p>
                     </div>
                     <div className="flex items-center gap-1 shrink-0 pt-0.5">
                       <button
@@ -229,8 +226,8 @@ export const PracticeGuideModal: React.FC<PracticeGuideModalProps> = ({
                   {/* Step 6: Single Numbers */}
                   <div className="pt-2 flex items-start justify-between gap-2">
                     <div>
-                      <b className="text-white text-xs sm:text-sm block">Single Numbers — 20 min</b>
-                      <p className="text-neutral-400">Play Triple Lock and see how far you can progress within the 20-minute limit.</p>
+                      <b className="text-white text-xs sm:text-sm block">Single Numbers / Triple Lock — 20 min</b>
+                      <p className="text-neutral-400">Hit Big single twice to advance to next number, hit Big single three times to lock number.</p>
                     </div>
                     <div className="shrink-0 pt-0.5">
                       <button

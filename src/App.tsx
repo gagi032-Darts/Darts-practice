@@ -310,6 +310,7 @@ export default function App() {
             onOpenHistory={() => setView('history')}
             onOpenGuide={() => setIsGuideOpen(true)}
             onOpenAccounts={() => setIsAccountsOpen(true)}
+            onOpenCheckoutAi={() => openCheckoutAi(121)}
             activeAccount={activeAccount}
           />
         )}
