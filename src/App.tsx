@@ -425,6 +425,10 @@ export default function App() {
         isOpen={isGuideOpen}
         onClose={() => setIsGuideOpen(false)}
         onSelectGame={startGame}
+        onOpenCheckoutAi={() => {
+          setIsGuideOpen(false);
+          openCheckoutAi(121);
+        }}
       />
 
       {/* Exit Drill Confirmation Modal */}

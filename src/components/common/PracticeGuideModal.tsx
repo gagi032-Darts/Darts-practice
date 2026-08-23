@@ -14,12 +14,14 @@ interface PracticeGuideModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectGame: (type: GameType) => void;
+  onOpenCheckoutAi?: () => void;
 }
 
 export const PracticeGuideModal: React.FC<PracticeGuideModalProps> = ({
   isOpen,
   onClose,
   onSelectGame,
+  onOpenCheckoutAi,
 }) => {
   const [activeTab, setActiveTab] = useState<'routine' | 'keypad' | 'features'>('routine');
 
@@ -241,19 +243,26 @@ export const PracticeGuideModal: React.FC<PracticeGuideModalProps> = ({
                     </div>
                   </div>
 
-                  {/* Step 7: 301 Solo */}
+                  {/* Step 7: 301 Solo & Match Play */}
                   <div className="pt-2 flex items-start justify-between gap-2">
                     <div>
-                      <b className="text-white text-xs sm:text-sm block">301 Solo — 20 min</b>
-                      <p className="text-neutral-400">Play solo 301 legs for 20 minutes with X01 match controls.</p>
+                      <b className="text-white text-xs sm:text-sm block">301 & X01 Match Play — 20 min</b>
+                      <p className="text-neutral-400">Play solo 301 legs for 20 minutes, or challenge AI DartBot.</p>
                     </div>
-                    <div className="shrink-0 pt-0.5">
+                    <div className="flex items-center gap-1 shrink-0 pt-0.5">
                       <button
                         type="button"
                         onClick={() => handleStartDrill('301')}
-                        className="px-2.5 py-1 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-xs text-yellow-400 font-bold flex items-center gap-1.5 border border-neutral-700 active:scale-95 transition-all shadow-xs"
+                        className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-yellow-400 font-bold flex items-center gap-1 border border-neutral-700 active:scale-95 transition-all cursor-pointer"
                       >
-                        <Play className="w-3 h-3 fill-yellow-400" /> 301 Solo
+                        <Play className="w-2.5 h-2.5" /> 301 Solo
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleStartDrill('dartbot')}
+                        className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-rose-400 font-bold flex items-center gap-1 border border-neutral-700 active:scale-95 transition-all cursor-pointer"
+                      >
+                        <Play className="w-2.5 h-2.5" /> X01 Match
                       </button>
                     </div>
                   </div>
@@ -325,35 +334,62 @@ export const PracticeGuideModal: React.FC<PracticeGuideModalProps> = ({
           )}
 
           {activeTab === 'features' && (
-            <div className="space-y-2.5 text-xs">
+            <div className="space-y-3 text-xs">
               <div>
                 <h4 className="font-black text-white text-sm">App Features</h4>
-                <p className="text-neutral-400 text-xs mt-0.5">Quick guide to built-in training tools.</p>
+                <p className="text-neutral-400 text-xs mt-0.5">Quick guide and instant launch to built-in training tools.</p>
               </div>
 
-              <div className="space-y-2 border-t border-neutral-800 pt-2.5">
-                <div>
-                  <b className="text-emerald-400">170-2 Outshot AI:</b>
-                  <p className="text-neutral-300">
-                    Tap the 170-2 AI button to check optimal professional checkout paths, recovery routes, and double percentages.
-                  </p>
+              <div className="space-y-2.5 border-t border-neutral-800 pt-2.5">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <b className="text-emerald-400">170-2 Outshot AI:</b>
+                    <p className="text-neutral-300">
+                      Check optimal professional checkout paths, recovery routes, and double percentages.
+                    </p>
+                  </div>
+                  {onOpenCheckoutAi && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        sound.tap();
+                        onClose();
+                        onOpenCheckoutAi();
+                      }}
+                      className="px-2 py-1 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-emerald-400 font-bold flex items-center gap-1 border border-neutral-700 shrink-0 cursor-pointer"
+                    >
+                      <Sparkles className="w-2.5 h-2.5" /> Open AI
+                    </button>
+                  )}
                 </div>
+
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <b className="text-rose-400">DartBot AI (Levels 1–10):</b>
+                    <p className="text-neutral-300">
+                      Simulates realistic opponents from Novice (35 Avg) to World Champion (105 Avg) with realistic turn pace.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleStartDrill('dartbot')}
+                    className="px-2 py-1 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-rose-400 font-bold flex items-center gap-1 border border-neutral-700 shrink-0 cursor-pointer"
+                  >
+                    <Play className="w-2.5 h-2.5" /> Launch
+                  </button>
+                </div>
+
                 <div>
                   <b className="text-cyan-400">Screen Wake Lock:</b>
                   <p className="text-neutral-300">
-                    Tap the Sun icon in the navbar to keep your device screen awake throughout your entire practice session.
+                    Tap the Sun icon in the navbar or homescreen to keep your device screen awake throughout your entire practice session.
                   </p>
                 </div>
+
                 <div>
-                  <b className="text-amber-400">Daily Dart Volume:</b>
+                  <b className="text-amber-400">Daily Dart Volume & Cloud Sync:</b>
                   <p className="text-neutral-300">
-                    Tracks every single dart thrown across all drills and match play with a 30-day streak calendar.
-                  </p>
-                </div>
-                <div>
-                  <b className="text-rose-400">DartBot AI (Levels 1–10):</b>
-                  <p className="text-neutral-300">
-                    Simulates realistic opponents from Novice (35 Avg) to World Champion (105 Avg) with realistic turn pace.
+                    Tracks every single dart thrown across all drills and match play with real-time cloud multi-device sync and local backup.
                   </p>
                 </div>
               </div>

@@ -67,6 +67,7 @@ export const Solo301Game: React.FC<Solo301GameProps> = ({
 
   // Modals
   const [pendingVisit, setPendingVisit] = useState<PendingVisit | null>(null);
+  const [pendingCheckoutDarts, setPendingCheckoutDarts] = useState<number>(3);
   const [showDartsAtDoubleModal, setShowDartsAtDoubleModal] = useState<boolean>(false);
   const [showCheckoutDartsModal, setShowCheckoutDartsModal] = useState<boolean>(false);
   const [lastCheckoutScore, setLastCheckoutScore] = useState<number>(0);
@@ -133,7 +134,8 @@ export const Solo301Game: React.FC<Solo301GameProps> = ({
   };
 
   // Step 2: Checkout darts confirmed (1, 2, or 3)
-  const handleConfirmCheckoutDarts = () => {
+  const handleConfirmCheckoutDarts = (dartsUsed: number = 3) => {
+    setPendingCheckoutDarts(dartsUsed);
     setShowCheckoutDartsModal(false);
     setShowDartsAtDoubleModal(true);
   };
@@ -143,7 +145,7 @@ export const Solo301Game: React.FC<Solo301GameProps> = ({
     setShowDartsAtDoubleModal(false);
     if (!pendingVisit) return;
 
-    const dartsInVisit = 3;
+    const dartsInVisit = pendingVisit.isCheckout ? pendingCheckoutDarts : 3;
     commitVisit(pendingVisit, dartsAtDbl, dartsInVisit);
   };
 
@@ -533,7 +535,8 @@ export const Solo301Game: React.FC<Solo301GameProps> = ({
           onClose={() => {
             setShowDartsAtDoubleModal(false);
             if (pendingVisit) {
-              commitVisit(pendingVisit, 0, 3);
+              const dartsInVisit = pendingVisit.isCheckout ? pendingCheckoutDarts : 3;
+              commitVisit(pendingVisit, 0, dartsInVisit);
             }
           }}
         />
@@ -543,12 +546,8 @@ export const Solo301Game: React.FC<Solo301GameProps> = ({
       {showCheckoutDartsModal && (
         <CheckoutDartsModal
           isOpen={showCheckoutDartsModal}
-          checkoutScore={lastCheckoutScore}
-          onSelect={handleConfirmCheckoutDarts}
-          onClose={() => {
-            setShowCheckoutDartsModal(false);
-            setShowDartsAtDoubleModal(true);
-          }}
+          onCancel={() => setShowCheckoutDartsModal(false)}
+          onConfirm={handleConfirmCheckoutDarts}
         />
       )}
     </div>
