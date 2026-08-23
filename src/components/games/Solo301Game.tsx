@@ -302,8 +302,31 @@ export const Solo301Game: React.FC<Solo301GameProps> = ({
 
   const suggestedRoute = getCheckoutRoute(scoreRemaining);
 
+  const currentLegHistory = visitHistory.filter((v) => v.legNumber === currentLegNum);
+  const totalRounds = Math.max(5, currentLegHistory.length);
+  const soloVisitsScrollRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (soloVisitsScrollRef.current) {
+      soloVisitsScrollRef.current.scrollTop = soloVisitsScrollRef.current.scrollHeight;
+    }
+  }, [visitHistory.length]);
+
+  const allRows = [];
+  for (let i = 0; i < totalRounds; i++) {
+    const v = currentLegHistory[i];
+    allRows.push({
+      roundIndex: i + 1,
+      dartNumber: (i + 1) * 3,
+      score: v ? (v.isBust ? 0 : v.pointsScored) : undefined,
+      endScore: v?.endScore,
+      isBust: v?.isBust,
+      isCheckout: v?.isCheckout,
+    });
+  }
+
   return (
-    <div className="w-full max-w-xl mx-auto space-y-3 sm:space-y-4">
+    <div className="w-full max-w-xl mx-auto space-y-2 sm:space-y-3">
       {/* 20-Min Timer Final Leg Notification Banner */}
       {isFinalInput && (
         <div className="bg-amber-950/80 border-2 border-amber-500/80 rounded-2xl p-3 sm:p-3.5 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-amber-200 shadow-lg animate-pulse">
@@ -379,6 +402,73 @@ export const Solo301Game: React.FC<Solo301GameProps> = ({
             </div>
           </div>
         )}
+      </div>
+
+      {/* Solo Visit History Table (Scrollable, showing 5 visits in view from start) */}
+      <div className="bg-[#121519] border border-[#232930] rounded-xl p-1.5 shadow-xs">
+        {/* Table Header */}
+        <div className="grid grid-cols-3 text-center text-[10px] font-bold text-neutral-400 border-b border-[#232930] pb-1 leading-none uppercase tracking-wider">
+          <span className="text-neutral-400 font-semibold">ROUND</span>
+          <span className="text-emerald-400 font-black">VISIT SCORE</span>
+          <span className="text-cyan-400 font-black">POINTS LEFT</span>
+        </div>
+
+        {/* Visits List */}
+        <div
+          ref={soloVisitsScrollRef}
+          className="space-y-1 pt-1 max-h-[155px] min-h-[145px] sm:max-h-[165px] overflow-y-auto overscroll-contain pr-1"
+        >
+          {allRows.map((row) => (
+            <div
+              key={row.roundIndex}
+              className="grid grid-cols-3 items-center text-center text-xs font-mono py-1 px-1.5 rounded bg-[#181d22]/90 border border-[#20272f] shadow-xs"
+            >
+              <div className="flex items-center justify-center">
+                <span className="text-[10px] text-neutral-400 font-bold px-1.5 py-0.5 rounded bg-[#101317] border border-[#232930]">
+                  R{row.roundIndex} <span className="text-neutral-500 font-normal">· {row.dartNumber}d</span>
+                </span>
+              </div>
+
+              <div className="flex items-center justify-center">
+                {row.score !== undefined ? (
+                  row.isBust ? (
+                    <span className="font-bold text-rose-400 text-[10px] px-1.5 py-0.5 bg-rose-950/60 rounded border border-rose-800/50">
+                      BUST
+                    </span>
+                  ) : row.isCheckout ? (
+                    <span className="font-black text-emerald-400 text-xs bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-700">
+                      🎯 {row.score} (CHECKOUT)
+                    </span>
+                  ) : (
+                    <span
+                      className={`font-black text-sm ${
+                        row.score === 180
+                          ? 'text-amber-300 font-mono scale-105'
+                          : row.score >= 100
+                          ? 'text-emerald-400'
+                          : 'text-white'
+                      }`}
+                    >
+                      {row.score}
+                    </span>
+                  )
+                ) : (
+                  <span className="text-neutral-600 font-bold text-xs">—</span>
+                )}
+              </div>
+
+              <div className="flex items-center justify-center">
+                {row.endScore !== undefined ? (
+                  <span className="font-black text-xs text-cyan-300 font-mono">
+                    {row.endScore}
+                  </span>
+                ) : (
+                  <span className="text-neutral-600 font-bold text-xs">—</span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* X01 5-Column Precision Match Keypad */}

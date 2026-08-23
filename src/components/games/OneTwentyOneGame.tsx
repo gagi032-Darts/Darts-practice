@@ -284,9 +284,18 @@ export const OneTwentyOneGame: React.FC<OneTwentyOneGameProps> = ({
     }
   };
 
-  // Step 1 of finish modal: Checkout darts confirmed
-  const handleConfirmCheckoutDarts = () => {
+  // Step 1 of finish modal: Checkout darts confirmed (1, 2, or 3 in final visit)
+  const handleConfirmCheckoutDarts = (dartsInFinalVisit: number = 3) => {
     setShowCheckoutDartsModal(false);
+    if (pendingCheckout) {
+      const totalDartsUsed = currentAttemptDarts + dartsInFinalVisit;
+      const isNewCp = totalDartsUsed <= cpThreshold;
+      setPendingCheckout({
+        ...pendingCheckout,
+        dartsUsed: totalDartsUsed,
+        isNewCheckpoint: isNewCp,
+      });
+    }
     setShowDartsAtDoubleModal(true);
   };
 
@@ -322,7 +331,8 @@ export const OneTwentyOneGame: React.FC<OneTwentyOneGameProps> = ({
 
     const nextTarget = data.target + 1;
     const nextHighest = Math.max(highestReached, nextTarget);
-    const nextTotalDarts = totalSessionDarts + (data.dartsUsed > currentAttemptDarts ? data.dartsUsed - currentAttemptDarts : 3);
+    const nextTotalDarts = totalSessionDarts + data.dartsUsed;
+    storage.recordDartsThrown(data.dartsUsed);
 
     setAttempts(nextAttempts);
     setCheckouts(nextCheckouts);
@@ -614,7 +624,7 @@ export const OneTwentyOneGame: React.FC<OneTwentyOneGameProps> = ({
       {/* Checkout Darts Modal */}
       <CheckoutDartsModal
         isOpen={showCheckoutDartsModal}
-        targetScore={lastCheckoutScore}
+        onCancel={() => setShowCheckoutDartsModal(false)}
         onConfirm={handleConfirmCheckoutDarts}
       />
 
