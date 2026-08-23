@@ -305,7 +305,7 @@ export const Solo301Game: React.FC<Solo301GameProps> = ({
   const suggestedRoute = getCheckoutRoute(scoreRemaining);
 
   const currentLegHistory = visitHistory.filter((v) => v.legNumber === currentLegNum);
-  const totalRounds = Math.max(5, currentLegHistory.length);
+  const totalRounds = Math.max(3, currentLegHistory.length);
   const soloVisitsScrollRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -381,6 +381,45 @@ export const Solo301Game: React.FC<Solo301GameProps> = ({
           </span>
         </div>
 
+        {/* Compact Performance Stats Along Blue Line */}
+        <div className="mt-2.5 pt-2 border-t-2 border-blue-500/90 grid grid-cols-4 gap-1 text-center">
+          <div className="px-0.5">
+            <span className="text-[9px] sm:text-[10px] text-neutral-400 uppercase font-bold tracking-wider block leading-tight">
+              3-Dart Avg
+            </span>
+            <span className="text-xs sm:text-sm font-mono font-black text-white block mt-0.5">
+              {overallAvg > 0 ? overallAvg : activeLegAvg}
+            </span>
+          </div>
+
+          <div className="px-0.5">
+            <span className="text-[9px] sm:text-[10px] text-neutral-400 uppercase font-bold tracking-wider block leading-tight">
+              Legs Won
+            </span>
+            <span className="text-xs sm:text-sm font-mono font-black text-yellow-400 block mt-0.5">
+              {completedLegs}
+            </span>
+          </div>
+
+          <div className="px-0.5">
+            <span className="text-[9px] sm:text-[10px] text-neutral-400 uppercase font-bold tracking-wider block leading-tight">
+              Best Leg
+            </span>
+            <span className="text-xs sm:text-sm font-mono font-black text-emerald-400 block mt-0.5">
+              {bestLegDarts ? `${bestLegDarts} Darts` : '—'}
+            </span>
+          </div>
+
+          <div className="px-0.5">
+            <span className="text-[9px] sm:text-[10px] text-neutral-400 uppercase font-bold tracking-wider block leading-tight">
+              Double %
+            </span>
+            <span className="text-xs sm:text-sm font-mono font-black text-cyan-400 block mt-0.5">
+              {checkoutPercentage !== null ? `${checkoutPercentage}%` : '—'}
+            </span>
+          </div>
+        </div>
+
         {/* Suggested Checkout Guide (if on finish) */}
         {suggestedRoute && (
           <div className="mt-2 bg-emerald-950/60 border border-emerald-800/70 rounded-xl p-2 flex items-center justify-between px-3 text-xs">
@@ -418,7 +457,7 @@ export const Solo301Game: React.FC<Solo301GameProps> = ({
         {/* Visits List */}
         <div
           ref={soloVisitsScrollRef}
-          className="space-y-1 pt-1 max-h-[155px] min-h-[145px] sm:max-h-[165px] overflow-y-auto overscroll-contain pr-1"
+          className="space-y-1 pt-1 max-h-[102px] min-h-[96px] overflow-y-auto overscroll-contain pr-1"
         >
           {allRows.map((row) => (
             <div
@@ -484,47 +523,6 @@ export const Solo301Game: React.FC<Solo301GameProps> = ({
           maxScore={180}
           remainingScore={scoreRemaining}
         />
-      </div>
-
-      {/* Live Performance Stats Strip */}
-      <div className="bg-[#15191e] border border-[#232930] rounded-2xl p-3 sm:p-4 shadow-md">
-        <div className="grid grid-cols-4 gap-2 text-center">
-          <div className="bg-[#1c222a] p-2.5 rounded-xl border border-[#2b3440]">
-            <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-              3-Dart Avg
-            </span>
-            <span className="text-base sm:text-lg font-mono font-black text-white mt-0.5 block">
-              {overallAvg > 0 ? overallAvg : activeLegAvg}
-            </span>
-          </div>
-
-          <div className="bg-[#1c222a] p-2.5 rounded-xl border border-[#2b3440]">
-            <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-              Legs Won
-            </span>
-            <span className="text-base sm:text-lg font-mono font-black text-yellow-400 mt-0.5 block">
-              {completedLegs}
-            </span>
-          </div>
-
-          <div className="bg-[#1c222a] p-2.5 rounded-xl border border-[#2b3440]">
-            <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-              Best Leg
-            </span>
-            <span className="text-base sm:text-lg font-mono font-black text-emerald-400 mt-0.5 block">
-              {bestLegDarts ? `${bestLegDarts} Darts` : '—'}
-            </span>
-          </div>
-
-          <div className="bg-[#1c222a] p-2.5 rounded-xl border border-[#2b3440]">
-            <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-              Double %
-            </span>
-            <span className="text-base sm:text-lg font-mono font-black text-cyan-400 mt-0.5 block">
-              {checkoutPercentage !== null ? `${checkoutPercentage}%` : '—'}
-            </span>
-          </div>
-        </div>
       </div>
 
       {/* Darts at Double Tracking Modal */}

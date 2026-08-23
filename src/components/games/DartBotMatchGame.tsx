@@ -1114,9 +1114,9 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
   const botLegPoints = botLegVisits.reduce((sum, v) => sum + (v.isBust ? 0 : v.pointsScored), 0);
   const botLegAvg = botLegDarts > 0 ? Number(((botLegPoints / botLegDarts) * 3).toFixed(2)) : botAvg;
 
-  // Build rounds for the 3-column visit tracker table (showing 5 visits from the beginning)
+  // Build rounds for the 3-column visit tracker table (showing 4 visits from the beginning)
   const maxVisitsInLeg = Math.max(playerLegVisits.length, botLegVisits.length);
-  const totalRounds = Math.max(5, maxVisitsInLeg);
+  const totalRounds = Math.max(4, maxVisitsInLeg);
   const allRows: {
     roundIndex: number;
     dartNumber: number;
@@ -1494,7 +1494,7 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
             {/* Visits List (Scrollable, default scrolled to bottom) */}
             <div
               ref={botVisitsScrollRef}
-              className="space-y-1 pt-1 max-h-[155px] min-h-[145px] sm:max-h-[165px] overflow-y-auto overscroll-contain pr-1"
+              className="space-y-1 pt-1 max-h-[132px] min-h-[126px] sm:max-h-[136px] overflow-y-auto overscroll-contain pr-1"
             >
               {allRows.map((row) => (
                 <div
