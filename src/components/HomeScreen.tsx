@@ -2,37 +2,25 @@ import React, { useState, useEffect } from 'react';
 import {
   Target,
   Flame,
-  TrendingUp,
   Activity,
-  RotateCw,
   Crosshair,
   Lock,
-  Award,
-  Zap,
   Bot,
   Calendar,
   BarChart3,
   Volume2,
   VolumeX,
   Clock,
-  ChevronDown,
-  ChevronUp,
   Play,
   Sun,
   Vibrate,
   VibrateOff,
   Users,
-  BookOpen,
-  Cloud,
   Sparkles,
   Keyboard,
   Info,
-  CheckCircle2,
-  ArrowRight,
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
 import { GameType, UserAccount } from '../types';
-import { GAME_DEFINITIONS } from '../utils/gamesData';
 import { storage } from '../utils/storage';
 import { sound } from '../utils/sound';
 import { wakeLock } from '../utils/wakeLock';
@@ -48,16 +36,6 @@ interface HomeScreenProps {
   activeAccount: UserAccount;
 }
 
-interface RoomSection {
-  id: string;
-  title: string;
-  badge: string;
-  subtitle: string;
-  icon: React.ReactNode;
-  accentColor: string;
-  gameIds: GameType[];
-}
-
 export const HomeScreen: React.FC<HomeScreenProps> = ({
   onSelectGame,
   onOpenDaily,
@@ -67,15 +45,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onOpenCheckoutAi,
   activeAccount,
 }) => {
-  const [activeTab, setActiveTab] = useState<'routine' | 'rooms' | 'keypad' | 'features'>('routine');
+  const [activeTab, setActiveTab] = useState<'routine' | 'keypad' | 'features'>('routine');
   const [soundOn, setSoundOn] = useState<boolean>(sound.isEnabled());
   const [hapticsOn, setHapticsOn] = useState<boolean>(sound.isHapticsEnabled());
   const [wakeLockActive, setWakeLockActive] = useState<boolean>(wakeLock.isEnabled());
   const [historyCount, setHistoryCount] = useState<number>(0);
   const [todayVolume, setTodayVolume] = useState<number>(0);
-
-  // Accordion state for All Game Rooms tab
-  const [expandedRoomId, setExpandedRoomId] = useState<string | null>('warmup');
 
   useEffect(() => {
     const history = storage.getHistory();
@@ -106,118 +81,27 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     onSelectGame(gameId);
   };
 
-  const toggleRoom = (roomId: string) => {
-    sound.tap();
-    setExpandedRoomId((prev) => (prev === roomId ? null : roomId));
-  };
-
-  const rooms: RoomSection[] = [
-    {
-      id: 'warmup',
-      title: 'Warm Up',
-      badge: '2 Drills',
-      subtitle: 'Arm Calibration & The Wheel progression routines',
-      icon: <Activity className="w-5 h-5 text-emerald-400" />,
-      accentColor: 'emerald',
-      gameIds: ['cal', 'wheel'],
-    },
-    {
-      id: 'scoring',
-      title: 'Scoring',
-      badge: '1 Drill',
-      subtitle: 'High Score 20-min power scoring evaluation & 3-dart average',
-      icon: <TrendingUp className="w-5 h-5 text-cyan-400" />,
-      accentColor: 'cyan',
-      gameIds: ['score'],
-    },
-    {
-      id: 'finishing',
-      title: 'Finishing',
-      badge: '3 Drills',
-      subtitle: '121 in 9, 121 in 12 & Catch 40 tactical checkout ladders',
-      icon: <Flame className="w-5 h-5 text-amber-400" />,
-      accentColor: 'amber',
-      gameIds: ['1219', '12112', 'catch40'],
-    },
-    {
-      id: 'bull',
-      title: 'Bull Warm Up',
-      badge: '1 Drill',
-      subtitle: 'Center-board grouping & Bullseye 50/25 scoring calibration',
-      icon: <Crosshair className="w-5 h-5 text-rose-400" />,
-      accentColor: 'rose',
-      gameIds: ['bull'],
-    },
-    {
-      id: 'triple',
-      title: 'Triple Lock',
-      badge: 'Stopwatch',
-      subtitle: 'Lock challenge descending 20 down to 1 with Bull finish',
-      icon: <Lock className="w-5 h-5 text-purple-400" />,
-      accentColor: 'purple',
-      gameIds: ['triple'],
-    },
-    {
-      id: 'dartbot',
-      title: 'X01 vs Bot',
-      badge: 'Solo & Bot',
-      subtitle: 'Standard 501/301/701 match play — play Solo or challenge AI DartBot',
-      icon: <Bot className="w-5 h-5 text-rose-400" />,
-      accentColor: 'rose',
-      gameIds: ['dartbot'],
-    },
-  ];
-
-  const getGameIcon = (type: GameType) => {
-    switch (type) {
-      case 'cal':
-        return <Activity className="w-5 h-5 text-emerald-400" />;
-      case 'wheel':
-        return <RotateCw className="w-5 h-5 text-teal-400" />;
-      case 'score':
-      case 'score1':
-      case 'score2':
-        return <TrendingUp className="w-5 h-5 text-cyan-400" />;
-      case '1219':
-        return <Flame className="w-5 h-5 text-amber-400" />;
-      case '12112':
-        return <Target className="w-5 h-5 text-emerald-400" />;
-      case 'catch40':
-        return <Zap className="w-5 h-5 text-yellow-400" />;
-      case 'bull':
-        return <Crosshair className="w-5 h-5 text-rose-400" />;
-      case 'triple':
-        return <Lock className="w-5 h-5 text-purple-400" />;
-      case '301':
-        return <Award className="w-5 h-5 text-yellow-400" />;
-      case 'dartbot':
-        return <Bot className="w-5 h-5 text-rose-400" />;
-      default:
-        return <Target className="w-5 h-5 text-emerald-400" />;
-    }
-  };
-
   return (
-    <div className="w-full max-w-3xl mx-auto space-y-3.5 sm:space-y-4">
+    <div className="w-full max-w-3xl mx-auto space-y-3 sm:space-y-3.5">
       {/* Top Utility & Profile Banner */}
-      <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-3.5 sm:p-4 shadow-lg">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-neutral-900 border border-neutral-800 rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-lg">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-emerald-500 flex items-center justify-center text-neutral-950 font-black shadow-md shadow-emerald-950/40 shrink-0">
-              <Target className="w-5 h-5 stroke-[2.5]" />
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-500 flex items-center justify-center text-neutral-950 font-black shadow-md shadow-emerald-950/40 shrink-0">
+              <Target className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5]" />
             </div>
             <div>
-              <h1 className="font-black text-lg sm:text-xl text-white tracking-tight leading-none">
+              <h1 className="font-black text-base sm:text-lg text-white tracking-tight leading-none">
                 Dart Practice Hub
               </h1>
-              <p className="text-[11px] text-neutral-400 mt-1">
+              <p className="text-[11px] text-neutral-400 mt-0.5">
                 Structured 2-hour routine, drill mechanics & precision tracking
               </p>
             </div>
           </div>
 
           {/* Quick Access Bar */}
-          <div className="flex items-center gap-2 shrink-0 flex-wrap justify-between sm:justify-end">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 flex-wrap justify-between sm:justify-end">
             {/* Account Card Button */}
             <button
               type="button"
@@ -227,7 +111,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 onOpenAccounts();
               }}
               title="Switch Player Profile / Cloud Accounts"
-              className="px-2.5 py-1.5 rounded-xl bg-neutral-850 hover:bg-neutral-800 active:scale-95 text-white border border-neutral-750 shadow-xs flex items-center gap-2 transition-all cursor-pointer"
+              className="px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-xl bg-neutral-850 hover:bg-neutral-800 active:scale-95 text-white border border-neutral-750 shadow-xs flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer"
             >
               <PlayerAvatar
                 photoUrl={activeAccount.photoUrl}
@@ -236,10 +120,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 size="xs"
               />
               <div className="text-left leading-none">
-                <span className="text-[10px] text-neutral-400 block font-semibold">
+                <span className="text-[9px] sm:text-[10px] text-neutral-400 block font-semibold">
                   {activeAccount.isCloudUser ? 'Cloud' : 'Profile'}
                 </span>
-                <span className="text-xs font-bold text-white max-w-[90px] truncate block mt-0.5">
+                <span className="text-[11px] sm:text-xs font-bold text-white max-w-[80px] sm:max-w-[90px] truncate block mt-0.5">
                   {activeAccount.name}
                 </span>
               </div>
@@ -251,13 +135,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               id="home-daily-btn"
               onClick={onOpenDaily}
               title="Daily Throw Count"
-              className="px-2.5 py-1.5 rounded-xl bg-neutral-850 hover:bg-neutral-800 active:scale-95 text-white border border-neutral-750 shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
+              className="px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-xl bg-neutral-850 hover:bg-neutral-800 active:scale-95 text-white border border-neutral-750 shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
             >
               <Calendar className="w-3.5 h-3.5 text-emerald-400" />
               <div className="text-left leading-none">
-                <span className="text-[10px] text-neutral-400 block">Today</span>
-                <span className="text-xs font-mono font-black text-emerald-400 mt-0.5 block">
-                  {todayVolume} <span className="text-[10px] text-neutral-400 font-normal">darts</span>
+                <span className="text-[9px] sm:text-[10px] text-neutral-400 block">Today</span>
+                <span className="text-[11px] sm:text-xs font-mono font-black text-emerald-400 mt-0.5 block">
+                  {todayVolume} <span className="text-[9px] sm:text-[10px] text-neutral-400 font-normal">darts</span>
                 </span>
               </div>
             </button>
@@ -268,33 +152,54 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               id="home-history-btn"
               onClick={onOpenHistory}
               title="Drill History & Records"
-              className="px-2.5 py-1.5 rounded-xl bg-neutral-850 hover:bg-neutral-800 active:scale-95 text-white border border-neutral-750 shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
+              className="px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-xl bg-neutral-850 hover:bg-neutral-800 active:scale-95 text-white border border-neutral-750 shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
             >
               <BarChart3 className="w-3.5 h-3.5 text-cyan-400" />
               <div className="text-left leading-none">
-                <span className="text-[10px] text-neutral-400 block">History</span>
-                <span className="text-xs font-mono font-black text-cyan-400 mt-0.5 block">
-                  {historyCount} <span className="text-[10px] text-neutral-400 font-normal">logs</span>
+                <span className="text-[9px] sm:text-[10px] text-neutral-400 block">History</span>
+                <span className="text-[11px] sm:text-xs font-mono font-black text-cyan-400 mt-0.5 block">
+                  {historyCount} <span className="text-[9px] sm:text-[10px] text-neutral-400 font-normal">logs</span>
                 </span>
               </div>
             </button>
 
-            {/* Quick 170-2 Outshot AI Button */}
-            {onOpenCheckoutAi && (
-              <button
-                type="button"
-                id="home-checkout-ai-btn"
-                onClick={() => {
-                  sound.tap();
-                  onOpenCheckoutAi();
-                }}
-                title="170-2 Checkout AI Assistant"
-                className="px-2.5 py-1.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900/90 active:scale-95 text-emerald-300 border border-emerald-700/80 shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-xs font-black">170-2 AI</span>
-              </button>
-            )}
+            {/* Keypad Guide Button (Moved Up) */}
+            <button
+              type="button"
+              id="home-keypad-btn"
+              onClick={() => {
+                sound.tap();
+                setActiveTab((prev) => (prev === 'keypad' ? 'routine' : 'keypad'));
+              }}
+              title="Keypad Scoring Guide"
+              className={`px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-xl border active:scale-95 shadow-xs flex items-center gap-1.5 transition-all cursor-pointer ${
+                activeTab === 'keypad'
+                  ? 'bg-emerald-600 border-emerald-500 text-white font-bold'
+                  : 'bg-neutral-850 hover:bg-neutral-800 border-neutral-750 text-neutral-300 hover:text-white'
+              }`}
+            >
+              <Keyboard className="w-3.5 h-3.5" />
+              <span className="text-[11px] sm:text-xs font-bold hidden xs:inline">Keypad</span>
+            </button>
+
+            {/* Features & AI Button (Moved Up) */}
+            <button
+              type="button"
+              id="home-features-btn"
+              onClick={() => {
+                sound.tap();
+                setActiveTab((prev) => (prev === 'features' ? 'routine' : 'features'));
+              }}
+              title="Features & AI"
+              className={`px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-xl border active:scale-95 shadow-xs flex items-center gap-1.5 transition-all cursor-pointer ${
+                activeTab === 'features'
+                  ? 'bg-emerald-600 border-emerald-500 text-white font-bold'
+                  : 'bg-neutral-850 hover:bg-neutral-800 border-neutral-750 text-neutral-300 hover:text-white'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span className="text-[11px] sm:text-xs font-bold hidden xs:inline">Features</span>
+            </button>
 
             {/* Device Toggles */}
             <div className="flex items-center gap-1">
@@ -304,7 +209,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   id="home-wakelock-btn"
                   onClick={handleToggleWakeLock}
                   title={wakeLockActive ? 'Screen Awake: ON' : 'Screen Awake: OFF'}
-                  className={`p-2 rounded-xl border transition-all active:scale-95 cursor-pointer ${
+                  className={`p-1.5 sm:p-2 rounded-xl border transition-all active:scale-95 cursor-pointer ${
                     wakeLockActive
                       ? 'bg-amber-950/70 border-amber-700/80 text-amber-300'
                       : 'bg-neutral-850 border-neutral-750 text-neutral-500 hover:text-neutral-300'
@@ -319,7 +224,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 id="home-haptics-btn"
                 onClick={handleToggleHaptics}
                 title={hapticsOn ? 'Haptics: ON' : 'Haptics: OFF'}
-                className={`p-2 rounded-xl border transition-all active:scale-95 cursor-pointer ${
+                className={`p-1.5 sm:p-2 rounded-xl border transition-all active:scale-95 cursor-pointer ${
                   hapticsOn
                     ? 'bg-neutral-850 border-neutral-750 text-teal-400'
                     : 'bg-neutral-850 border-neutral-750 text-neutral-500'
@@ -337,7 +242,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 id="home-sound-btn"
                 onClick={handleToggleSound}
                 title={soundOn ? 'Sound: ON' : 'Sound: OFF'}
-                className="p-2 rounded-xl bg-neutral-850 hover:bg-neutral-800 active:scale-95 text-neutral-300 hover:text-white border border-neutral-750 transition-all cursor-pointer"
+                className="p-1.5 sm:p-2 rounded-xl bg-neutral-850 hover:bg-neutral-800 active:scale-95 text-neutral-300 hover:text-white border border-neutral-750 transition-all cursor-pointer"
               >
                 {soundOn ? (
                   <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
@@ -347,77 +252,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               </button>
             </div>
           </div>
-        </div>
-
-        {/* Main Hub Tabs (2-Hour Routine, All Rooms, Keypad Guide, Features) */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 mt-3.5 pt-3 border-t border-neutral-800">
-          <button
-            type="button"
-            id="hub-tab-routine"
-            onClick={() => {
-              sound.tap();
-              setActiveTab('routine');
-            }}
-            className={`py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs ${
-              activeTab === 'routine'
-                ? 'bg-emerald-600 text-white shadow-emerald-950/50'
-                : 'bg-neutral-850 text-neutral-300 hover:text-white hover:bg-neutral-800'
-            }`}
-          >
-            <Clock className="w-3.5 h-3.5" />
-            <span>2-Hour Routine</span>
-          </button>
-
-          <button
-            type="button"
-            id="hub-tab-rooms"
-            onClick={() => {
-              sound.tap();
-              setActiveTab('rooms');
-            }}
-            className={`py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs ${
-              activeTab === 'rooms'
-                ? 'bg-emerald-600 text-white shadow-emerald-950/50'
-                : 'bg-neutral-850 text-neutral-300 hover:text-white hover:bg-neutral-800'
-            }`}
-          >
-            <Target className="w-3.5 h-3.5" />
-            <span>All Game Rooms</span>
-          </button>
-
-          <button
-            type="button"
-            id="hub-tab-keypad"
-            onClick={() => {
-              sound.tap();
-              setActiveTab('keypad');
-            }}
-            className={`py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs ${
-              activeTab === 'keypad'
-                ? 'bg-emerald-600 text-white shadow-emerald-950/50'
-                : 'bg-neutral-850 text-neutral-300 hover:text-white hover:bg-neutral-800'
-            }`}
-          >
-            <Keyboard className="w-3.5 h-3.5" />
-            <span>Keypad Guide</span>
-          </button>
-
-          <button
-            type="button"
-            id="hub-tab-features"
-            onClick={() => {
-              sound.tap();
-              setActiveTab('features');
-            }}
-            className={`py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs ${
-              activeTab === 'features'
-                ? 'bg-emerald-600 text-white shadow-emerald-950/50'
-                : 'bg-neutral-850 text-neutral-300 hover:text-white hover:bg-neutral-800'
-            }`}
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Features & AI</span>
-          </button>
         </div>
       </div>
 
@@ -686,129 +520,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </div>
       )}
 
-      {/* TAB 2: ALL GAME ROOMS (FALLING ACCORDION ROOM CATALOG) */}
-      {activeTab === 'rooms' && (
-        <div className="space-y-2.5 animate-fadeIn">
-          {rooms.map((room) => {
-            const isExpanded = expandedRoomId === room.id;
-
-            return (
-              <div
-                key={room.id}
-                className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
-                  isExpanded
-                    ? 'bg-neutral-900 border-emerald-500/60 shadow-lg ring-1 ring-emerald-500/20'
-                    : 'bg-neutral-900/90 border-neutral-800 hover:border-neutral-700 hover:bg-neutral-900'
-                }`}
-              >
-                {/* Room Header Trigger */}
-                <button
-                  type="button"
-                  id={`room-btn-${room.id}`}
-                  onClick={() => toggleRoom(room.id)}
-                  className="w-full p-3.5 sm:p-4 flex items-center justify-between gap-3 text-left transition-colors cursor-pointer"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-xl bg-neutral-800 border border-neutral-700/80 flex items-center justify-center shrink-0">
-                      {room.icon}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h2 className="text-sm sm:text-base font-black text-white truncate">
-                          {room.title}
-                        </h2>
-                        <span className="px-2 py-0.5 rounded-full bg-neutral-800 border border-neutral-700 text-[10px] font-extrabold text-neutral-300 uppercase tracking-wider shrink-0">
-                          {room.badge}
-                        </span>
-                      </div>
-                      <p className="text-xs text-neutral-400 truncate mt-0.5">
-                        {room.subtitle}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 shrink-0">
-                    <div
-                      className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all ${
-                        isExpanded
-                          ? 'bg-emerald-500 text-neutral-950 shadow-xs'
-                          : 'bg-neutral-800 text-neutral-400'
-                      }`}
-                    >
-                      {isExpanded ? (
-                        <ChevronUp className="w-4 h-4" />
-                      ) : (
-                        <ChevronDown className="w-4 h-4" />
-                      )}
-                    </div>
-                  </div>
-                </button>
-
-                {/* Falling Menu Content Dropdown */}
-                <AnimatePresence>
-                  {isExpanded && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="border-t border-neutral-800/80 bg-neutral-950/60 p-3 sm:p-4 space-y-2.5"
-                    >
-                      <div className="grid gap-2.5">
-                        {room.gameIds.map((gameId) => {
-                          const game = GAME_DEFINITIONS[gameId];
-                          if (!game) return null;
-
-                          return (
-                            <div
-                              key={game.id}
-                              className="bg-neutral-900/90 border border-neutral-800 hover:border-emerald-500/50 rounded-xl p-3.5 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
-                            >
-                              <div className="flex items-start gap-3 min-w-0">
-                                <div className="w-9 h-9 rounded-lg bg-neutral-800 border border-neutral-700/60 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
-                                  {getGameIcon(game.id)}
-                                </div>
-                                <div className="min-w-0">
-                                  <div className="flex items-center gap-2 flex-wrap">
-                                    <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-emerald-400 transition-colors">
-                                      {game.title}
-                                    </h3>
-                                    <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-neutral-800 text-neutral-300 text-[10px] font-bold border border-neutral-700/50">
-                                      <Clock className="w-2.5 h-2.5 text-neutral-400" />
-                                      <span>
-                                        {game.isCountUp ? 'Stopwatch' : `${game.durationMinutes} min`}
-                                      </span>
-                                    </span>
-                                  </div>
-                                  <p className="text-xs text-neutral-400 mt-1 leading-relaxed">
-                                    {game.description}
-                                  </p>
-                                </div>
-                              </div>
-
-                              <button
-                                type="button"
-                                id={`start-game-${game.id}`}
-                                onClick={() => handleStartGame(game.id)}
-                                className="w-full sm:w-auto px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs shadow-md border border-emerald-400/40 flex items-center justify-center gap-1.5 shrink-0 transition-all cursor-pointer"
-                              >
-                                <Play className="w-3.5 h-3.5 fill-current" />
-                                <span>Start Practice</span>
-                              </button>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* TAB 3: KEYPAD GUIDE */}
+      {/* TAB: KEYPAD GUIDE */}
       {activeTab === 'keypad' && (
         <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-4 sm:p-5 space-y-4 animate-fadeIn text-xs sm:text-sm">
           <div>
