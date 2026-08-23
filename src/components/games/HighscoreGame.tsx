@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { TrendingUp, Award, Flame } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { TrendingUp, Hourglass, Flag } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { HighscoreResult } from '../../types';
 import { DartsMatchKeypad } from '../common/DartsMatchKeypad';
@@ -30,6 +30,43 @@ export const HighscoreGame: React.FC<HighscoreGameProps> = ({
 }) => {
   const [inputValue, setInputValue] = useState<string>('');
   const [visits, setVisits] = useState<number[]>([]);
+  const visitsScrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (visitsScrollRef.current) {
+      visitsScrollRef.current.scrollTop = visitsScrollRef.current.scrollHeight;
+    }
+  }, [visits.length]);
+
+  const buildResult = (currentVisits: number[]): HighscoreResult => {
+    const sum = currentVisits.reduce((acc, x) => acc + x, 0);
+    const avgVal = currentVisits.length > 0 ? sum / currentVisits.length : 0;
+    const bestVal = currentVisits.length > 0 ? Math.max(...currentVisits) : 0;
+
+    const first9 = currentVisits.slice(0, 3);
+    const first9Avg =
+      first9.length > 0
+        ? parseFloat((first9.reduce((acc, x) => acc + x, 0) / first9.length).toFixed(2))
+        : null;
+
+    const distMap: Record<string, number> = {};
+    BUCKETS.forEach((b) => {
+      distMap[b.label] = currentVisits.filter(b.test).length;
+    });
+
+    return {
+      visits: currentVisits,
+      avg: parseFloat(avgVal.toFixed(2)),
+      totalPoints: sum,
+      darts: currentVisits.length * 3,
+      bestVisit: bestVal,
+      firstNineAvg: first9Avg,
+      oneEighties: currentVisits.filter((x) => x === 180).length,
+      tonForties: currentVisits.filter((x) => x >= 140 && x < 180).length,
+      tons: currentVisits.filter((x) => x >= 100 && x < 140).length,
+      distribution: distMap,
+    };
+  };
 
   const handleEnterVisit = (customVal?: number) => {
     const rawVal = customVal !== undefined ? customVal : parseInt(inputValue, 10);
@@ -56,34 +93,13 @@ export const HighscoreGame: React.FC<HighscoreGameProps> = ({
     storage.recordDartsThrown(3);
 
     if (isFinalInput) {
-      const sum = nextVisits.reduce((acc, x) => acc + x, 0);
-      const avgVal = nextVisits.length > 0 ? sum / nextVisits.length : 0;
-      const best = nextVisits.length > 0 ? Math.max(...nextVisits) : 0;
-
-      const first9 = nextVisits.slice(0, 3);
-      const first9Avg =
-        first9.length > 0
-          ? parseFloat((first9.reduce((acc, x) => acc + x, 0) / first9.length).toFixed(2))
-          : null;
-
-      const distMap: Record<string, number> = {};
-      BUCKETS.forEach((b) => {
-        distMap[b.label] = nextVisits.filter(b.test).length;
-      });
-
-      onFinish({
-        visits: nextVisits,
-        avg: parseFloat(avgVal.toFixed(2)),
-        totalPoints: sum,
-        darts: nextVisits.length * 3,
-        bestVisit: best,
-        firstNineAvg: first9Avg,
-        oneEighties: nextVisits.filter((x) => x === 180).length,
-        tonForties: nextVisits.filter((x) => x >= 140 && x < 180).length,
-        tons: nextVisits.filter((x) => x >= 100 && x < 140).length,
-        distribution: distMap,
-      });
+      onFinish(buildResult(nextVisits));
     }
+  };
+
+  const handleManualFinish = () => {
+    sound.lock();
+    onFinish(buildResult(visits));
   };
 
   const handleUndo = () => {
@@ -97,15 +113,60 @@ export const HighscoreGame: React.FC<HighscoreGameProps> = ({
   const avg = visits.length > 0 ? (totalScore / visits.length).toFixed(2) : '0.00';
   const best = visits.length > 0 ? Math.max(...visits) : 0;
   const lastVisit = visits.length > 0 ? visits[visits.length - 1] : null;
+  const tonCount = visits.filter((x) => x >= 100).length;
+
+  const totalRounds = Math.max(3, visits.length);
+  let runningScore = 0;
+  const visitRows = visits.map((score, idx) => {
+    runningScore += score;
+    return {
+      roundIndex: idx + 1,
+      dartNumber: (idx + 1) * 3,
+      score,
+      runningTotal: runningScore,
+    };
+  });
+
+  const allRows = [];
+  for (let i = 0; i < totalRounds; i++) {
+    if (i < visitRows.length) {
+      allRows.push(visitRows[i]);
+    } else {
+      allRows.push({
+        roundIndex: i + 1,
+        dartNumber: (i + 1) * 3,
+        score: undefined,
+        runningTotal: undefined,
+      });
+    }
+  }
 
   return (
-    <div className="w-full max-w-xl mx-auto space-y-3 sm:space-y-4">
-      {/* Top Banner Card */}
+    <div className="w-full max-w-xl mx-auto space-y-2 sm:space-y-3">
+      {/* 20-Min Timer Final Input Notification Banner */}
+      {isFinalInput && (
+        <div className="bg-amber-950/80 border-2 border-amber-500/80 rounded-2xl p-3 sm:p-3.5 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-amber-200 shadow-lg animate-pulse">
+          <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-center sm:text-left">
+            <Hourglass className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>20-min timer reached! Throw your final visit or finish session now.</span>
+          </div>
+          <button
+            type="button"
+            onClick={handleManualFinish}
+            className="shrink-0 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-95 text-neutral-950 font-black text-xs flex items-center gap-1.5 shadow-md cursor-pointer transition-all"
+          >
+            <Flag className="w-3.5 h-3.5" /> Finish Session
+          </button>
+        </div>
+      )}
+
+      {/* Top Banner Card: Running Total Score */}
       <div className="bg-[#15191e] border border-[#232930] rounded-2xl sm:rounded-3xl p-3 sm:p-4 text-center shadow-xl relative overflow-hidden">
+        {/* Header Badges */}
         <div className="flex items-center justify-between text-xs font-bold text-neutral-400 mb-1 sm:mb-2">
           <div className="flex items-center gap-2">
             <span className="flex items-center gap-1.5 uppercase tracking-wider text-emerald-400 font-black">
-              <TrendingUp className="w-4 h-4" /> High Score {drillNumber ? `#${drillNumber}` : ''}
+              <TrendingUp className="w-4 h-4" /> High Score {drillNumber ? `#${drillNumber}` : 'Practice'}
             </span>
             <span className="px-2 py-0.5 rounded-full bg-neutral-800 border border-neutral-700 text-neutral-300 font-mono text-[11px]">
               Visit #{visits.length + 1}
@@ -124,18 +185,114 @@ export const HighscoreGame: React.FC<HighscoreGameProps> = ({
           </div>
         </div>
 
-        {/* Big Score / Running Total Display */}
+        {/* Big Score Display */}
         <div className="my-1 sm:my-2 flex flex-col items-center justify-center">
-          <div className="text-5xl sm:text-7xl font-mono font-black text-white tracking-tight leading-none drop-shadow-md">
+          <div className="text-6xl sm:text-8xl font-mono font-black text-white tracking-tight leading-none drop-shadow-md">
             {totalScore.toLocaleString()}
           </div>
           <span className="text-[11px] sm:text-xs text-neutral-400 font-bold uppercase tracking-widest mt-1">
             Total Points Scored
           </span>
         </div>
+
+        {/* Compact Performance Stats Along Blue Line */}
+        <div className="mt-2.5 pt-2 border-t-2 border-blue-500/90 grid grid-cols-4 gap-1 text-center">
+          <div className="px-0.5">
+            <span className="text-[9px] sm:text-[10px] text-neutral-400 uppercase font-bold tracking-wider block leading-tight">
+              3-Dart Avg
+            </span>
+            <span className="text-xs sm:text-sm font-mono font-black text-emerald-400 block mt-0.5">
+              {avg}
+            </span>
+          </div>
+
+          <div className="px-0.5">
+            <span className="text-[9px] sm:text-[10px] text-neutral-400 uppercase font-bold tracking-wider block leading-tight">
+              Darts Thrown
+            </span>
+            <span className="text-xs sm:text-sm font-mono font-black text-cyan-400 block mt-0.5">
+              {visits.length * 3}
+            </span>
+          </div>
+
+          <div className="px-0.5">
+            <span className="text-[9px] sm:text-[10px] text-neutral-400 uppercase font-bold tracking-wider block leading-tight">
+              Best Visit
+            </span>
+            <span className="text-xs sm:text-sm font-mono font-black text-amber-400 block mt-0.5">
+              {best > 0 ? best : '—'}
+            </span>
+          </div>
+
+          <div className="px-0.5">
+            <span className="text-[9px] sm:text-[10px] text-neutral-400 uppercase font-bold tracking-wider block leading-tight">
+              100+ Tons
+            </span>
+            <span className="text-xs sm:text-sm font-mono font-black text-white block mt-0.5">
+              {tonCount}
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* X01 5-Column Precision Match Keypad */}
+      {/* Visit History Table (Matching 301 style) */}
+      <div className="bg-[#121519] border border-[#232930] rounded-xl p-1.5 shadow-xs">
+        {/* Table Header */}
+        <div className="grid grid-cols-3 text-center text-[10px] font-bold text-neutral-400 border-b border-[#232930] pb-1 leading-none uppercase tracking-wider">
+          <span className="text-neutral-400 font-semibold">ROUND</span>
+          <span className="text-emerald-400 font-black">VISIT SCORE</span>
+          <span className="text-cyan-400 font-black">RUNNING TOTAL</span>
+        </div>
+
+        {/* Visits List */}
+        <div
+          ref={visitsScrollRef}
+          className="space-y-1 pt-1 max-h-[102px] min-h-[96px] overflow-y-auto overscroll-contain pr-1"
+        >
+          {allRows.map((row) => (
+            <div
+              key={row.roundIndex}
+              className="grid grid-cols-3 items-center text-center text-xs font-mono py-1 px-1.5 rounded bg-[#181d22]/90 border border-[#20272f] shadow-xs"
+            >
+              <div className="flex items-center justify-center">
+                <span className="text-[10px] text-neutral-400 font-bold px-1.5 py-0.5 rounded bg-[#101317] border border-[#232930]">
+                  R{row.roundIndex} <span className="text-neutral-500 font-normal">· {row.dartNumber}d</span>
+                </span>
+              </div>
+
+              <div className="flex items-center justify-center">
+                {row.score !== undefined ? (
+                  <span
+                    className={`font-black text-sm ${
+                      row.score === 180
+                        ? 'text-amber-300 font-mono scale-105'
+                        : row.score >= 100
+                        ? 'text-emerald-400'
+                        : 'text-white'
+                    }`}
+                  >
+                    {row.score === 180 ? '🎯 180!' : row.score}
+                  </span>
+                ) : (
+                  <span className="text-neutral-600 font-bold text-xs">—</span>
+                )}
+              </div>
+
+              <div className="flex items-center justify-center">
+                {row.runningTotal !== undefined ? (
+                  <span className="font-black text-xs text-cyan-300 font-mono">
+                    {row.runningTotal}
+                  </span>
+                ) : (
+                  <span className="text-neutral-600 font-bold text-xs">—</span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Precision Match Keypad */}
       <div className="bg-[#15191e] border border-[#232930] rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-xl">
         <DartsMatchKeypad
           value={inputValue}
@@ -145,41 +302,6 @@ export const HighscoreGame: React.FC<HighscoreGameProps> = ({
           canUndo={visits.length > 0}
           maxScore={180}
         />
-      </div>
-
-      {/* Live Performance Stats Strip */}
-      <div className="bg-[#15191e] border border-[#232930] rounded-2xl p-3 sm:p-4 shadow-md">
-        <div className="grid grid-cols-3 gap-2.5 text-center">
-          {/* 1. 3-Dart Average */}
-          <div className="bg-[#1c222a] p-2.5 sm:p-3 rounded-xl border border-[#2b3440] shadow-inner">
-            <span className="text-[11px] font-bold text-neutral-400 block uppercase tracking-wider">
-              3-Dart Avg
-            </span>
-            <span className="text-xl sm:text-2xl font-black font-mono text-emerald-400 mt-0.5 block tracking-tight">
-              {avg}
-            </span>
-          </div>
-
-          {/* 2. Total Darts */}
-          <div className="bg-[#1c222a] p-2.5 sm:p-3 rounded-xl border border-[#2b3440] shadow-inner">
-            <span className="text-[11px] font-bold text-neutral-400 block uppercase tracking-wider">
-              Darts Thrown
-            </span>
-            <span className="text-xl sm:text-2xl font-black font-mono text-cyan-400 mt-0.5 block tracking-tight">
-              {visits.length * 3}
-            </span>
-          </div>
-
-          {/* 3. Best Visit */}
-          <div className="bg-[#1c222a] p-2.5 sm:p-3 rounded-xl border border-[#2b3440] shadow-inner">
-            <span className="text-[11px] font-bold text-neutral-400 block uppercase tracking-wider">
-              Best Visit
-            </span>
-            <span className="text-xl sm:text-2xl font-black font-mono text-amber-400 mt-0.5 block tracking-tight">
-              {best}
-            </span>
-          </div>
-        </div>
       </div>
     </div>
   );
