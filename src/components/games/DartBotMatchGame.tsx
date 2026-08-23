@@ -836,81 +836,43 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
   if (inSetup) {
     return (
       <div className="w-full max-w-2xl mx-auto space-y-5 animate-in fade-in duration-200">
-        {/* Header Banner & Mode Switcher */}
-        <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden space-y-4">
+        {/* Header Banner */}
+        <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden space-y-3">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center justify-center shadow-inner">
-              {matchMode === 'bot' ? <Bot className="w-6 h-6" /> : <User className="w-6 h-6 text-emerald-400" />}
+              <Bot className="w-6 h-6" />
             </div>
             <div>
               <span className="text-xs font-bold text-rose-400 uppercase tracking-wider block">
-                {matchMode === 'bot' ? 'Match Play vs AI DartBot' : 'Solo Leg Practice'}
+                Match Play vs AI DartBot
               </span>
               <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                {matchMode === 'bot' ? 'X01 vs AI DartBot' : 'X01 Solo Practice'}
+                X01 vs AI DartBot
               </h2>
             </div>
           </div>
 
-          {/* Mode Switcher Tabs */}
-          <div className="grid grid-cols-2 gap-2 bg-neutral-950/70 p-1.5 rounded-2xl border border-neutral-800">
-            <button
-              type="button"
-              onClick={() => {
-                sound.tap();
-                setMatchMode('bot');
-              }}
-              className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer ${
-                matchMode === 'bot'
-                  ? 'bg-rose-500 text-neutral-950 shadow-md'
-                  : 'text-neutral-400 hover:text-white hover:bg-neutral-850'
-              }`}
-            >
-              <Bot className="w-4 h-4" />
-              <span>VS DARTBOT AI</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                sound.tap();
-                setMatchMode('solo');
-              }}
-              className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer ${
-                matchMode === 'solo'
-                  ? 'bg-emerald-500 text-neutral-950 shadow-md'
-                  : 'text-neutral-400 hover:text-white hover:bg-neutral-850'
-              }`}
-            >
-              <User className="w-4 h-4" />
-              <span>SOLO PRACTICE</span>
-            </button>
-          </div>
-
           <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
-            {matchMode === 'bot'
-              ? 'Play 501/301 legs against an AI opponent with realistic scoring cadence and finish windows.'
-              : 'Throw legs alone at your own pace with live 3-dart averages, first-9 stats, and checkout guidance.'}
+            Play 301, 501, or 701 legs against an AI opponent with realistic scoring cadence and finish windows.
           </p>
         </div>
 
         {/* Setup Configuration Form */}
         <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-5 sm:p-6 space-y-6 shadow-xl">
-          {/* 1. Game Type / Starting Score */}
+          {/* 1. Game Type / Starting Score (301, 501, 701) */}
           <div>
             <label className="text-xs font-bold text-neutral-300 uppercase tracking-wider block mb-2">
               Game Format (Starting Score)
             </label>
             <div className="grid grid-cols-3 gap-2.5">
-              {[501, 301, 701].map((s) => (
+              {[301, 501, 701].map((s) => (
                 <button
                   key={s}
                   type="button"
                   onClick={() => setStartingScore(s)}
                   className={`py-3 rounded-2xl font-mono font-black text-lg border transition-all active:scale-95 cursor-pointer ${
                     startingScore === s
-                      ? matchMode === 'bot'
-                        ? 'bg-rose-500 text-neutral-950 border-rose-400 shadow-md'
-                        : 'bg-emerald-500 text-neutral-950 border-emerald-400 shadow-md'
+                      ? 'bg-rose-500 text-neutral-950 border-rose-400 shadow-md'
                       : 'bg-neutral-800/80 text-neutral-300 hover:text-white border-neutral-700/80 hover:bg-neutral-750'
                   }`}
                 >
@@ -1127,13 +1089,11 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
             type="button"
             id="start-dartbot-match-btn"
             onClick={handleStartMatch}
-            className={`w-full py-4 active:scale-[0.98] text-neutral-950 font-black text-lg rounded-2xl shadow-xl flex items-center justify-center gap-2 cursor-pointer transition-all ${
-              matchMode === 'bot' ? 'bg-rose-500 hover:bg-rose-400' : 'bg-emerald-500 hover:bg-emerald-400'
-            }`}
+            className="w-full py-4 active:scale-[0.98] text-neutral-950 font-black text-lg rounded-2xl shadow-xl flex items-center justify-center gap-2 cursor-pointer transition-all bg-rose-500 hover:bg-rose-400"
           >
             <Play className="w-5 h-5 fill-current" />
             <span>
-              START {startingScore} MATCH ({matchMode === 'solo' ? 'SOLO PRACTICE' : `VS ${levelInfo.name}`})
+              START {startingScore} MATCH (VS {levelInfo.name.toUpperCase()})
             </span>
           </button>
         </div>
