@@ -356,7 +356,7 @@ export const DartsMatchKeypad: React.FC<DartsMatchKeypadProps> = ({
           disabled={disabled}
           onClick={() => handlePreset(26)}
           title="Instant 26 score"
-          className="h-11 sm:h-12 md:h-13 text-sm sm:text-base font-black font-mono bg-[#112a1d] hover:bg-[#163826] active:bg-[#0c2016] active:scale-95 text-emerald-300 hover:text-emerald-200 rounded-xl border border-[#1e5838] flex items-center justify-center transition-all cursor-pointer shadow-xs"
+          className="h-13 sm:h-14 md:h-15 text-sm sm:text-base font-black font-mono bg-[#112a1d] hover:bg-[#163826] active:bg-[#0c2016] active:scale-95 text-emerald-300 hover:text-emerald-200 rounded-xl border border-[#1e5838] flex items-center justify-center transition-all cursor-pointer shadow-xs"
         >
           26
         </button>
@@ -365,7 +365,7 @@ export const DartsMatchKeypad: React.FC<DartsMatchKeypadProps> = ({
           id="keypad-num-1"
           disabled={disabled}
           onClick={() => handleDigit('1')}
-          className="h-11 sm:h-12 md:h-13 text-lg sm:text-xl font-black font-mono bg-[#20252b] hover:bg-[#282f37] active:bg-[#181d22] active:scale-95 text-white rounded-xl border border-[#303841] flex items-center justify-center transition-all cursor-pointer shadow-xs"
+          className="h-13 sm:h-14 md:h-15 text-xl sm:text-2xl font-black font-mono bg-[#20252b] hover:bg-[#282f37] active:bg-[#181d22] active:scale-95 text-white rounded-xl border border-[#303841] flex items-center justify-center transition-all cursor-pointer shadow-xs"
         >
           1
         </button>
@@ -374,7 +374,7 @@ export const DartsMatchKeypad: React.FC<DartsMatchKeypadProps> = ({
           id="keypad-num-2"
           disabled={disabled}
           onClick={() => handleDigit('2')}
-          className="h-11 sm:h-12 md:h-13 text-lg sm:text-xl font-black font-mono bg-[#20252b] hover:bg-[#282f37] active:bg-[#181d22] active:scale-95 text-white rounded-xl border border-[#303841] flex items-center justify-center transition-all cursor-pointer shadow-xs"
+          className="h-13 sm:h-14 md:h-15 text-xl sm:text-2xl font-black font-mono bg-[#20252b] hover:bg-[#282f37] active:bg-[#181d22] active:scale-95 text-white rounded-xl border border-[#303841] flex items-center justify-center transition-all cursor-pointer shadow-xs"
         >
           2
         </button>
@@ -383,7 +383,7 @@ export const DartsMatchKeypad: React.FC<DartsMatchKeypadProps> = ({
           id="keypad-num-3"
           disabled={disabled}
           onClick={() => handleDigit('3')}
-          className="h-11 sm:h-12 md:h-13 text-lg sm:text-xl font-black font-mono bg-[#20252b] hover:bg-[#282f37] active:bg-[#181d22] active:scale-95 text-white rounded-xl border border-[#303841] flex items-center justify-center transition-all cursor-pointer shadow-xs"
+          className="h-13 sm:h-14 md:h-15 text-xl sm:text-2xl font-black font-mono bg-[#20252b] hover:bg-[#282f37] active:bg-[#181d22] active:scale-95 text-white rounded-xl border border-[#303841] flex items-center justify-center transition-all cursor-pointer shadow-xs"
         >
           3
         </button>
@@ -393,7 +393,7 @@ export const DartsMatchKeypad: React.FC<DartsMatchKeypadProps> = ({
           disabled={disabled}
           onClick={() => handlePreset(60)}
           title="Instant 60 score"
-          className="h-11 sm:h-12 md:h-13 text-sm sm:text-base font-black font-mono bg-[#112a1d] hover:bg-[#163826] active:bg-[#0c2016] active:scale-95 text-emerald-300 hover:text-emerald-200 rounded-xl border border-[#1e5838] flex items-center justify-center transition-all cursor-pointer shadow-xs"
+          className="h-13 sm:h-14 md:h-15 text-sm sm:text-base font-black font-mono bg-[#112a1d] hover:bg-[#163826] active:bg-[#0c2016] active:scale-95 text-emerald-300 hover:text-emerald-200 rounded-xl border border-[#1e5838] flex items-center justify-center transition-all cursor-pointer shadow-xs"
         >
           60
         </button>
@@ -405,7 +405,7 @@ export const DartsMatchKeypad: React.FC<DartsMatchKeypadProps> = ({
           disabled={disabled}
           onClick={() => handlePreset(41)}
           title="Instant 41 score"
-          className="h-11 sm:h-12 md:h-13 text-sm sm:text-base font-black font-mono bg-[#112a1d] hover:bg-[#163826] active:bg-[#0c2016] active:scale-95 text-emerald-300 hover:text-emerald-200 rounded-xl border border-[#1e5838] flex items-center justify-center transition-all cursor-pointer shadow-xs"
+          className="h-13 sm:h-14 md:h-15 text-sm sm:text-base font-black font-mono bg-[#112a1d] hover:bg-[#163826] active:bg-[#0c2016] active:scale-95 text-emerald-300 hover:text-emerald-200 rounded-xl border border-[#1e5838] flex items-center justify-center transition-all cursor-pointer shadow-xs"
         >
           41
         </button>
@@ -414,7 +414,7 @@ export const DartsMatchKeypad: React.FC<DartsMatchKeypadProps> = ({
           id="keypad-num-4"
           disabled={disabled}
           onClick={() => handleDigit('4')}
-          className="h-11 sm:h-12 md:h-13 text-lg sm:text-xl font-black font-mono bg-[#20252b] hover:bg-[#282f37] active:bg-[#181d22] active:scale-95 text-white rounded-xl border border-[#303841] flex items-center justify-center transition-all cursor-pointer shadow-xs"
+          className="h-13 sm:h-14 md:h-15 text-xl sm:text-2xl font-black font-mono bg-[#20252b] hover:bg-[#282f37] active:bg-[#181d22] active:scale-95 text-white rounded-xl border border-[#303841] flex items-center justify-center transition-all cursor-pointer shadow-xs"
         >
           4
         </button>
@@ -423,7 +423,7 @@ export const DartsMatchKeypad: React.FC<DartsMatchKeypadProps> = ({
           id="keypad-num-5"
           disabled={disabled}
           onClick={() => handleDigit('5')}
-          className="h-11 sm:h-12 md:h-13 text-lg sm:text-xl font-black font-mono bg-[#20252b] hover:bg-[#282f37] active:bg-[#181d22] active:scale-95 text-white rounded-xl border border-[#303841] flex items-center justify-center transition-all cursor-pointer shadow-xs"
+          className="h-13 sm:h-14 md:h-15 text-xl sm:text-2xl font-black font-mono bg-[#20252b] hover:bg-[#282f37] active:bg-[#181d22] active:scale-95 text-white rounded-xl border border-[#303841] flex items-center justify-center transition-all cursor-pointer shadow-xs"
         >
           5
         </button>
@@ -432,7 +432,7 @@ export const DartsMatchKeypad: React.FC<DartsMatchKeypadProps> = ({
           id="keypad-num-6"
           disabled={disabled}
           onClick={() => handleDigit('6')}
-          className="h-11 sm:h-12 md:h-13 text-lg sm:text-xl font-black font-mono bg-[#20252b] hover:bg-[#282f37] active:bg-[#181d22] active:scale-95 text-white rounded-xl border border-[#303841] flex items-center justify-center transition-all cursor-pointer shadow-xs"
+          className="h-13 sm:h-14 md:h-15 text-xl sm:text-2xl font-black font-mono bg-[#20252b] hover:bg-[#282f37] active:bg-[#181d22] active:scale-95 text-white rounded-xl border border-[#303841] flex items-center justify-center transition-all cursor-pointer shadow-xs"
         >
           6
         </button>
@@ -442,7 +442,7 @@ export const DartsMatchKeypad: React.FC<DartsMatchKeypadProps> = ({
           disabled={disabled}
           onClick={() => handlePreset(85)}
           title="Instant 85 score"
-          className="h-11 sm:h-12 md:h-13 text-sm sm:text-base font-black font-mono bg-[#112a1d] hover:bg-[#163826] active:bg-[#0c2016] active:scale-95 text-emerald-300 hover:text-emerald-200 rounded-xl border border-[#1e5838] flex items-center justify-center transition-all cursor-pointer shadow-xs"
+          className="h-13 sm:h-14 md:h-15 text-sm sm:text-base font-black font-mono bg-[#112a1d] hover:bg-[#163826] active:bg-[#0c2016] active:scale-95 text-emerald-300 hover:text-emerald-200 rounded-xl border border-[#1e5838] flex items-center justify-center transition-all cursor-pointer shadow-xs"
         >
           85
         </button>
@@ -454,7 +454,7 @@ export const DartsMatchKeypad: React.FC<DartsMatchKeypadProps> = ({
           disabled={disabled}
           onClick={() => handlePreset(45)}
           title="Instant 45 score"
-          className="h-11 sm:h-12 md:h-13 text-sm sm:text-base font-black font-mono bg-[#112a1d] hover:bg-[#163826] active:bg-[#0c2016] active:scale-95 text-emerald-300 hover:text-emerald-200 rounded-xl border border-[#1e5838] flex items-center justify-center transition-all cursor-pointer shadow-xs"
+          className="h-13 sm:h-14 md:h-15 text-sm sm:text-base font-black font-mono bg-[#112a1d] hover:bg-[#163826] active:bg-[#0c2016] active:scale-95 text-emerald-300 hover:text-emerald-200 rounded-xl border border-[#1e5838] flex items-center justify-center transition-all cursor-pointer shadow-xs"
         >
           45
         </button>
@@ -463,7 +463,7 @@ export const DartsMatchKeypad: React.FC<DartsMatchKeypadProps> = ({
           id="keypad-num-7"
           disabled={disabled}
           onClick={() => handleDigit('7')}
-          className="h-11 sm:h-12 md:h-13 text-lg sm:text-xl font-black font-mono bg-[#20252b] hover:bg-[#282f37] active:bg-[#181d22] active:scale-95 text-white rounded-xl border border-[#303841] flex items-center justify-center transition-all cursor-pointer shadow-xs"
+          className="h-13 sm:h-14 md:h-15 text-xl sm:text-2xl font-black font-mono bg-[#20252b] hover:bg-[#282f37] active:bg-[#181d22] active:scale-95 text-white rounded-xl border border-[#303841] flex items-center justify-center transition-all cursor-pointer shadow-xs"
         >
           7
         </button>
@@ -472,7 +472,7 @@ export const DartsMatchKeypad: React.FC<DartsMatchKeypadProps> = ({
           id="keypad-num-8"
           disabled={disabled}
           onClick={() => handleDigit('8')}
-          className="h-11 sm:h-12 md:h-13 text-lg sm:text-xl font-black font-mono bg-[#20252b] hover:bg-[#282f37] active:bg-[#181d22] active:scale-95 text-white rounded-xl border border-[#303841] flex items-center justify-center transition-all cursor-pointer shadow-xs"
+          className="h-13 sm:h-14 md:h-15 text-xl sm:text-2xl font-black font-mono bg-[#20252b] hover:bg-[#282f37] active:bg-[#181d22] active:scale-95 text-white rounded-xl border border-[#303841] flex items-center justify-center transition-all cursor-pointer shadow-xs"
         >
           8
         </button>
@@ -481,7 +481,7 @@ export const DartsMatchKeypad: React.FC<DartsMatchKeypadProps> = ({
           id="keypad-num-9"
           disabled={disabled}
           onClick={() => handleDigit('9')}
-          className="h-11 sm:h-12 md:h-13 text-lg sm:text-xl font-black font-mono bg-[#20252b] hover:bg-[#282f37] active:bg-[#181d22] active:scale-95 text-white rounded-xl border border-[#303841] flex items-center justify-center transition-all cursor-pointer shadow-xs"
+          className="h-13 sm:h-14 md:h-15 text-xl sm:text-2xl font-black font-mono bg-[#20252b] hover:bg-[#282f37] active:bg-[#181d22] active:scale-95 text-white rounded-xl border border-[#303841] flex items-center justify-center transition-all cursor-pointer shadow-xs"
         >
           9
         </button>
@@ -491,7 +491,7 @@ export const DartsMatchKeypad: React.FC<DartsMatchKeypadProps> = ({
           disabled={disabled}
           onClick={() => handlePreset(100)}
           title="Instant 100 score (Ton)"
-          className="h-11 sm:h-12 md:h-13 text-sm sm:text-base font-black font-mono bg-[#112a1d] hover:bg-[#163826] active:bg-[#0c2016] active:scale-95 text-emerald-300 hover:text-emerald-200 rounded-xl border border-[#1e5838] flex items-center justify-center transition-all cursor-pointer shadow-xs"
+          className="h-13 sm:h-14 md:h-15 text-sm sm:text-base font-black font-mono bg-[#112a1d] hover:bg-[#163826] active:bg-[#0c2016] active:scale-95 text-emerald-300 hover:text-emerald-200 rounded-xl border border-[#1e5838] flex items-center justify-center transition-all cursor-pointer shadow-xs"
         >
           100
         </button>
@@ -502,9 +502,9 @@ export const DartsMatchKeypad: React.FC<DartsMatchKeypadProps> = ({
           id="keypad-btn-clr"
           disabled={disabled}
           onClick={handleClear}
-          className="col-span-2 h-11 sm:h-12 md:h-13 text-xs sm:text-sm font-bold bg-[#2e1d21] hover:bg-[#3d242a] active:bg-[#251619] active:scale-95 text-rose-300 hover:text-rose-200 rounded-xl border border-[#522932] flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
+          className="col-span-2 h-13 sm:h-14 md:h-15 text-xs sm:text-sm font-bold bg-[#2e1d21] hover:bg-[#3d242a] active:bg-[#251619] active:scale-95 text-rose-300 hover:text-rose-200 rounded-xl border border-[#522932] flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
         >
-          <RotateCcw className="w-3.5 h-3.5" />
+          <RotateCcw className="w-4 h-4" />
           <span>CLR</span>
         </button>
 
@@ -513,7 +513,7 @@ export const DartsMatchKeypad: React.FC<DartsMatchKeypadProps> = ({
           id="keypad-num-0"
           disabled={disabled}
           onClick={() => handleDigit('0')}
-          className="h-11 sm:h-12 md:h-13 text-lg sm:text-xl font-black font-mono bg-[#20252b] hover:bg-[#282f37] active:bg-[#181d22] active:scale-95 text-white rounded-xl border border-[#303841] flex items-center justify-center transition-all cursor-pointer shadow-xs"
+          className="h-13 sm:h-14 md:h-15 text-xl sm:text-2xl font-black font-mono bg-[#20252b] hover:bg-[#282f37] active:bg-[#181d22] active:scale-95 text-white rounded-xl border border-[#303841] flex items-center justify-center transition-all cursor-pointer shadow-xs"
         >
           0
         </button>
@@ -524,7 +524,7 @@ export const DartsMatchKeypad: React.FC<DartsMatchKeypadProps> = ({
           id={hasValue ? 'keypad-btn-enter' : 'keypad-btn-noscore'}
           disabled={disabled}
           onClick={hasValue ? handleEnterAction : handleNoScore}
-          className={`col-span-2 h-11 sm:h-12 md:h-13 text-xs sm:text-sm font-black rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer active:scale-95 shadow-xs ${
+          className={`col-span-2 h-13 sm:h-14 md:h-15 text-xs sm:text-sm font-black rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer active:scale-95 shadow-xs ${
             hasValue
               ? 'bg-[#43a047] hover:bg-[#4caf50] active:bg-[#388e3c] text-white border border-[#66bb6a] shadow-emerald-950/40 ring-1 ring-emerald-400/40'
               : 'bg-[#2e1d21] hover:bg-[#3d242a] active:bg-[#251619] text-neutral-200 hover:text-white border border-[#522932]'
@@ -532,7 +532,7 @@ export const DartsMatchKeypad: React.FC<DartsMatchKeypadProps> = ({
         >
           {hasValue ? (
             <>
-              <CornerDownLeft className="w-3.5 h-3.5 stroke-[2.5]" />
+              <CornerDownLeft className="w-4 h-4 stroke-[2.5]" />
               <span>ENTER</span>
             </>
           ) : (

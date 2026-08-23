@@ -364,6 +364,7 @@ export default function App() {
             isFinalInput={isFinalInput}
             onFinish={handleGameFinish}
             onOpenCheckoutAi={openCheckoutAi}
+            onExit={handleExitRequest}
           />
         )}
 
@@ -372,6 +373,7 @@ export default function App() {
             isFinalInput={isFinalInput}
             onFinish={handleGameFinish}
             onOpenCheckoutAi={openCheckoutAi}
+            onExit={handleExitRequest}
           />
         )}
 
