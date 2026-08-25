@@ -252,12 +252,35 @@ export const PracticeGuideModal: React.FC<PracticeGuideModalProps> = ({
                   </div>
 
                   {/* Step 6: Single Numbers */}
-                  <div className="pt-2 flex items-start justify-between gap-2">
+                  <div className="pt-2 flex flex-col sm:flex-row sm:items-start justify-between gap-2">
                     <div>
-                      <b className="text-white text-xs sm:text-sm block">Single Numbers / Triple Lock — 20 min</b>
-                      <p className="text-neutral-400">Hit Big single twice to advance to next number, hit Big single three times to lock number.</p>
+                      <b className="text-white text-xs sm:text-sm block">Single Numbers & Grouping — 10–20 min</b>
+                      <p className="text-neutral-400">Play Big Singles (1 to 20), Triple Lock (20 to Bull), or A1 Practice routine (20 to 12).</p>
                     </div>
-                    <div className="shrink-0 pt-0.5">
+                    <div className="flex items-center gap-1.5 shrink-0 pt-0.5 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={() => handleStartDrill('bigsingles_intermediate')}
+                        className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-cyan-400 font-bold flex items-center gap-1 border border-neutral-700"
+                        title="Intermediate: 2/3 hits advance, 1 stay, 0 back 1"
+                      >
+                        <Play className="w-2.5 h-2.5" /> Big Singles (Inter)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleStartDrill('bigsingles_advanced')}
+                        className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-amber-400 font-bold flex items-center gap-1 border border-neutral-700"
+                        title="Advanced: 3 hits advance, 2 stay, 1 back 1, 0 back 2"
+                      >
+                        <Play className="w-2.5 h-2.5" /> Big Singles (Adv)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleStartDrill('a1practice')}
+                        className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-amber-400 font-bold flex items-center gap-1 border border-neutral-700"
+                      >
+                        <Play className="w-2.5 h-2.5" /> A1 Practice
+                      </button>
                       <button
                         type="button"
                         onClick={() => handleStartDrill('triple')}

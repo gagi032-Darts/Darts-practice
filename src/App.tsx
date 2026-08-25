@@ -17,6 +17,8 @@ import { PowerSwitchGame } from './components/games/PowerSwitchGame';
 import { BigScoresGame } from './components/games/BigScoresGame';
 import { CheckoutChallengeGame } from './components/games/CheckoutChallengeGame';
 import { DoublesBoomerangGame } from './components/games/DoublesBoomerangGame';
+import { A1PracticeGame } from './components/games/A1PracticeGame';
+import { BigSinglesGame } from './components/games/BigSinglesGame';
 import { SummaryModal } from './components/games/SummaryModal';
 import { HistoryModal } from './components/games/HistoryModal';
 import { DailyCountModal } from './components/games/DailyCountModal';
@@ -423,6 +425,21 @@ export default function App() {
 
         {view === 'game' && selectedGame === 'boomerang' && (
           <DoublesBoomerangGame
+            isFinalInput={isFinalInput}
+            onFinish={handleGameFinish}
+          />
+        )}
+
+        {view === 'game' && selectedGame === 'a1practice' && (
+          <A1PracticeGame
+            isFinalInput={isFinalInput}
+            onFinish={handleGameFinish}
+          />
+        )}
+
+        {view === 'game' && (selectedGame === 'bigsingles' || selectedGame === 'bigsingles_intermediate' || selectedGame === 'bigsingles_advanced') && (
+          <BigSinglesGame
+            initialLevel={selectedGame === 'bigsingles_advanced' ? 'advanced' : 'intermediate'}
             isFinalInput={isFinalInput}
             onFinish={handleGameFinish}
           />

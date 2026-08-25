@@ -395,6 +395,48 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
                             </>
                           );
                         })()
+                      ) : item.gameType === 'a1practice' ? (
+                        (() => {
+                          const a1Res = item.result as any;
+                          return (
+                            <>
+                              <span className="px-2.5 py-1 rounded-lg bg-amber-950/90 border border-amber-700/80 text-amber-300 text-xs font-bold font-mono">
+                                Cleared: {a1Res.targetsCleared || 0} / 9
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Visits:</span>
+                                <b className="text-white font-mono">{a1Res.successfulVisits} / {a1Res.totalVisits} ({a1Res.totalDarts}d)</b>
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Accuracy:</span>
+                                <b className="text-emerald-400 font-mono">{a1Res.accuracy}%</b>
+                              </span>
+                            </>
+                          );
+                        })()
+                      ) : item.gameType === 'bigsingles' ? (
+                        (() => {
+                          const bsRes = item.result as any;
+                          return (
+                            <>
+                              <span className="px-2 py-0.5 rounded-md bg-cyan-950/90 border border-cyan-700/80 text-cyan-300 text-xs font-bold uppercase">
+                                {bsRes.level || 'Intermediate'}
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Progress:</span>
+                                <b className="text-white font-mono">{bsRes.completedRounds > 0 ? `${bsRes.completedRounds} rnds + #${bsRes.currentNumberReached}` : `Reached #${bsRes.highestNumberReached || bsRes.currentNumberReached || 1}`}</b>
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Darts:</span>
+                                <b className="text-cyan-300 font-mono">{bsRes.totalDarts || 0} ({bsRes.totalDartHits || 0} hits)</b>
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Accuracy:</span>
+                                <b className="text-emerald-400 font-mono">{bsRes.dartHitAccuracy || 0}%</b>
+                              </span>
+                            </>
+                          );
+                        })()
                       ) : (
                         Object.entries(item.result)
                           .filter(([k, v]) => k !== 'distribution' && !Array.isArray(v) && v !== null && v !== undefined)

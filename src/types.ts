@@ -13,6 +13,10 @@ export type GameType =
   | 'catch40'
   | 'cochallenge'
   | 'boomerang'
+  | 'a1practice'
+  | 'bigsingles'
+  | 'bigsingles_intermediate'
+  | 'bigsingles_advanced'
   | 'bull'
   | 'triple'
   | '301'
@@ -124,6 +128,39 @@ export interface DoublesBoomerangResult {
   overallAccuracy: number;
   roundDetails: BoomerangRoundRecord[];
   targetStats?: Record<number, { attempts: number; hits: number }>;
+}
+
+export interface A1PracticeResult {
+  completed: boolean;
+  targetsCleared: number; // 0 to 9
+  totalTargets: number; // 9
+  totalVisits: number;
+  totalDarts: number; // totalVisits * 3
+  successfulVisits: number; // hits (2 or 3 in large single)
+  accuracy: number; // (successfulVisits / totalVisits) * 100
+  targetStats: Record<string, { attempts: number; hits: number; completed: boolean }>;
+}
+
+export type BigSinglesLevel = 'intermediate' | 'advanced';
+
+export interface BigSinglesRoundRecord {
+  roundNumber: number;
+  darts: number;
+  hits: number;
+  visits: number;
+  accuracy: number;
+}
+
+export interface BigSinglesResult {
+  level: BigSinglesLevel;
+  completedRounds: number; // How many full 1-20 sweeps completed
+  currentNumberReached: number; // 1 to 20
+  highestNumberReached: number; // 1 to 20
+  totalVisits: number;
+  totalDarts: number; // totalVisits * 3
+  totalDartHits: number; // actual individual dart hits (0 to 3 per visit)
+  dartHitAccuracy: number; // (totalDartHits / totalDarts) * 100
+  roundDetails?: BigSinglesRoundRecord[];
 }
 
 export interface BullResult {
@@ -357,6 +394,8 @@ export type GameResultData =
   | CatchFortyResult
   | CheckoutChallengeResult
   | DoublesBoomerangResult
+  | A1PracticeResult
+  | BigSinglesResult
   | BullResult
   | TripleLockResult
   | Solo301Result

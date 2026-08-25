@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Trophy, CheckCircle2, RotateCcw, Home, BarChart2, Share2, Bot, User, Award, TrendingUp, BarChart3, Flame, Zap, Lock, Crosshair, ShieldAlert, Hourglass } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { GameType, GameResultData, DartBotMatchResult, HighscoreResult, TripleLockResult, Solo301Result, SwitchbladeResult, PowerSwitchResult, BigScoresResult, CheckoutChallengeResult, DoublesBoomerangResult } from '../../types';
+import { GameType, GameResultData, DartBotMatchResult, HighscoreResult, TripleLockResult, Solo301Result, SwitchbladeResult, PowerSwitchResult, BigScoresResult, CheckoutChallengeResult, DoublesBoomerangResult, A1PracticeResult, BigSinglesResult } from '../../types';
 import { GAME_DEFINITIONS } from '../../utils/gamesData';
 import { sound } from '../../utils/sound';
 import { LegBreakdownView } from '../common/LegBreakdownView';
@@ -1326,6 +1326,266 @@ export const SummaryModal: React.FC<SummaryModalProps> = ({
             id="summary-view-history"
             onClick={onOpenHistory}
             className="mt-3 text-xs text-neutral-400 hover:text-sky-400 font-semibold flex items-center justify-center gap-1.5 mx-auto py-1 transition-colors cursor-pointer"
+          >
+            <BarChart2 className="w-3.5 h-3.5" />
+            <span>View All Saved History & Records →</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Dedicated scorecard rendering for A1 - Practice routine
+  if (gameType === 'a1practice') {
+    const a1Res = result as A1PracticeResult;
+
+    return (
+      <div className="w-full max-w-xl mx-auto space-y-4">
+        <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-6 text-center shadow-2xl relative overflow-hidden">
+          {/* Header Icon */}
+          <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto mb-3 shadow-inner">
+            <Trophy className="w-8 h-8" />
+          </div>
+
+          <span className="text-xs font-bold text-amber-400 uppercase tracking-widest block mb-1">
+            🎯 A1 Practice Completed
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-black font-mono text-white tracking-tight">
+            {a1Res.targetsCleared === 9
+              ? 'Full Board Cleared!'
+              : `${a1Res.targetsCleared} of 9 Targets Cleared`}
+          </h2>
+          <p className="text-xs text-neutral-400 mt-1">
+            Duration: <b className="text-neutral-200 font-mono">{durationFormatted}</b> · Total Darts: <b className="text-amber-300 font-mono">{a1Res.totalDarts}</b>
+          </p>
+
+          {/* Primary KPI Metrics */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 my-4">
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Targets Cleared
+              </span>
+              <span className="text-2xl font-mono font-black text-amber-400 mt-1 block tracking-tight">
+                {a1Res.targetsCleared} <span className="text-xs text-neutral-400 font-sans font-normal">/ 9</span>
+              </span>
+            </div>
+
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Successful Visits
+              </span>
+              <span className="text-2xl font-mono font-black text-emerald-400 mt-1 block tracking-tight">
+                {a1Res.successfulVisits}
+              </span>
+            </div>
+
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Hit Rate
+              </span>
+              <span className="text-2xl font-mono font-black text-emerald-400 mt-1 block tracking-tight">
+                {a1Res.accuracy}%
+              </span>
+            </div>
+
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Total Visits
+              </span>
+              <span className="text-2xl font-mono font-black text-white mt-1 block tracking-tight">
+                {a1Res.totalVisits}
+              </span>
+            </div>
+          </div>
+
+          {/* Target Breakdown Grid */}
+          {a1Res.targetStats && (
+            <div className="bg-neutral-850/80 border border-neutral-750/80 rounded-2xl p-4 text-left shadow-inner my-3 space-y-2">
+              <span className="text-xs font-bold text-neutral-300 uppercase tracking-wider block border-b border-neutral-700/60 pb-2 flex items-center justify-between">
+                <span>Targets Breakdown (20 to 12)</span>
+                <span className="text-[11px] text-neutral-400 font-normal">3 hits to lock</span>
+              </span>
+              <div className="grid grid-cols-3 gap-2 pt-1">
+                {['20', '19', '18', '17', '16', '15', '14', '13', '12'].map((key) => {
+                  const stat = a1Res.targetStats[key];
+                  if (!stat) return null;
+                  return (
+                    <div
+                      key={key}
+                      className={`p-2 rounded-xl border text-xs font-mono text-center flex flex-col items-center justify-center ${
+                        stat.completed
+                          ? 'bg-emerald-950/60 border-emerald-700/80 text-emerald-300'
+                          : 'bg-neutral-900/90 border-neutral-800 text-neutral-300'
+                      }`}
+                    >
+                      <b className="text-sm font-bold text-white">{key}</b>
+                      <span className="text-[11px] mt-0.5">
+                        {stat.hits}/3 hits ({stat.attempts}v)
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6 pt-4 border-t border-neutral-800">
+            <button
+              type="button"
+              id="summary-play-again"
+              onClick={onPlayAgain}
+              className="h-13 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-95 text-neutral-950 font-black text-base shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <RotateCcw className="w-5 h-5" />
+              <span>Practice Again</span>
+            </button>
+
+            <button
+              type="button"
+              id="summary-go-home"
+              onClick={onGoHome}
+              className="h-13 rounded-xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-neutral-200 hover:text-white font-bold text-base border border-neutral-700 flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <Home className="w-5 h-5" />
+              <span>Dashboard</span>
+            </button>
+          </div>
+
+          <button
+            type="button"
+            id="summary-view-history"
+            onClick={onOpenHistory}
+            className="mt-3 text-xs text-neutral-400 hover:text-amber-400 font-semibold flex items-center justify-center gap-1.5 mx-auto py-1 transition-colors cursor-pointer"
+          >
+            <BarChart2 className="w-3.5 h-3.5" />
+            <span>View All Saved History & Records →</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Dedicated scorecard rendering for Big Singles
+  if (gameType === 'bigsingles' || gameType === 'bigsingles_intermediate' || gameType === 'bigsingles_advanced') {
+    const bsRes = result as BigSinglesResult;
+
+    return (
+      <div className="w-full max-w-xl mx-auto space-y-4">
+        <div className="bg-[#0b1220] border border-[#1e2d4a] rounded-3xl p-6 text-center shadow-2xl relative overflow-hidden">
+          {/* Header Icon */}
+          <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center mx-auto mb-3 shadow-inner">
+            <Trophy className="w-8 h-8" />
+          </div>
+
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <span className="text-xs font-bold text-cyan-400 uppercase tracking-widest block">
+              🎯 BIG SINGLES COMPLETED
+            </span>
+            <span className="px-2 py-0.5 rounded-md bg-[#162238] border border-cyan-700/60 text-[10px] font-bold text-cyan-300 uppercase">
+              {bsRes.level}
+            </span>
+          </div>
+
+          <h2 className="text-3xl sm:text-4xl font-black font-mono text-white tracking-tight">
+            {bsRes.completedRounds > 0
+              ? `${bsRes.completedRounds} ${bsRes.completedRounds === 1 ? 'Round' : 'Rounds'} Cleared + Reached #${bsRes.currentNumberReached}`
+              : `Reached Number ${bsRes.highestNumberReached} of 20`}
+          </h2>
+          <p className="text-xs text-neutral-400 mt-1">
+            Duration: <b className="text-neutral-200 font-mono">{durationFormatted}</b> · Total Darts: <b className="text-cyan-300 font-mono">{bsRes.totalDarts}</b>
+          </p>
+
+          {/* Primary KPI Metrics */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 my-4">
+            <div className="bg-[#0e1626] border border-[#1e2d4a] rounded-2xl p-3 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Rounds Cleared
+              </span>
+              <span className="text-2xl font-mono font-black text-cyan-400 mt-1 block tracking-tight">
+                {bsRes.completedRounds}
+              </span>
+            </div>
+
+            <div className="bg-[#0e1626] border border-[#1e2d4a] rounded-2xl p-3 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Peak Number
+              </span>
+              <span className="text-2xl font-mono font-black text-amber-400 mt-1 block tracking-tight">
+                #{bsRes.highestNumberReached}
+              </span>
+            </div>
+
+            <div className="bg-[#0e1626] border border-[#1e2d4a] rounded-2xl p-3 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Hit Accuracy
+              </span>
+              <span className="text-2xl font-mono font-black text-emerald-400 mt-1 block tracking-tight">
+                {bsRes.dartHitAccuracy}%
+              </span>
+            </div>
+
+            <div className="bg-[#0e1626] border border-[#1e2d4a] rounded-2xl p-3 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Total Hits / Darts
+              </span>
+              <span className="text-2xl font-mono font-black text-white mt-1 block tracking-tight text-sm sm:text-xl">
+                {bsRes.totalDartHits} <span className="text-xs text-neutral-400 font-sans font-normal">/ {bsRes.totalDarts}</span>
+              </span>
+            </div>
+          </div>
+
+          {/* Round Details Breakdown if multiple rounds */}
+          {bsRes.roundDetails && bsRes.roundDetails.length > 0 && (
+            <div className="bg-[#0e1626] border border-[#1e2d4a] rounded-2xl p-3 text-left my-3 space-y-1.5">
+              <span className="text-[11px] font-bold text-neutral-300 uppercase tracking-wider block border-b border-neutral-700/50 pb-1.5">
+                Completed 1-20 Round Sweeps
+              </span>
+              <div className="space-y-1">
+                {bsRes.roundDetails.map((rd) => (
+                  <div
+                    key={rd.roundNumber}
+                    className="flex items-center justify-between text-xs font-mono py-1 px-2 rounded-lg bg-neutral-900/60 border border-neutral-800"
+                  >
+                    <span className="font-bold text-cyan-400">Round {rd.roundNumber}</span>
+                    <span className="text-neutral-300">
+                      {rd.darts} darts ({rd.visits} visits)
+                    </span>
+                    <span className="text-emerald-400 font-bold">{rd.accuracy}% acc</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6 pt-4 border-t border-neutral-800">
+            <button
+              type="button"
+              id="summary-play-again"
+              onClick={onPlayAgain}
+              className="h-13 rounded-xl bg-cyan-600 hover:bg-cyan-500 active:scale-95 text-white font-black text-base shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <RotateCcw className="w-5 h-5" />
+              <span>Practice Again</span>
+            </button>
+
+            <button
+              type="button"
+              id="summary-go-home"
+              onClick={onGoHome}
+              className="h-13 rounded-xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-neutral-200 hover:text-white font-bold text-base border border-neutral-700 flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <Home className="w-5 h-5" />
+              <span>Dashboard</span>
+            </button>
+          </div>
+
+          <button
+            type="button"
+            id="summary-view-history"
+            onClick={onOpenHistory}
+            className="mt-3 text-xs text-neutral-400 hover:text-cyan-400 font-semibold flex items-center justify-center gap-1.5 mx-auto py-1 transition-colors cursor-pointer"
           >
             <BarChart2 className="w-3.5 h-3.5" />
             <span>View All Saved History & Records →</span>
