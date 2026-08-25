@@ -240,6 +240,36 @@ class SoundManager {
     }
   }
 
+  // High score / Ton (100+) sound
+  public ton(): void {
+    this.vibrate([30, 20, 50]);
+    const ctx = this.getContext();
+    if (!ctx) return;
+    try {
+      const notes = [440, 554.37, 659.25]; // A major arpeggio
+      notes.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.value = freq;
+        const start = ctx.currentTime + idx * 0.06;
+        gain.gain.setValueAtTime(0.16, start);
+        gain.gain.exponentialRampToValueAtTime(0.001, start + 0.18);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(start);
+        osc.stop(start + 0.18);
+      });
+    } catch {
+      // Audio error ignored
+    }
+  }
+
+  // Bust sound
+  public bust(): void {
+    this.miss();
+  }
+
   // Time is up buzzer
   public timeUp(): void {
     this.vibrate([100, 50, 150]);

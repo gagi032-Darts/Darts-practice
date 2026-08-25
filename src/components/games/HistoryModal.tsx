@@ -281,6 +281,120 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
                             </>
                           );
                         })()
+                      ) : item.gameType === 'switchblade' ? (
+                        (() => {
+                          const sbRes = item.result as any;
+                          return (
+                            <>
+                              <span className="px-2.5 py-1 rounded-lg bg-rose-950/90 border border-rose-700/80 text-rose-300 text-xs font-bold font-mono">
+                                {sbRes.totalPoints?.toLocaleString()} pts
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Avg/Throw:</span>
+                                <b className="text-emerald-400 font-mono">{sbRes.averageScorePerVisit}</b>
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Rounds:</span>
+                                <b className="text-amber-400 font-mono">{sbRes.cyclesCompleted}</b>
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Darts:</span>
+                                <b className="text-white font-mono">{sbRes.darts}</b>
+                              </span>
+                            </>
+                          );
+                        })()
+                      ) : item.gameType === 'powerswitch' ? (
+                        (() => {
+                          const psRes = item.result as any;
+                          return (
+                            <>
+                              <span className="px-2.5 py-1 rounded-lg bg-amber-950/90 border border-amber-700/80 text-amber-300 text-xs font-bold font-mono">
+                                {psRes.totalPoints?.toLocaleString()} pts
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Avg/Visit:</span>
+                                <b className="text-emerald-400 font-mono">{psRes.pointsPerVisitAvg}</b>
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Treble %:</span>
+                                <b className="text-cyan-400 font-mono">{psRes.trebleRate}%</b>
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Visits:</span>
+                                <b className="text-white font-mono">{psRes.visits}</b>
+                              </span>
+                            </>
+                          );
+                        })()
+                      ) : item.gameType === 'bigscores' ? (
+                        (() => {
+                          const bsRes = item.result as any;
+                          return (
+                            <>
+                              <span className="px-2.5 py-1 rounded-lg bg-violet-950/90 border border-violet-700/80 text-violet-300 text-xs font-bold font-mono">
+                                {bsRes.totalPoints?.toLocaleString()} pts
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Avg/Visit:</span>
+                                <b className="text-emerald-400 font-mono">{bsRes.averageScorePerVisit}</b>
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">3-Dart:</span>
+                                <b className="text-cyan-400 font-mono">{bsRes.threeDartAvg}</b>
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Rounds:</span>
+                                <b className="text-amber-400 font-mono">{bsRes.cyclesCompleted}</b>
+                              </span>
+                            </>
+                          );
+                        })()
+                      ) : item.gameType === 'cochallenge' ? (
+                        (() => {
+                          const coRes = item.result as any;
+                          return (
+                            <>
+                              <span className="px-2.5 py-1 rounded-lg bg-amber-950/90 border border-amber-700/80 text-amber-300 text-xs font-bold font-mono">
+                                High Out: {coRes.highestCheckout > 0 ? coRes.highestCheckout : '—'}
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Checkouts:</span>
+                                <b className="text-cyan-400 font-mono">{coRes.checkoutsMade} / {coRes.attempts}</b>
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Rate:</span>
+                                <b className="text-emerald-400 font-mono">{coRes.checkoutRate}%</b>
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Best Streak:</span>
+                                <b className="text-amber-400 font-mono">{coRes.bestStreak || 0} 🔥</b>
+                              </span>
+                            </>
+                          );
+                        })()
+                      ) : item.gameType === 'boomerang' ? (
+                        (() => {
+                          const boomRes = item.result as any;
+                          return (
+                            <>
+                              <span className="px-2.5 py-1 rounded-lg bg-sky-950/90 border border-sky-700/80 text-sky-300 text-xs font-bold font-mono">
+                                Rounds: {boomRes.roundsCompleted || 0}
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-amber-950/90 border border-amber-700/80 text-amber-300 text-xs font-bold font-mono">
+                                Best: {boomRes.bestRoundDarts ? `${boomRes.bestRoundDarts}d` : '—'}
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Hits:</span>
+                                <b className="text-emerald-400 font-mono">{boomRes.totalHits} / {boomRes.totalDarts}</b>
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Accuracy:</span>
+                                <b className="text-emerald-400 font-mono">{boomRes.overallAccuracy}%</b>
+                              </span>
+                            </>
+                          );
+                        })()
                       ) : (
                         Object.entries(item.result)
                           .filter(([k, v]) => k !== 'distribution' && !Array.isArray(v) && v !== null && v !== undefined)

@@ -5,12 +5,18 @@ import { TimerHeader } from './components/common/TimerHeader';
 import { ArmCalibrationGame } from './components/games/ArmCalibrationGame';
 import { WheelGame } from './components/games/WheelGame';
 import { BullWarmupGame } from './components/games/BullWarmupGame';
+import { AlignGame } from './components/games/AlignGame';
 import { HighscoreGame } from './components/games/HighscoreGame';
 import { OneTwentyOneGame } from './components/games/OneTwentyOneGame';
 import { CatchFortyGame } from './components/games/CatchFortyGame';
 import { TripleLockGame } from './components/games/TripleLockGame';
 import { DartBotMatchGame } from './components/games/DartBotMatchGame';
 import { Solo301Game } from './components/games/Solo301Game';
+import { SwitchbladeGame } from './components/games/SwitchbladeGame';
+import { PowerSwitchGame } from './components/games/PowerSwitchGame';
+import { BigScoresGame } from './components/games/BigScoresGame';
+import { CheckoutChallengeGame } from './components/games/CheckoutChallengeGame';
+import { DoublesBoomerangGame } from './components/games/DoublesBoomerangGame';
 import { SummaryModal } from './components/games/SummaryModal';
 import { HistoryModal } from './components/games/HistoryModal';
 import { DailyCountModal } from './components/games/DailyCountModal';
@@ -136,7 +142,7 @@ export default function App() {
   };
 
   // Start or reset a game drill
-  const startGame = (type: GameType) => {
+  const startGame = (type: GameType, customDurationMinutes?: number) => {
     clearTimer();
     wakeLock.request();
     const def = GAME_DEFINITIONS[type];
@@ -156,7 +162,7 @@ export default function App() {
         setSecondsElapsed((prev) => prev + 1);
       }, 1000);
     } else {
-      const totalSec = (def.durationMinutes || 10) * 60;
+      const totalSec = (customDurationMinutes || def.durationMinutes || 10) * 60;
       setInitialDuration(totalSec);
       setTimeRemaining(totalSec);
       setSecondsElapsed(0);
@@ -352,8 +358,36 @@ export default function App() {
           />
         )}
 
+        {view === 'game' && selectedGame === 'align' && (
+          <AlignGame
+            isFinalInput={isFinalInput}
+            onFinish={handleGameFinish}
+          />
+        )}
+
         {view === 'game' && (selectedGame === 'score' || selectedGame === 'score1' || selectedGame === 'score2') && (
           <HighscoreGame
+            isFinalInput={isFinalInput}
+            onFinish={handleGameFinish}
+          />
+        )}
+
+        {view === 'game' && selectedGame === 'switchblade' && (
+          <SwitchbladeGame
+            isFinalInput={isFinalInput}
+            onFinish={handleGameFinish}
+          />
+        )}
+
+        {view === 'game' && selectedGame === 'powerswitch' && (
+          <PowerSwitchGame
+            isFinalInput={isFinalInput}
+            onFinish={handleGameFinish}
+          />
+        )}
+
+        {view === 'game' && selectedGame === 'bigscores' && (
+          <BigScoresGame
             isFinalInput={isFinalInput}
             onFinish={handleGameFinish}
           />
@@ -375,6 +409,22 @@ export default function App() {
             onFinish={handleGameFinish}
             onOpenCheckoutAi={openCheckoutAi}
             onExit={handleExitRequest}
+          />
+        )}
+
+        {view === 'game' && selectedGame === 'cochallenge' && (
+          <CheckoutChallengeGame
+            isFinalInput={isFinalInput}
+            onFinish={handleGameFinish}
+            onOpenCheckoutAi={openCheckoutAi}
+            onStartCustomTimer={(mins) => startGame('cochallenge', mins)}
+          />
+        )}
+
+        {view === 'game' && selectedGame === 'boomerang' && (
+          <DoublesBoomerangGame
+            isFinalInput={isFinalInput}
+            onFinish={handleGameFinish}
           />
         )}
 

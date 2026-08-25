@@ -132,7 +132,7 @@ export const PracticeGuideModal: React.FC<PracticeGuideModalProps> = ({
                   <div className="pt-2 flex items-start justify-between gap-2">
                     <div>
                       <b className="text-white text-xs sm:text-sm block">Warm Up — 20 min</b>
-                      <p className="text-neutral-400">Play both 10-minute warm-up games once.</p>
+                      <p className="text-neutral-400">Choose 2 10-minute warm-up games to establish arm alignment and target focus.</p>
                     </div>
                     <div className="flex items-center gap-1 shrink-0 pt-0.5">
                       <button
@@ -145,9 +145,23 @@ export const PracticeGuideModal: React.FC<PracticeGuideModalProps> = ({
                       <button
                         type="button"
                         onClick={() => handleStartDrill('wheel')}
-                        className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-emerald-400 font-bold flex items-center gap-1 border border-neutral-700"
+                        className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-teal-400 font-bold flex items-center gap-1 border border-neutral-700"
                       >
                         <Play className="w-2.5 h-2.5" /> Wheel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleStartDrill('align')}
+                        className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-cyan-400 font-bold flex items-center gap-1 border border-neutral-700"
+                      >
+                        <Play className="w-2.5 h-2.5" /> Align
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleStartDrill('bull')}
+                        className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-rose-400 font-bold flex items-center gap-1 border border-neutral-700"
+                      >
+                        <Play className="w-2.5 h-2.5" /> Bull
                       </button>
                     </div>
                   </div>
@@ -173,9 +187,9 @@ export const PracticeGuideModal: React.FC<PracticeGuideModalProps> = ({
                   <div className="pt-2 flex items-start justify-between gap-2">
                     <div>
                       <b className="text-white text-xs sm:text-sm block">Finishing — 20 min</b>
-                      <p className="text-neutral-400">Choose one: 121 in 9 (checkpoint in 3 darts), 121 in 12 (checkpoint in 6 darts), or Catch 40.</p>
+                      <p className="text-neutral-400">Choose one: 121 in 9, 121 in 12, Catch 40, Checkout Challenge, or Doubles Boomerang.</p>
                     </div>
-                    <div className="flex items-center gap-1 shrink-0 pt-0.5">
+                    <div className="flex items-center gap-1 shrink-0 pt-0.5 flex-wrap">
                       <button
                         type="button"
                         onClick={() => handleStartDrill('1219')}
@@ -196,6 +210,20 @@ export const PracticeGuideModal: React.FC<PracticeGuideModalProps> = ({
                         className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-amber-400 font-bold flex items-center gap-1 border border-neutral-700"
                       >
                         <Play className="w-2.5 h-2.5" /> Catch 40
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleStartDrill('cochallenge')}
+                        className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-cyan-400 font-bold flex items-center gap-1 border border-neutral-700"
+                      >
+                        <Play className="w-2.5 h-2.5" /> Challenge
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleStartDrill('boomerang')}
+                        className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-sky-400 font-bold flex items-center gap-1 border border-neutral-700"
+                      >
+                        <Play className="w-2.5 h-2.5" /> Boomerang
                       </button>
                     </div>
                   </div>

@@ -19,12 +19,15 @@ import {
   Sparkles,
   Keyboard,
   Info,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { GameType, UserAccount } from '../types';
 import { storage } from '../utils/storage';
 import { sound } from '../utils/sound';
 import { wakeLock } from '../utils/wakeLock';
 import { PlayerAvatar } from './common/PlayerAvatar';
+import { GameInstructionModal } from './common/GameInstructionModal';
 
 interface HomeScreenProps {
   onSelectGame: (type: GameType) => void;
@@ -51,6 +54,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   const [wakeLockActive, setWakeLockActive] = useState<boolean>(wakeLock.isEnabled());
   const [historyCount, setHistoryCount] = useState<number>(0);
   const [todayVolume, setTodayVolume] = useState<number>(0);
+  const [instructionGame, setInstructionGame] = useState<GameType | null>(null);
+  const [openDropdown121, setOpenDropdown121] = useState<boolean>(false);
 
   useEffect(() => {
     const history = storage.getHistory();
@@ -78,6 +83,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
   const handleStartGame = (gameId: GameType) => {
     sound.tap();
+    setInstructionGame(gameId);
+  };
+
+  const handleConfirmStart = (gameId: GameType) => {
+    setInstructionGame(null);
     onSelectGame(gameId);
   };
 
@@ -281,38 +291,52 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           <div className="space-y-2.5">
             {/* Step 1: Warm Up */}
             <div className="bg-neutral-900/95 border border-neutral-800 rounded-2xl p-3.5 sm:p-4 hover:border-emerald-500/40 transition-all">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-black text-xs flex items-center justify-center border border-emerald-500/40">
+                  <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                    <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-black text-xs flex items-center justify-center border border-emerald-500/40 shrink-0">
                       1
                     </span>
-                    <h3 className="text-sm sm:text-base font-bold text-white">
+                    <h3 className="text-xs sm:text-sm md:text-base font-bold text-white whitespace-nowrap">
                       Warm Up — 20 min
                     </h3>
-                    <span className="px-2 py-0.5 rounded bg-neutral-800 text-[10px] font-bold text-neutral-300 border border-neutral-700">
-                      2 × 10 min
+                    <span className="px-1.5 sm:px-2 py-0.5 rounded bg-neutral-800 text-[10px] font-bold text-emerald-300 border border-neutral-700 whitespace-nowrap">
+                      2 × 10 min (Choose 2)
                     </span>
                   </div>
                   <p className="text-xs text-neutral-400 leading-relaxed">
-                    Play both 10-minute warm-up games once to establish arm alignment, release fluidity, and clockwise board coverage.
+                    Choose 2 10 min warm-up games to establish arm alignment, release fluidity, and target focus.
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0 pt-1 sm:pt-0">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-1 lg:pt-0">
                   <button
                     type="button"
                     onClick={() => handleStartGame('cal')}
-                    className="flex-1 sm:flex-initial px-3 py-1.5 rounded-xl bg-neutral-800 hover:bg-emerald-600 active:scale-95 text-xs text-emerald-400 hover:text-white font-bold flex items-center justify-center gap-1.5 border border-neutral-700 hover:border-emerald-500 transition-all cursor-pointer"
+                    className="px-2 py-1.5 rounded-xl bg-neutral-800 hover:bg-emerald-600 active:scale-95 text-xs text-emerald-400 hover:text-white font-bold flex items-center justify-center gap-1 border border-neutral-700 hover:border-emerald-500 transition-all cursor-pointer whitespace-nowrap"
                   >
-                    <Play className="w-3 h-3 fill-current" /> Calibration
+                    <Play className="w-2.5 h-2.5 fill-current" /> Calibration (10m)
                   </button>
                   <button
                     type="button"
                     onClick={() => handleStartGame('wheel')}
-                    className="flex-1 sm:flex-initial px-3 py-1.5 rounded-xl bg-neutral-800 hover:bg-teal-600 active:scale-95 text-xs text-teal-400 hover:text-white font-bold flex items-center justify-center gap-1.5 border border-neutral-700 hover:border-teal-500 transition-all cursor-pointer"
+                    className="px-2 py-1.5 rounded-xl bg-neutral-800 hover:bg-teal-600 active:scale-95 text-xs text-teal-400 hover:text-white font-bold flex items-center justify-center gap-1 border border-neutral-700 hover:border-teal-500 transition-all cursor-pointer whitespace-nowrap"
                   >
-                    <Play className="w-3 h-3 fill-current" /> The Wheel
+                    <Play className="w-2.5 h-2.5 fill-current" /> The Wheel (10m)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleStartGame('align')}
+                    className="px-2 py-1.5 rounded-xl bg-neutral-800 hover:bg-cyan-600 active:scale-95 text-xs text-cyan-400 hover:text-white font-bold flex items-center justify-center gap-1 border border-neutral-700 hover:border-cyan-500 transition-all cursor-pointer whitespace-nowrap"
+                  >
+                    <Play className="w-2.5 h-2.5 fill-current" /> Align (10m)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleStartGame('bull')}
+                    className="px-2 py-1.5 rounded-xl bg-neutral-800 hover:bg-rose-600 active:scale-95 text-xs text-rose-400 hover:text-white font-bold flex items-center justify-center gap-1 border border-neutral-700 hover:border-rose-500 transition-all cursor-pointer whitespace-nowrap"
+                  >
+                    <Play className="w-2.5 h-2.5 fill-current" /> Bull Warm Up (10m)
                   </button>
                 </div>
               </div>
@@ -320,31 +344,52 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
             {/* Step 2: Scoring */}
             <div className="bg-neutral-900/95 border border-neutral-800 rounded-2xl p-3.5 sm:p-4 hover:border-cyan-500/40 transition-all">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-cyan-500/20 text-cyan-400 font-black text-xs flex items-center justify-center border border-cyan-500/40">
+                  <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                    <span className="w-5 h-5 rounded-full bg-cyan-500/20 text-cyan-400 font-black text-xs flex items-center justify-center border border-cyan-500/40 shrink-0">
                       2
                     </span>
-                    <h3 className="text-sm sm:text-base font-bold text-white">
+                    <h3 className="text-xs sm:text-sm md:text-base font-bold text-white whitespace-nowrap">
                       Scoring — 20 min
                     </h3>
-                    <span className="px-2 py-0.5 rounded bg-neutral-800 text-[10px] font-bold text-cyan-300 border border-neutral-700">
-                      High Score
+                    <span className="px-1.5 sm:px-2 py-0.5 rounded bg-neutral-800 text-[10px] font-bold text-cyan-300 border border-neutral-700 whitespace-nowrap">
+                      2 × 10 min (Choose 2)
                     </span>
                   </div>
                   <p className="text-xs text-neutral-400 leading-relaxed">
-                    Play one 20-minute Highscore session. Focus on T20 rhythm, 100+ visits, and tracking your real 3-dart scoring average.
+                    Choose 2 10 min games.
                   </p>
                 </div>
 
-                <div className="shrink-0 pt-1 sm:pt-0">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-1 lg:pt-0">
                   <button
                     type="button"
                     onClick={() => handleStartGame('score')}
-                    className="w-full sm:w-auto px-4 py-1.5 rounded-xl bg-neutral-800 hover:bg-cyan-600 active:scale-95 text-xs text-cyan-400 hover:text-white font-bold flex items-center justify-center gap-1.5 border border-neutral-700 hover:border-cyan-500 transition-all cursor-pointer"
+                    className="px-2 py-1.5 rounded-xl bg-neutral-800 hover:bg-cyan-600 active:scale-95 text-xs text-cyan-400 hover:text-white font-bold flex items-center justify-center gap-1 border border-neutral-700 hover:border-cyan-500 transition-all cursor-pointer whitespace-nowrap"
                   >
-                    <Play className="w-3 h-3 fill-current" /> High Score (20m)
+                    <Play className="w-2.5 h-2.5 fill-current" /> High Score (10m)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleStartGame('switchblade')}
+                    className="px-2 py-1.5 rounded-xl bg-neutral-800 hover:bg-rose-600 active:scale-95 text-xs text-rose-400 hover:text-white font-bold flex items-center justify-center gap-1 border border-neutral-700 hover:border-rose-500 transition-all cursor-pointer whitespace-nowrap"
+                  >
+                    <Play className="w-2.5 h-2.5 fill-current" /> Switchblade (10m)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleStartGame('powerswitch')}
+                    className="px-2 py-1.5 rounded-xl bg-neutral-800 hover:bg-amber-600 active:scale-95 text-xs text-amber-400 hover:text-white font-bold flex items-center justify-center gap-1 border border-neutral-700 hover:border-amber-500 transition-all cursor-pointer whitespace-nowrap"
+                  >
+                    <Play className="w-2.5 h-2.5 fill-current" /> Power Switch (10m)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleStartGame('bigscores')}
+                    className="px-2 py-1.5 rounded-xl bg-neutral-800 hover:bg-violet-600 active:scale-95 text-xs text-violet-400 hover:text-white font-bold flex items-center justify-center gap-1 border border-neutral-700 hover:border-violet-500 transition-all cursor-pointer whitespace-nowrap"
+                  >
+                    <Play className="w-2.5 h-2.5 fill-current" /> Big Scores (10m)
                   </button>
                 </div>
               </div>
@@ -352,45 +397,124 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
             {/* Step 3: Finishing */}
             <div className="bg-neutral-900/95 border border-neutral-800 rounded-2xl p-3.5 sm:p-4 hover:border-amber-500/40 transition-all">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 font-black text-xs flex items-center justify-center border border-amber-500/40">
+                  <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                    <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 font-black text-xs flex items-center justify-center border border-amber-500/40 shrink-0">
                       3
                     </span>
-                    <h3 className="text-sm sm:text-base font-bold text-white">
+                    <h3 className="text-xs sm:text-sm md:text-base font-bold text-white whitespace-nowrap">
                       Finishing & Outshots — 20 min
                     </h3>
-                    <span className="px-2 py-0.5 rounded bg-neutral-800 text-[10px] font-bold text-amber-300 border border-neutral-700">
-                      Choose 1 of 3
+                    <span className="px-1.5 sm:px-2 py-0.5 rounded bg-neutral-800 text-[10px] font-bold text-amber-300 border border-neutral-700 whitespace-nowrap">
+                      Choose 1 of 4
                     </span>
                   </div>
                   <p className="text-xs text-neutral-400 leading-relaxed">
-                    Choose one finishing drill: 121 in 9 Darts (checkpoint in 3 darts), 121 in 12 Darts (checkpoint in 6 darts), or Catch 40 checkout mastery.
+                    Choose one 20 min drill.
                   </p>
                 </div>
 
-                <div className="flex items-center gap-1.5 shrink-0 flex-wrap pt-1 sm:pt-0">
-                  <button
-                    type="button"
-                    onClick={() => handleStartGame('1219')}
-                    className="px-2.5 py-1.5 rounded-xl bg-neutral-800 hover:bg-amber-600 active:scale-95 text-xs text-amber-400 hover:text-white font-bold flex items-center gap-1 border border-neutral-700 hover:border-amber-500 transition-all cursor-pointer"
-                  >
-                    <Play className="w-2.5 h-2.5 fill-current" /> 121 (9d)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleStartGame('12112')}
-                    className="px-2.5 py-1.5 rounded-xl bg-neutral-800 hover:bg-amber-600 active:scale-95 text-xs text-amber-400 hover:text-white font-bold flex items-center gap-1 border border-neutral-700 hover:border-amber-500 transition-all cursor-pointer"
-                  >
-                    <Play className="w-2.5 h-2.5 fill-current" /> 121 (12d)
-                  </button>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-1 lg:pt-0">
+                  {/* 121 Dropdown Launcher */}
+                  <div className="relative w-full">
+                    <button
+                      type="button"
+                      id="dropdown-121-btn"
+                      onClick={() => setOpenDropdown121((prev) => !prev)}
+                      className={`w-full px-2 py-1.5 rounded-xl active:scale-95 text-xs font-bold flex items-center justify-center gap-1.5 border transition-all cursor-pointer whitespace-nowrap ${
+                        openDropdown121
+                          ? 'bg-amber-600 text-white border-amber-400 shadow-md ring-2 ring-amber-500/40'
+                          : 'bg-neutral-800 hover:bg-neutral-700 text-amber-400 hover:text-white border-neutral-700 hover:border-amber-500'
+                      }`}
+                    >
+                      <Play className="w-2.5 h-2.5 fill-current" />
+                      <span>121</span>
+                      {openDropdown121 ? (
+                        <ChevronUp className="w-3.5 h-3.5 opacity-80" />
+                      ) : (
+                        <ChevronDown className="w-3.5 h-3.5 opacity-80" />
+                      )}
+                    </button>
+
+                    {/* Falling Dropdown Menu */}
+                    {openDropdown121 && (
+                      <div className="absolute left-0 lg:right-0 lg:left-auto top-full mt-1.5 w-48 bg-[#14181d] border border-[#2b3542] rounded-xl shadow-2xl p-1.5 z-40 animate-fadeIn space-y-1">
+                        <div className="px-2 py-1 text-[10px] font-bold text-neutral-400 uppercase tracking-wider border-b border-[#222933]">
+                          Choose 121 Mode
+                        </div>
+
+                        <button
+                          type="button"
+                          id="select-121-9d-btn"
+                          onClick={() => {
+                            setOpenDropdown121(false);
+                            handleStartGame('1219');
+                          }}
+                          className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-amber-500/20 active:bg-amber-500/30 text-xs text-white hover:text-amber-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
+                        >
+                          <div className="flex flex-col">
+                            <span className="text-xs text-white group-hover:text-amber-300 font-bold flex items-center gap-1.5">
+                              <Play className="w-2.5 h-2.5 fill-current text-amber-400" /> 9 Darts Mode
+                            </span>
+                            <span className="text-[10px] text-neutral-400 font-normal">
+                              3 darts per attempt · 3 lives
+                            </span>
+                          </div>
+                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-amber-400 border border-neutral-700">
+                            9d
+                          </span>
+                        </button>
+
+                        <button
+                          type="button"
+                          id="select-121-12d-btn"
+                          onClick={() => {
+                            setOpenDropdown121(false);
+                            handleStartGame('12112');
+                          }}
+                          className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-amber-500/20 active:bg-amber-500/30 text-xs text-white hover:text-amber-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
+                        >
+                          <div className="flex flex-col">
+                            <span className="text-xs text-white group-hover:text-amber-300 font-bold flex items-center gap-1.5">
+                              <Play className="w-2.5 h-2.5 fill-current text-amber-400" /> 12 Darts Mode
+                            </span>
+                            <span className="text-[10px] text-neutral-400 font-normal">
+                              6 darts per attempt · 3 lives
+                            </span>
+                          </div>
+                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-amber-400 border border-neutral-700">
+                            12d
+                          </span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
                   <button
                     type="button"
                     onClick={() => handleStartGame('catch40')}
-                    className="px-2.5 py-1.5 rounded-xl bg-neutral-800 hover:bg-yellow-600 active:scale-95 text-xs text-yellow-400 hover:text-white font-bold flex items-center gap-1 border border-neutral-700 hover:border-yellow-500 transition-all cursor-pointer"
+                    className="w-full px-2 py-1.5 rounded-xl bg-neutral-800 hover:bg-yellow-600 active:scale-95 text-xs text-yellow-400 hover:text-white font-bold flex items-center justify-center gap-1 border border-neutral-700 hover:border-yellow-500 transition-all cursor-pointer whitespace-nowrap"
                   >
                     <Play className="w-2.5 h-2.5 fill-current" /> Catch 40
+                  </button>
+
+                  <button
+                    type="button"
+                    id="launch-checkout-challenge-btn"
+                    onClick={() => handleStartGame('cochallenge')}
+                    className="w-full px-2 py-1.5 rounded-xl bg-neutral-800 hover:bg-cyan-600 active:scale-95 text-xs text-cyan-400 hover:text-white font-bold flex items-center justify-center gap-1 border border-neutral-700 hover:border-cyan-500 transition-all cursor-pointer whitespace-nowrap"
+                  >
+                    <Play className="w-2.5 h-2.5 fill-current" /> Checkout Challenge
+                  </button>
+
+                  <button
+                    type="button"
+                    id="launch-doubles-boomerang-btn"
+                    onClick={() => handleStartGame('boomerang')}
+                    className="w-full px-2 py-1.5 rounded-xl bg-neutral-800 hover:bg-sky-600 active:scale-95 text-xs text-sky-400 hover:text-white font-bold flex items-center justify-center gap-1 border border-neutral-700 hover:border-sky-500 transition-all cursor-pointer whitespace-nowrap"
+                  >
+                    <Play className="w-2.5 h-2.5 fill-current" /> Doubles Boomerang
                   </button>
                 </div>
               </div>
@@ -654,6 +778,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           </div>
         </div>
       )}
+
+      {/* Pre-Game Instructions Prompt Modal */}
+      <GameInstructionModal
+        gameType={instructionGame}
+        isOpen={!!instructionGame}
+        onClose={() => setInstructionGame(null)}
+        onConfirmStart={handleConfirmStart}
+      />
     </div>
   );
 };

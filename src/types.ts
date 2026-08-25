@@ -1,12 +1,18 @@
 export type GameType =
   | 'cal'
   | 'wheel'
+  | 'align'
   | 'score'
   | 'score1'
   | 'score2'
+  | 'switchblade'
+  | 'powerswitch'
+  | 'bigscores'
   | '1219'
   | '12112'
   | 'catch40'
+  | 'cochallenge'
+  | 'boomerang'
   | 'bull'
   | 'triple'
   | '301'
@@ -35,6 +41,14 @@ export interface WheelResult {
   darts: number;
   hits: number;
   accuracy: number;
+}
+
+export interface AlignResult {
+  visits: number;
+  hits: number;
+  accuracy: number;
+  darts: number;
+  perfectVisits: number;
 }
 
 export interface HighscoreResult {
@@ -70,6 +84,46 @@ export interface CatchFortyResult {
   dartsAtDouble?: number;
   doublesHit?: number;
   doublePercentage?: number;
+}
+
+export interface CheckoutChallengeAttemptRecord {
+  target: number;
+  result: 'hit' | 'miss';
+  dartsUsed: number;
+  nextTarget: number;
+  checkoutRoute?: string;
+}
+
+export interface CheckoutChallengeResult {
+  startTarget: number;
+  highestCheckout: number;
+  attempts: number;
+  checkoutsMade: number;
+  checkoutRate: number;
+  totalDarts: number;
+  bestStreak: number;
+  finalTarget: number;
+  selectedDurationMinutes: number;
+  history: CheckoutChallengeAttemptRecord[];
+}
+
+export interface BoomerangRoundRecord {
+  round: number;
+  darts: number;
+  hits: number;
+  accuracy: number;
+  completed: boolean;
+}
+
+export interface DoublesBoomerangResult {
+  roundsCompleted: number;
+  totalRoundsAttempted: number;
+  bestRoundDarts: number | null;
+  totalDarts: number;
+  totalHits: number;
+  overallAccuracy: number;
+  roundDetails: BoomerangRoundRecord[];
+  targetStats?: Record<number, { attempts: number; hits: number }>;
 }
 
 export interface BullResult {
@@ -201,12 +255,108 @@ export interface DartBotMatchResult {
   legs?: LegStats[];
 }
 
+export interface SwitchbladeThrowRecord {
+  cycleIndex: number;
+  throwIndex: number; // 0 to 4
+  targetLabel: string; // 'T20 - T20 - T20', 'T20 - T20 - T19', etc.
+  targets: string[]; // ['T20', 'T20', 'T20']
+  hits: ('miss' | 'single' | 'double' | 'treble')[];
+  dartPoints: number[];
+  totalScore: number;
+}
+
+export interface SwitchbladeResult {
+  totalPoints: number;
+  darts: number;
+  visits: number;
+  cyclesCompleted: number; // Completed 5-throw full rounds
+  averageScorePerVisit: number;
+  dart1HitRate: number; // % times hit single/double/treble or treble
+  dart2HitRate: number;
+  dart3HitRate: number;
+  dart1TreblePct: number;
+  dart2TreblePct: number;
+  dart3TreblePct: number;
+  targetScores: Record<string, { totalScore: number; count: number; avgScore: number }>;
+  throwsHistory: SwitchbladeThrowRecord[];
+  cycleScores: number[]; // total score per 5-throw cycle
+}
+
+export interface PowerSwitchVisitRecord {
+  visitNumber: number;
+  darts: {
+    target: string; // 'T20', 'T19', 'T18'
+    multiplier: 'miss' | 'single' | 'double' | 'treble';
+    points: number; // 0, 1, 2, 3
+  }[];
+  totalPoints: number;
+}
+
+export interface PowerSwitchResult {
+  totalPoints: number;
+  darts: number;
+  visits: number;
+  pointsPerVisitAvg: number;
+  trebleHits: number;
+  doubleHits: number;
+  singleHits: number;
+  misses: number;
+  trebleRate: number;
+  hitRate: number;
+  history: PowerSwitchVisitRecord[];
+}
+
+export interface BigScoresThrowRecord {
+  cycleIndex: number;
+  throwIndex: number; // 0 to 4 (20, 19, 18, 17, Bull)
+  targetLabel: string; // '20', '19', '18', '17', 'Bull'
+  hits: ('miss' | 'single' | 'double' | 'treble')[];
+  dartPoints: number[];
+  totalScore: number;
+}
+
+export interface BigScoresResult {
+  totalPoints: number;
+  darts: number;
+  visits: number;
+  cyclesCompleted: number; // Completed 5-throw full rounds
+  averageScorePerVisit: number;
+  threeDartAvg: number;
+  trebleRate: number;
+  hitRate: number;
+  trebleHits: number;
+  doubleHits: number;
+  singleHits: number;
+  misses: number;
+  segmentScores: Record<
+    string,
+    {
+      totalScore: number;
+      count: number;
+      avgScore: number;
+      hits: number;
+      trebles: number;
+      doubles: number;
+      singles: number;
+      misses: number;
+    }
+  >;
+  throwsHistory: BigScoresThrowRecord[];
+  cycleScores: number[]; // total score per 5-throw cycle
+}
+
 export type GameResultData =
   | ArmCalResult
   | WheelResult
+  | AlignResult
   | HighscoreResult
+  | SwitchbladeResult
+  | PowerSwitchResult
+  | BigScoresResult
   | OneTwentyOneResult
   | CatchFortyResult
+  | CheckoutChallengeResult
+  | DoublesBoomerangResult
   | BullResult
   | TripleLockResult
   | Solo301Result

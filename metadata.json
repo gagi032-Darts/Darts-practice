@@ -1,6 +1,6 @@
 {
   "name": "Dart Practice",
-  "description": "Precision darts training routine tracker featuring custom AI DartBot match play (501/301/701 with adjustable skill & checkout %), Outshot AI (170 down to 2), warm-ups, scoring analyzers, finishing ladders, and Triple Lock.",
+  "description": "Precision darts training routine tracker featuring custom AI DartBot match play (501/301/701 with adjustable skill & checkout %), Outshot AI (170 down to 2), Doubles Boomerang, Checkout Challenge, warm-ups, scoring analyzers, finishing ladders, and Triple Lock.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

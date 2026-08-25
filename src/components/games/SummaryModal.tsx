@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Trophy, CheckCircle2, RotateCcw, Home, BarChart2, Share2, Bot, User, Award, TrendingUp, BarChart3, Flame, Zap, Lock, Crosshair, ShieldAlert, Hourglass } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { GameType, GameResultData, DartBotMatchResult, HighscoreResult, TripleLockResult, Solo301Result } from '../../types';
+import { GameType, GameResultData, DartBotMatchResult, HighscoreResult, TripleLockResult, Solo301Result, SwitchbladeResult, PowerSwitchResult, BigScoresResult, CheckoutChallengeResult, DoublesBoomerangResult } from '../../types';
 import { GAME_DEFINITIONS } from '../../utils/gamesData';
 import { sound } from '../../utils/sound';
 import { LegBreakdownView } from '../common/LegBreakdownView';
@@ -661,6 +661,671 @@ export const SummaryModal: React.FC<SummaryModalProps> = ({
             id="summary-view-history"
             onClick={onOpenHistory}
             className="mt-3 text-xs text-neutral-400 hover:text-yellow-400 font-semibold flex items-center justify-center gap-1.5 mx-auto py-1 transition-colors cursor-pointer"
+          >
+            <BarChart2 className="w-3.5 h-3.5" />
+            <span>View All Saved History & Records →</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Dedicated scorecard rendering for Switchblade
+  if (gameType === 'switchblade') {
+    const sbRes = result as SwitchbladeResult;
+    const targetKeys = ['T20 - T20 - T20', 'T20 - T20 - T19', 'T20 - T20 - T18', 'T20 - T20 - T17', 'T20 - T20 - Bull'];
+
+    return (
+      <div className="w-full max-w-xl mx-auto space-y-4">
+        <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-6 text-center shadow-2xl relative overflow-hidden">
+          {/* Header Icon */}
+          <div className="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center justify-center mx-auto mb-3 shadow-inner">
+            <Crosshair className="w-8 h-8" />
+          </div>
+
+          <span className="text-xs font-bold text-rose-400 uppercase tracking-widest block mb-1">
+            🗡️ Switchblade Drill Completed
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            {sbRes.totalPoints.toLocaleString()} Total Points
+          </h2>
+          <p className="text-xs text-neutral-400 mt-1">
+            Duration: <b className="text-neutral-200 font-mono">{durationFormatted}</b> · Throws: <b className="text-neutral-200 font-mono">{sbRes.visits}</b> ({sbRes.darts} darts) · Completed Cycles: <b className="text-emerald-400 font-mono">{sbRes.cyclesCompleted}</b>
+          </p>
+
+          {/* Primary KPI Metrics */}
+          <div className="grid grid-cols-3 gap-2.5 my-4">
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3.5 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Avg / Throw
+              </span>
+              <span className="text-2xl sm:text-3xl font-mono font-black text-emerald-400 mt-1 block tracking-tight">
+                {sbRes.averageScorePerVisit}
+              </span>
+            </div>
+
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3.5 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                3-Dart Avg
+              </span>
+              <span className="text-2xl sm:text-3xl font-mono font-black text-cyan-400 mt-1 block tracking-tight">
+                {sbRes.darts > 0 ? ((sbRes.totalPoints / sbRes.darts) * 3).toFixed(1) : '0.0'}
+              </span>
+            </div>
+
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3.5 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Full Rounds
+              </span>
+              <span className="text-2xl sm:text-3xl font-mono font-black text-amber-400 mt-1 block tracking-tight">
+                {sbRes.cyclesCompleted}
+              </span>
+            </div>
+          </div>
+
+          {/* Dart Hit Rates */}
+          <div className="grid grid-cols-3 gap-2 text-xs font-mono mb-4">
+            <div className="bg-neutral-800/70 border border-neutral-700/60 p-2.5 rounded-xl text-center">
+              <span className="text-[10px] text-neutral-400 font-sans block uppercase">Dart 1 (T20)</span>
+              <b className="text-white text-sm">{sbRes.dart1HitRate}% hit</b>
+              <span className="text-[10px] text-emerald-400 block font-sans">({sbRes.dart1TreblePct}% T)</span>
+            </div>
+            <div className="bg-neutral-800/70 border border-neutral-700/60 p-2.5 rounded-xl text-center">
+              <span className="text-[10px] text-neutral-400 font-sans block uppercase">Dart 2 (T20)</span>
+              <b className="text-white text-sm">{sbRes.dart2HitRate}% hit</b>
+              <span className="text-[10px] text-emerald-400 block font-sans">({sbRes.dart2TreblePct}% T)</span>
+            </div>
+            <div className="bg-neutral-800/70 border border-neutral-700/60 p-2.5 rounded-xl text-center">
+              <span className="text-[10px] text-neutral-400 font-sans block uppercase">Dart 3 (Switch)</span>
+              <b className="text-white text-sm">{sbRes.dart3HitRate}% hit</b>
+              <span className="text-[10px] text-amber-400 block font-sans">({sbRes.dart3TreblePct}% T/Bull)</span>
+            </div>
+          </div>
+
+          {/* Target Set Performance Breakdown */}
+          {sbRes.targetScores && (
+            <div className="bg-neutral-850/80 border border-neutral-750/80 rounded-2xl p-4 text-left shadow-inner my-3 space-y-2">
+              <span className="text-xs font-bold text-neutral-300 uppercase tracking-wider block border-b border-neutral-700/60 pb-2">
+                Target Sequences Breakdown
+              </span>
+              <div className="space-y-1.5 pt-1">
+                {targetKeys.map((k) => {
+                  const item = sbRes.targetScores[k] || { totalScore: 0, count: 0, avgScore: 0 };
+                  return (
+                    <div
+                      key={k}
+                      className="flex items-center justify-between text-xs py-1.5 px-2.5 rounded-xl bg-neutral-900/80 border border-neutral-800"
+                    >
+                      <span className="font-bold text-rose-300 font-mono">{k}</span>
+                      <div className="flex items-center gap-3 font-mono">
+                        <span className="text-neutral-400 text-[11px]">{item.count} attempts</span>
+                        <span className="text-white font-bold">{item.totalScore} pts</span>
+                        <span className="text-emerald-400 font-black text-xs">({item.avgScore} avg)</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Round-by-Round Breakdown */}
+          {sbRes.cycleScores && sbRes.cycleScores.length > 0 && (
+            <div className="bg-neutral-850/80 border border-neutral-750/80 rounded-2xl p-4 text-left shadow-inner my-3 space-y-2">
+              <span className="text-xs font-bold text-neutral-300 uppercase tracking-wider block border-b border-neutral-700/60 pb-2">
+                Round-by-Round Score
+              </span>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1 font-mono text-xs">
+                {sbRes.cycleScores.map((score, idx) => (
+                  <div key={idx} className="bg-neutral-900/90 border border-neutral-800 p-2 rounded-xl text-center">
+                    <span className="text-[10px] text-neutral-400 block font-sans">Round #{idx + 1}</span>
+                    <b className="text-amber-400 text-sm">{score} pts</b>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6 pt-4 border-t border-neutral-800">
+            <button
+              type="button"
+              id="summary-play-again"
+              onClick={onPlayAgain}
+              className="h-13 rounded-xl bg-rose-600 hover:bg-rose-500 active:scale-95 text-white font-bold text-base shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <RotateCcw className="w-5 h-5" />
+              <span>Practice Again</span>
+            </button>
+
+            <button
+              type="button"
+              id="summary-go-home"
+              onClick={onGoHome}
+              className="h-13 rounded-xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-neutral-200 hover:text-white font-bold text-base border border-neutral-700 flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <Home className="w-5 h-5" />
+              <span>Dashboard</span>
+            </button>
+          </div>
+
+          <button
+            type="button"
+            id="summary-view-history"
+            onClick={onOpenHistory}
+            className="mt-3 text-xs text-neutral-400 hover:text-rose-400 font-semibold flex items-center justify-center gap-1.5 mx-auto py-1 transition-colors cursor-pointer"
+          >
+            <BarChart2 className="w-3.5 h-3.5" />
+            <span>View All Saved History & Records →</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Dedicated scorecard rendering for Power Switch
+  if (gameType === 'powerswitch') {
+    const psRes = result as PowerSwitchResult;
+
+    return (
+      <div className="w-full max-w-xl mx-auto space-y-4">
+        <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-6 text-center shadow-2xl relative overflow-hidden">
+          {/* Header Icon */}
+          <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto mb-3 shadow-inner">
+            <Zap className="w-8 h-8" />
+          </div>
+
+          <span className="text-xs font-bold text-amber-400 uppercase tracking-widest block mb-1">
+            ⚡ Power Switch Routine Completed
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            {psRes.totalPoints.toLocaleString()} Total Points
+          </h2>
+          <p className="text-xs text-neutral-400 mt-1">
+            Duration: <b className="text-neutral-200 font-mono">{durationFormatted}</b> · Total Visits: <b className="text-neutral-200 font-mono">{psRes.visits}</b> ({psRes.darts} darts)
+          </p>
+
+          {/* Primary KPI Metrics */}
+          <div className="grid grid-cols-3 gap-2.5 my-4">
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3.5 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Avg / Visit
+              </span>
+              <span className="text-2xl sm:text-3xl font-mono font-black text-emerald-400 mt-1 block tracking-tight">
+                {psRes.pointsPerVisitAvg}
+              </span>
+            </div>
+
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3.5 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Treble %
+              </span>
+              <span className="text-2xl sm:text-3xl font-mono font-black text-amber-400 mt-1 block tracking-tight">
+                {psRes.trebleRate}%
+              </span>
+            </div>
+
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3.5 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Target Hit %
+              </span>
+              <span className="text-2xl sm:text-3xl font-mono font-black text-cyan-400 mt-1 block tracking-tight">
+                {psRes.hitRate}%
+              </span>
+            </div>
+          </div>
+
+          {/* Hits Breakdown */}
+          <div className="bg-neutral-850/80 border border-neutral-750/80 rounded-2xl p-4 text-left shadow-inner my-3 space-y-2">
+            <span className="text-xs font-bold text-neutral-300 uppercase tracking-wider block border-b border-neutral-700/60 pb-2">
+              Multiplier Hit Distribution
+            </span>
+            <div className="grid grid-cols-4 gap-2 pt-1 font-mono text-xs text-center">
+              <div className="bg-neutral-900/90 border border-neutral-800 p-2.5 rounded-xl">
+                <span className="text-[10px] text-emerald-400 uppercase block font-sans font-bold">Trebles (+3)</span>
+                <b className="text-white text-base">{psRes.trebleHits}</b>
+              </div>
+              <div className="bg-neutral-900/90 border border-neutral-800 p-2.5 rounded-xl">
+                <span className="text-[10px] text-cyan-400 uppercase block font-sans font-bold">Doubles (+2)</span>
+                <b className="text-white text-base">{psRes.doubleHits}</b>
+              </div>
+              <div className="bg-neutral-900/90 border border-neutral-800 p-2.5 rounded-xl">
+                <span className="text-[10px] text-neutral-300 uppercase block font-sans font-bold">Singles (+1)</span>
+                <b className="text-white text-base">{psRes.singleHits}</b>
+              </div>
+              <div className="bg-neutral-900/90 border border-neutral-800 p-2.5 rounded-xl">
+                <span className="text-[10px] text-rose-400 uppercase block font-sans font-bold">Misses (0)</span>
+                <b className="text-white text-base">{psRes.misses}</b>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6 pt-4 border-t border-neutral-800">
+            <button
+              type="button"
+              id="summary-play-again"
+              onClick={onPlayAgain}
+              className="h-13 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-95 text-neutral-950 font-black text-base shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <RotateCcw className="w-5 h-5" />
+              <span>Practice Again</span>
+            </button>
+
+            <button
+              type="button"
+              id="summary-go-home"
+              onClick={onGoHome}
+              className="h-13 rounded-xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-neutral-200 hover:text-white font-bold text-base border border-neutral-700 flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <Home className="w-5 h-5" />
+              <span>Dashboard</span>
+            </button>
+          </div>
+
+          <button
+            type="button"
+            id="summary-view-history"
+            onClick={onOpenHistory}
+            className="mt-3 text-xs text-neutral-400 hover:text-amber-400 font-semibold flex items-center justify-center gap-1.5 mx-auto py-1 transition-colors cursor-pointer"
+          >
+            <BarChart2 className="w-3.5 h-3.5" />
+            <span>View All Saved History & Records →</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Dedicated scorecard rendering for Big Scores
+  if (gameType === 'bigscores') {
+    const bsRes = result as BigScoresResult;
+    const stageKeys = ['20', '19', '18', '17', 'Bull'];
+
+    return (
+      <div className="w-full max-w-xl mx-auto space-y-4">
+        <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-6 text-center shadow-2xl relative overflow-hidden">
+          {/* Header Icon */}
+          <div className="w-16 h-16 rounded-2xl bg-violet-500/10 border border-violet-500/30 text-violet-400 flex items-center justify-center mx-auto mb-3 shadow-inner">
+            <Trophy className="w-8 h-8" />
+          </div>
+
+          <span className="text-xs font-bold text-violet-400 uppercase tracking-widest block mb-1">
+            🏆 Big Scores Routine Completed
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            {bsRes.totalPoints.toLocaleString()} Total Points
+          </h2>
+          <p className="text-xs text-neutral-400 mt-1">
+            Duration: <b className="text-neutral-200 font-mono">{durationFormatted}</b> · Visits: <b className="text-neutral-200 font-mono">{bsRes.visits}</b> ({bsRes.darts} darts) · Completed Rounds: <b className="text-violet-400 font-mono">{bsRes.cyclesCompleted}</b>
+          </p>
+
+          {/* Primary KPI Metrics */}
+          <div className="grid grid-cols-3 gap-2.5 my-4">
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3.5 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Avg / Visit
+              </span>
+              <span className="text-2xl sm:text-3xl font-mono font-black text-emerald-400 mt-1 block tracking-tight">
+                {bsRes.averageScorePerVisit}
+              </span>
+            </div>
+
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3.5 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                3-Dart Avg
+              </span>
+              <span className="text-2xl sm:text-3xl font-mono font-black text-cyan-400 mt-1 block tracking-tight">
+                {bsRes.threeDartAvg}
+              </span>
+            </div>
+
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3.5 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Full Rounds
+              </span>
+              <span className="text-2xl sm:text-3xl font-mono font-black text-amber-400 mt-1 block tracking-tight">
+                {bsRes.cyclesCompleted}
+              </span>
+            </div>
+          </div>
+
+          {/* Target Breakdown */}
+          {bsRes.segmentScores && (
+            <div className="bg-neutral-850/80 border border-neutral-750/80 rounded-2xl p-4 text-left shadow-inner my-3 space-y-2">
+              <span className="text-xs font-bold text-neutral-300 uppercase tracking-wider block border-b border-neutral-700/60 pb-2">
+                Segment Breakdown (20 → 19 → 18 → 17 → Bull)
+              </span>
+              <div className="space-y-1.5 pt-1">
+                {stageKeys.map((k) => {
+                  const item = bsRes.segmentScores[k] || { totalScore: 0, count: 0, avgScore: 0, hits: 0, trebles: 0, doubles: 0, singles: 0, misses: 0 };
+                  return (
+                    <div
+                      key={k}
+                      className="text-xs py-2 px-3 rounded-xl bg-neutral-900/80 border border-neutral-800 font-mono space-y-1"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-violet-300">
+                          {k === 'Bull' ? 'Bullseye' : `Segment ${k}`}
+                        </span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-neutral-400 text-[11px] font-sans">{item.count} visits</span>
+                          <span className="text-white font-bold">{item.totalScore} pts</span>
+                          <span className="text-emerald-400 font-black">({item.avgScore} avg)</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 text-[10px] text-neutral-400 pt-0.5 border-t border-neutral-800/60">
+                        <span className="text-emerald-400 font-bold">T: {item.trebles || 0}</span>
+                        <span>·</span>
+                        <span className="text-cyan-400 font-bold">D: {item.doubles || 0}</span>
+                        <span>·</span>
+                        <span className="text-neutral-300 font-bold">S: {item.singles || 0}</span>
+                        <span>·</span>
+                        <span className="text-rose-400 font-bold">M: {item.misses || 0}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Round-by-Round Breakdown */}
+          {bsRes.cycleScores && bsRes.cycleScores.length > 0 && (
+            <div className="bg-neutral-850/80 border border-neutral-750/80 rounded-2xl p-4 text-left shadow-inner my-3 space-y-2">
+              <span className="text-xs font-bold text-neutral-300 uppercase tracking-wider block border-b border-neutral-700/60 pb-2">
+                Round-by-Round Score
+              </span>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1 font-mono text-xs">
+                {bsRes.cycleScores.map((score, idx) => (
+                  <div key={idx} className="bg-neutral-900/90 border border-neutral-800 p-2.5 rounded-xl text-center">
+                    <span className="text-[10px] text-neutral-400 block font-sans">Round #{idx + 1}</span>
+                    <b className="text-amber-400 text-sm">{score} pts</b>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6 pt-4 border-t border-neutral-800">
+            <button
+              type="button"
+              id="summary-play-again"
+              onClick={onPlayAgain}
+              className="h-13 rounded-xl bg-violet-600 hover:bg-violet-500 active:scale-95 text-white font-black text-base shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <RotateCcw className="w-5 h-5" />
+              <span>Practice Again</span>
+            </button>
+
+            <button
+              type="button"
+              id="summary-go-home"
+              onClick={onGoHome}
+              className="h-13 rounded-xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-neutral-200 hover:text-white font-bold text-base border border-neutral-700 flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <Home className="w-5 h-5" />
+              <span>Dashboard</span>
+            </button>
+          </div>
+
+          <button
+            type="button"
+            id="summary-view-history"
+            onClick={onOpenHistory}
+            className="mt-3 text-xs text-neutral-400 hover:text-violet-400 font-semibold flex items-center justify-center gap-1.5 mx-auto py-1 transition-colors cursor-pointer"
+          >
+            <BarChart2 className="w-3.5 h-3.5" />
+            <span>View All Saved History & Records →</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Dedicated scorecard rendering for Checkout Challenge
+  if (gameType === 'cochallenge') {
+    const coRes = result as CheckoutChallengeResult;
+
+    return (
+      <div className="w-full max-w-xl mx-auto space-y-4">
+        <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-6 text-center shadow-2xl relative overflow-hidden">
+          {/* Header Icon */}
+          <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center mx-auto mb-3 shadow-inner">
+            <Trophy className="w-8 h-8" />
+          </div>
+
+          <span className="text-xs font-bold text-cyan-400 uppercase tracking-widest block mb-1">
+            🎯 Checkout Challenge Completed
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-black font-mono text-amber-400 tracking-tight">
+            {coRes.highestCheckout > 0 ? `${coRes.highestCheckout} Highest Out` : 'No Checkouts Made'}
+          </h2>
+          <p className="text-xs text-neutral-400 mt-1">
+            Duration: <b className="text-neutral-200 font-mono">{durationFormatted}</b> · Start: <b className="text-neutral-200 font-mono">{coRes.startTarget}</b> · Final Target: <b className="text-cyan-400 font-mono">{coRes.finalTarget}</b>
+          </p>
+
+          {/* Primary KPI Metrics */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 my-4">
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Highest Out
+              </span>
+              <span className="text-2xl font-mono font-black text-amber-400 mt-1 block tracking-tight">
+                {coRes.highestCheckout > 0 ? coRes.highestCheckout : '—'}
+              </span>
+            </div>
+
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Checkouts
+              </span>
+              <span className="text-2xl font-mono font-black text-cyan-400 mt-1 block tracking-tight">
+                {coRes.checkoutsMade} <span className="text-xs text-neutral-400 font-sans font-normal">/ {coRes.attempts}</span>
+              </span>
+            </div>
+
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Success Rate
+              </span>
+              <span className="text-2xl font-mono font-black text-emerald-400 mt-1 block tracking-tight">
+                {coRes.checkoutRate}%
+              </span>
+            </div>
+
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Best Streak
+              </span>
+              <span className="text-2xl font-mono font-black text-amber-400 mt-1 block tracking-tight">
+                {coRes.bestStreak} 🔥
+              </span>
+            </div>
+          </div>
+
+          {/* Attempt Progression History */}
+          {coRes.history && coRes.history.length > 0 && (
+            <div className="bg-neutral-850/80 border border-neutral-750/80 rounded-2xl p-4 text-left shadow-inner my-3 space-y-2">
+              <span className="text-xs font-bold text-neutral-300 uppercase tracking-wider block border-b border-neutral-700/60 pb-2 flex items-center justify-between">
+                <span>Attempt Progression</span>
+                <span className="text-[11px] text-neutral-400 font-normal">{coRes.totalDarts} total darts thrown</span>
+              </span>
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {coRes.history.map((att, idx) => (
+                  <div
+                    key={idx}
+                    className={`px-2.5 py-1 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 border ${
+                      att.result === 'hit'
+                        ? 'bg-emerald-950/80 border-emerald-700 text-emerald-300'
+                        : 'bg-rose-950/80 border-rose-800 text-rose-300'
+                    }`}
+                  >
+                    <span>{att.target}</span>
+                    <span className="text-[10px] opacity-80">
+                      {att.result === 'hit' ? `(${att.dartsUsed}d)` : 'Miss'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6 pt-4 border-t border-neutral-800">
+            <button
+              type="button"
+              id="summary-play-again"
+              onClick={onPlayAgain}
+              className="h-13 rounded-xl bg-cyan-500 hover:bg-cyan-400 active:scale-95 text-neutral-950 font-black text-base shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <RotateCcw className="w-5 h-5" />
+              <span>Practice Again</span>
+            </button>
+
+            <button
+              type="button"
+              id="summary-go-home"
+              onClick={onGoHome}
+              className="h-13 rounded-xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-neutral-200 hover:text-white font-bold text-base border border-neutral-700 flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <Home className="w-5 h-5" />
+              <span>Dashboard</span>
+            </button>
+          </div>
+
+          <button
+            type="button"
+            id="summary-view-history"
+            onClick={onOpenHistory}
+            className="mt-3 text-xs text-neutral-400 hover:text-cyan-400 font-semibold flex items-center justify-center gap-1.5 mx-auto py-1 transition-colors cursor-pointer"
+          >
+            <BarChart2 className="w-3.5 h-3.5" />
+            <span>View All Saved History & Records →</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Dedicated scorecard rendering for Doubles Boomerang
+  if (gameType === 'boomerang') {
+    const boomRes = result as DoublesBoomerangResult;
+
+    return (
+      <div className="w-full max-w-xl mx-auto space-y-4">
+        <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-6 text-center shadow-2xl relative overflow-hidden">
+          {/* Header Icon */}
+          <div className="w-16 h-16 rounded-2xl bg-sky-500/10 border border-sky-500/30 text-sky-400 flex items-center justify-center mx-auto mb-3 shadow-inner">
+            <Trophy className="w-8 h-8" />
+          </div>
+
+          <span className="text-xs font-bold text-sky-400 uppercase tracking-widest block mb-1">
+            🎯 Doubles Boomerang Completed
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-black font-mono text-white tracking-tight">
+            {boomRes.roundsCompleted > 0
+              ? `${boomRes.roundsCompleted} ${boomRes.roundsCompleted === 1 ? 'Round' : 'Rounds'} Cleared`
+              : 'Session Completed'}
+          </h2>
+          <p className="text-xs text-neutral-400 mt-1">
+            Duration: <b className="text-neutral-200 font-mono">{durationFormatted}</b> · Total Darts: <b className="text-sky-300 font-mono">{boomRes.totalDarts}</b>
+          </p>
+
+          {/* Primary KPI Metrics */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 my-4">
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Best Round
+              </span>
+              <span className="text-2xl font-mono font-black text-amber-400 mt-1 block tracking-tight">
+                {boomRes.bestRoundDarts ? `${boomRes.bestRoundDarts}d` : '—'}
+              </span>
+            </div>
+
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Rounds Cleared
+              </span>
+              <span className="text-2xl font-mono font-black text-sky-400 mt-1 block tracking-tight">
+                {boomRes.roundsCompleted}
+              </span>
+            </div>
+
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Doubles Hit
+              </span>
+              <span className="text-2xl font-mono font-black text-emerald-400 mt-1 block tracking-tight">
+                {boomRes.totalHits} <span className="text-xs text-neutral-400 font-sans font-normal">/ {boomRes.totalDarts}</span>
+              </span>
+            </div>
+
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Hit Accuracy
+              </span>
+              <span className="text-2xl font-mono font-black text-emerald-400 mt-1 block tracking-tight">
+                {boomRes.overallAccuracy}%
+              </span>
+            </div>
+          </div>
+
+          {/* Round-by-Round Breakdown */}
+          {boomRes.roundDetails && boomRes.roundDetails.length > 0 && (
+            <div className="bg-neutral-850/80 border border-neutral-750/80 rounded-2xl p-4 text-left shadow-inner my-3 space-y-2">
+              <span className="text-xs font-bold text-neutral-300 uppercase tracking-wider block border-b border-neutral-700/60 pb-2 flex items-center justify-between">
+                <span>Rounds Performance</span>
+                <span className="text-[11px] text-neutral-400 font-normal">20 doubles per round</span>
+              </span>
+              <div className="space-y-1.5 pt-1">
+                {boomRes.roundDetails.map((rd) => (
+                  <div
+                    key={rd.round}
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-neutral-900/90 border border-neutral-800 text-xs font-mono"
+                  >
+                    <span className="font-bold text-sky-300">Round {rd.round}</span>
+                    <span className="text-neutral-300">
+                      <b className="text-white font-bold">{rd.darts}</b> darts thrown
+                    </span>
+                    <span className="px-2 py-0.5 rounded-md bg-emerald-950/80 border border-emerald-700 text-emerald-300 font-bold">
+                      {rd.accuracy}%
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6 pt-4 border-t border-neutral-800">
+            <button
+              type="button"
+              id="summary-play-again"
+              onClick={onPlayAgain}
+              className="h-13 rounded-xl bg-sky-500 hover:bg-sky-400 active:scale-95 text-neutral-950 font-black text-base shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <RotateCcw className="w-5 h-5" />
+              <span>Practice Again</span>
+            </button>
+
+            <button
+              type="button"
+              id="summary-go-home"
+              onClick={onGoHome}
+              className="h-13 rounded-xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-neutral-200 hover:text-white font-bold text-base border border-neutral-700 flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <Home className="w-5 h-5" />
+              <span>Dashboard</span>
+            </button>
+          </div>
+
+          <button
+            type="button"
+            id="summary-view-history"
+            onClick={onOpenHistory}
+            className="mt-3 text-xs text-neutral-400 hover:text-sky-400 font-semibold flex items-center justify-center gap-1.5 mx-auto py-1 transition-colors cursor-pointer"
           >
             <BarChart2 className="w-3.5 h-3.5" />
             <span>View All Saved History & Records →</span>
