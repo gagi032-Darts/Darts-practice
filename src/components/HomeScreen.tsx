@@ -55,8 +55,20 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   const [historyCount, setHistoryCount] = useState<number>(0);
   const [todayVolume, setTodayVolume] = useState<number>(0);
   const [instructionGame, setInstructionGame] = useState<GameType | null>(null);
-  const [openDropdown121, setOpenDropdown121] = useState<boolean>(false);
-  const [openDropdownBigSingles, setOpenDropdownBigSingles] = useState<boolean>(false);
+  const [openDropdown, setOpenDropdown] = useState<
+    'warmup' | 'scoring' | 'finishing' | 'singles' | 'match' | null
+  >(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('[data-dropdown-container]')) {
+        setOpenDropdown(null);
+      }
+    };
+    window.addEventListener('click', handleOutsideClick);
+    return () => window.removeEventListener('click', handleOutsideClick);
+  }, []);
 
   useEffect(() => {
     const history = storage.getHistory();
@@ -292,13 +304,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           <div className="space-y-2.5">
             {/* Step 1: Warm Up */}
             <div className="bg-neutral-900/95 border border-neutral-800 rounded-2xl p-3.5 sm:p-4 hover:border-emerald-500/40 transition-all">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
                     <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-black text-xs flex items-center justify-center border border-emerald-500/40 shrink-0">
                       1
                     </span>
-                    <h3 className="text-xs sm:text-sm md:text-base font-bold text-white whitespace-nowrap">
+                    <h3 className="text-sm sm:text-base font-bold text-white whitespace-nowrap">
                       Warm Up — 20 min
                     </h3>
                     <span className="px-1.5 sm:px-2 py-0.5 rounded bg-neutral-800 text-[10px] font-bold text-emerald-300 border border-neutral-700 whitespace-nowrap">
@@ -310,48 +322,131 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   </p>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-1 lg:pt-0">
+                <div className="relative shrink-0 pt-1 sm:pt-0" data-dropdown-container>
                   <button
                     type="button"
-                    onClick={() => handleStartGame('cal')}
-                    className="px-2 py-1.5 rounded-xl bg-neutral-800 hover:bg-emerald-600 active:scale-95 text-xs text-emerald-400 hover:text-white font-bold flex items-center justify-center gap-1 border border-neutral-700 hover:border-emerald-500 transition-all cursor-pointer whitespace-nowrap"
+                    id="dropdown-warmup-btn"
+                    onClick={() => setOpenDropdown((prev) => (prev === 'warmup' ? null : 'warmup'))}
+                    className={`w-full sm:w-auto px-3.5 py-1.5 rounded-xl active:scale-95 text-xs font-bold flex items-center justify-center gap-1.5 border transition-all cursor-pointer whitespace-nowrap ${
+                      openDropdown === 'warmup'
+                        ? 'bg-emerald-600 text-white border-emerald-400 shadow-md ring-2 ring-emerald-500/40'
+                        : 'bg-neutral-800 hover:bg-neutral-700 text-emerald-400 hover:text-white border-neutral-700 hover:border-emerald-500'
+                    }`}
                   >
-                    <Play className="w-2.5 h-2.5 fill-current" /> Calibration (10m)
+                    <Play className="w-3 h-3 fill-current" />
+                    <span>Games</span>
+                    {openDropdown === 'warmup' ? (
+                      <ChevronUp className="w-3.5 h-3.5 opacity-80" />
+                    ) : (
+                      <ChevronDown className="w-3.5 h-3.5 opacity-80" />
+                    )}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => handleStartGame('wheel')}
-                    className="px-2 py-1.5 rounded-xl bg-neutral-800 hover:bg-teal-600 active:scale-95 text-xs text-teal-400 hover:text-white font-bold flex items-center justify-center gap-1 border border-neutral-700 hover:border-teal-500 transition-all cursor-pointer whitespace-nowrap"
-                  >
-                    <Play className="w-2.5 h-2.5 fill-current" /> The Wheel (10m)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleStartGame('align')}
-                    className="px-2 py-1.5 rounded-xl bg-neutral-800 hover:bg-cyan-600 active:scale-95 text-xs text-cyan-400 hover:text-white font-bold flex items-center justify-center gap-1 border border-neutral-700 hover:border-cyan-500 transition-all cursor-pointer whitespace-nowrap"
-                  >
-                    <Play className="w-2.5 h-2.5 fill-current" /> Align (10m)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleStartGame('bull')}
-                    className="px-2 py-1.5 rounded-xl bg-neutral-800 hover:bg-rose-600 active:scale-95 text-xs text-rose-400 hover:text-white font-bold flex items-center justify-center gap-1 border border-neutral-700 hover:border-rose-500 transition-all cursor-pointer whitespace-nowrap"
-                  >
-                    <Play className="w-2.5 h-2.5 fill-current" /> Bull Warm Up (10m)
-                  </button>
+
+                  {/* Falling Dropdown Menu */}
+                  {openDropdown === 'warmup' && (
+                    <div className="absolute right-0 top-full mt-1.5 w-72 sm:w-80 bg-[#14181d] border border-[#2b3542] rounded-xl shadow-2xl p-1.5 z-40 animate-fadeIn space-y-1">
+                      <div className="px-2 py-1 text-[10px] font-bold text-neutral-400 uppercase tracking-wider border-b border-[#222933]">
+                        Select Warm Up Game (10 min)
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          handleStartGame('cal');
+                        }}
+                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-emerald-500/20 active:bg-emerald-500/30 text-xs text-white hover:text-emerald-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs text-white group-hover:text-emerald-300 font-bold flex items-center gap-1.5">
+                            <Play className="w-2.5 h-2.5 fill-current text-emerald-400" /> Calibration
+                          </span>
+                          <span className="text-[10px] text-neutral-400 font-normal">
+                            20 down to 1 + Bull, arm calibration & focus
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-emerald-400 border border-neutral-700">
+                          10m
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          handleStartGame('wheel');
+                        }}
+                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-teal-500/20 active:bg-teal-500/30 text-xs text-white hover:text-teal-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs text-white group-hover:text-teal-300 font-bold flex items-center gap-1.5">
+                            <Play className="w-2.5 h-2.5 fill-current text-teal-400" /> The Wheel
+                          </span>
+                          <span className="text-[10px] text-neutral-400 font-normal">
+                            Clockwise circular sweep around the board 1→20
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-teal-400 border border-neutral-700">
+                          10m
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          handleStartGame('align');
+                        }}
+                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-cyan-500/20 active:bg-cyan-500/30 text-xs text-white hover:text-cyan-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs text-white group-hover:text-cyan-300 font-bold flex items-center gap-1.5">
+                            <Play className="w-2.5 h-2.5 fill-current text-cyan-400" /> Align
+                          </span>
+                          <span className="text-[10px] text-neutral-400 font-normal">
+                            Vertical line alignment & grouping calibration
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-cyan-400 border border-neutral-700">
+                          10m
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          handleStartGame('bull');
+                        }}
+                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-rose-500/20 active:bg-rose-500/30 text-xs text-white hover:text-rose-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs text-white group-hover:text-rose-300 font-bold flex items-center gap-1.5">
+                            <Play className="w-2.5 h-2.5 fill-current text-rose-400" /> Bull Warm Up
+                          </span>
+                          <span className="text-[10px] text-neutral-400 font-normal">
+                            Outer & inner bullseye focus & grouping
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-rose-400 border border-neutral-700">
+                          10m
+                        </span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
 
             {/* Step 2: Scoring */}
             <div className="bg-neutral-900/95 border border-neutral-800 rounded-2xl p-3.5 sm:p-4 hover:border-cyan-500/40 transition-all">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
                     <span className="w-5 h-5 rounded-full bg-cyan-500/20 text-cyan-400 font-black text-xs flex items-center justify-center border border-cyan-500/40 shrink-0">
                       2
                     </span>
-                    <h3 className="text-xs sm:text-sm md:text-base font-bold text-white whitespace-nowrap">
+                    <h3 className="text-sm sm:text-base font-bold text-white whitespace-nowrap">
                       Scoring — 20 min
                     </h3>
                     <span className="px-1.5 sm:px-2 py-0.5 rounded bg-neutral-800 text-[10px] font-bold text-cyan-300 border border-neutral-700 whitespace-nowrap">
@@ -359,52 +454,135 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                     </span>
                   </div>
                   <p className="text-xs text-neutral-400 leading-relaxed">
-                    Choose 2 10 min games.
+                    Choose 2 10 min games to build heavy treble scoring and switch accuracy.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-1 lg:pt-0">
+                <div className="relative shrink-0 pt-1 sm:pt-0" data-dropdown-container>
                   <button
                     type="button"
-                    onClick={() => handleStartGame('score')}
-                    className="px-2 py-1.5 rounded-xl bg-neutral-800 hover:bg-cyan-600 active:scale-95 text-xs text-cyan-400 hover:text-white font-bold flex items-center justify-center gap-1 border border-neutral-700 hover:border-cyan-500 transition-all cursor-pointer whitespace-nowrap"
+                    id="dropdown-scoring-btn"
+                    onClick={() => setOpenDropdown((prev) => (prev === 'scoring' ? null : 'scoring'))}
+                    className={`w-full sm:w-auto px-3.5 py-1.5 rounded-xl active:scale-95 text-xs font-bold flex items-center justify-center gap-1.5 border transition-all cursor-pointer whitespace-nowrap ${
+                      openDropdown === 'scoring'
+                        ? 'bg-cyan-600 text-white border-cyan-400 shadow-md ring-2 ring-cyan-500/40'
+                        : 'bg-neutral-800 hover:bg-neutral-700 text-cyan-400 hover:text-white border-neutral-700 hover:border-cyan-500'
+                    }`}
                   >
-                    <Play className="w-2.5 h-2.5 fill-current" /> High Score (10m)
+                    <Play className="w-3 h-3 fill-current" />
+                    <span>Games</span>
+                    {openDropdown === 'scoring' ? (
+                      <ChevronUp className="w-3.5 h-3.5 opacity-80" />
+                    ) : (
+                      <ChevronDown className="w-3.5 h-3.5 opacity-80" />
+                    )}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => handleStartGame('switchblade')}
-                    className="px-2 py-1.5 rounded-xl bg-neutral-800 hover:bg-rose-600 active:scale-95 text-xs text-rose-400 hover:text-white font-bold flex items-center justify-center gap-1 border border-neutral-700 hover:border-rose-500 transition-all cursor-pointer whitespace-nowrap"
-                  >
-                    <Play className="w-2.5 h-2.5 fill-current" /> Switchblade (10m)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleStartGame('powerswitch')}
-                    className="px-2 py-1.5 rounded-xl bg-neutral-800 hover:bg-amber-600 active:scale-95 text-xs text-amber-400 hover:text-white font-bold flex items-center justify-center gap-1 border border-neutral-700 hover:border-amber-500 transition-all cursor-pointer whitespace-nowrap"
-                  >
-                    <Play className="w-2.5 h-2.5 fill-current" /> Power Switch (10m)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleStartGame('bigscores')}
-                    className="px-2 py-1.5 rounded-xl bg-neutral-800 hover:bg-violet-600 active:scale-95 text-xs text-violet-400 hover:text-white font-bold flex items-center justify-center gap-1 border border-neutral-700 hover:border-violet-500 transition-all cursor-pointer whitespace-nowrap"
-                  >
-                    <Play className="w-2.5 h-2.5 fill-current" /> Big Scores (10m)
-                  </button>
+
+                  {/* Falling Dropdown Menu */}
+                  {openDropdown === 'scoring' && (
+                    <div className="absolute right-0 top-full mt-1.5 w-72 sm:w-80 bg-[#14181d] border border-[#2b3542] rounded-xl shadow-2xl p-1.5 z-40 animate-fadeIn space-y-1">
+                      <div className="px-2 py-1 text-[10px] font-bold text-neutral-400 uppercase tracking-wider border-b border-[#222933]">
+                        Select Scoring Game (10 min)
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          handleStartGame('score');
+                        }}
+                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-cyan-500/20 active:bg-cyan-500/30 text-xs text-white hover:text-cyan-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs text-white group-hover:text-cyan-300 font-bold flex items-center gap-1.5">
+                            <Play className="w-2.5 h-2.5 fill-current text-cyan-400" /> High Score
+                          </span>
+                          <span className="text-[10px] text-neutral-400 font-normal">
+                            Traditional 3-dart power treble scoring
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-cyan-400 border border-neutral-700">
+                          10m
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          handleStartGame('switchblade');
+                        }}
+                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-rose-500/20 active:bg-rose-500/30 text-xs text-white hover:text-rose-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs text-white group-hover:text-rose-300 font-bold flex items-center gap-1.5">
+                            <Play className="w-2.5 h-2.5 fill-current text-rose-400" /> Switchblade
+                          </span>
+                          <span className="text-[10px] text-neutral-400 font-normal">
+                            Dynamic alternate scoring T20 / T19 / T18
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-rose-400 border border-neutral-700">
+                          10m
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          handleStartGame('powerswitch');
+                        }}
+                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-amber-500/20 active:bg-amber-500/30 text-xs text-white hover:text-amber-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs text-white group-hover:text-amber-300 font-bold flex items-center gap-1.5">
+                            <Play className="w-2.5 h-2.5 fill-current text-amber-400" /> Power Switch
+                          </span>
+                          <span className="text-[10px] text-neutral-400 font-normal">
+                            Starts at T20, Treble holds & switch on miss
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-amber-400 border border-neutral-700">
+                          10m
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          handleStartGame('bigscores');
+                        }}
+                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-violet-500/20 active:bg-violet-500/30 text-xs text-white hover:text-violet-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs text-white group-hover:text-violet-300 font-bold flex items-center gap-1.5">
+                            <Play className="w-2.5 h-2.5 fill-current text-violet-400" /> Big Scores
+                          </span>
+                          <span className="text-[10px] text-neutral-400 font-normal">
+                            Target power scores 100+ & 140+
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-violet-400 border border-neutral-700">
+                          10m
+                        </span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
 
             {/* Step 3: Finishing */}
             <div className="bg-neutral-900/95 border border-neutral-800 rounded-2xl p-3.5 sm:p-4 hover:border-amber-500/40 transition-all">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
                     <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 font-black text-xs flex items-center justify-center border border-amber-500/40 shrink-0">
                       3
                     </span>
-                    <h3 className="text-xs sm:text-sm md:text-base font-bold text-white whitespace-nowrap">
+                    <h3 className="text-sm sm:text-base font-bold text-white whitespace-nowrap">
                       Finishing & Outshots — 20 min
                     </h3>
                     <span className="px-1.5 sm:px-2 py-0.5 rounded bg-neutral-800 text-[10px] font-bold text-amber-300 border border-neutral-700 whitespace-nowrap">
@@ -412,111 +590,143 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                     </span>
                   </div>
                   <p className="text-xs text-neutral-400 leading-relaxed">
-                    Choose one 20 min drill.
+                    Choose one 20 min drill to master crucial checkout routes, combinations, and doubles.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-1 lg:pt-0">
-                  {/* 121 Dropdown Launcher */}
-                  <div className="relative w-full">
-                    <button
-                      type="button"
-                      id="dropdown-121-btn"
-                      onClick={() => setOpenDropdown121((prev) => !prev)}
-                      className={`w-full px-2 py-1.5 rounded-xl active:scale-95 text-xs font-bold flex items-center justify-center gap-1.5 border transition-all cursor-pointer whitespace-nowrap ${
-                        openDropdown121
-                          ? 'bg-amber-600 text-white border-amber-400 shadow-md ring-2 ring-amber-500/40'
-                          : 'bg-neutral-800 hover:bg-neutral-700 text-amber-400 hover:text-white border-neutral-700 hover:border-amber-500'
-                      }`}
-                    >
-                      <Play className="w-2.5 h-2.5 fill-current" />
-                      <span>121</span>
-                      {openDropdown121 ? (
-                        <ChevronUp className="w-3.5 h-3.5 opacity-80" />
-                      ) : (
-                        <ChevronDown className="w-3.5 h-3.5 opacity-80" />
-                      )}
-                    </button>
-
-                    {/* Falling Dropdown Menu */}
-                    {openDropdown121 && (
-                      <div className="absolute left-0 lg:right-0 lg:left-auto top-full mt-1.5 w-48 bg-[#14181d] border border-[#2b3542] rounded-xl shadow-2xl p-1.5 z-40 animate-fadeIn space-y-1">
-                        <div className="px-2 py-1 text-[10px] font-bold text-neutral-400 uppercase tracking-wider border-b border-[#222933]">
-                          Choose 121 Mode
-                        </div>
-
-                        <button
-                          type="button"
-                          id="select-121-9d-btn"
-                          onClick={() => {
-                            setOpenDropdown121(false);
-                            handleStartGame('1219');
-                          }}
-                          className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-amber-500/20 active:bg-amber-500/30 text-xs text-white hover:text-amber-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
-                        >
-                          <div className="flex flex-col">
-                            <span className="text-xs text-white group-hover:text-amber-300 font-bold flex items-center gap-1.5">
-                              <Play className="w-2.5 h-2.5 fill-current text-amber-400" /> 9 Darts Mode
-                            </span>
-                            <span className="text-[10px] text-neutral-400 font-normal">
-                              3 darts per attempt · 3 lives
-                            </span>
-                          </div>
-                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-amber-400 border border-neutral-700">
-                            9d
-                          </span>
-                        </button>
-
-                        <button
-                          type="button"
-                          id="select-121-12d-btn"
-                          onClick={() => {
-                            setOpenDropdown121(false);
-                            handleStartGame('12112');
-                          }}
-                          className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-amber-500/20 active:bg-amber-500/30 text-xs text-white hover:text-amber-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
-                        >
-                          <div className="flex flex-col">
-                            <span className="text-xs text-white group-hover:text-amber-300 font-bold flex items-center gap-1.5">
-                              <Play className="w-2.5 h-2.5 fill-current text-amber-400" /> 12 Darts Mode
-                            </span>
-                            <span className="text-[10px] text-neutral-400 font-normal">
-                              6 darts per attempt · 3 lives
-                            </span>
-                          </div>
-                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-amber-400 border border-neutral-700">
-                            12d
-                          </span>
-                        </button>
-                      </div>
+                <div className="relative shrink-0 pt-1 sm:pt-0" data-dropdown-container>
+                  <button
+                    type="button"
+                    id="dropdown-finishing-btn"
+                    onClick={() => setOpenDropdown((prev) => (prev === 'finishing' ? null : 'finishing'))}
+                    className={`w-full sm:w-auto px-3.5 py-1.5 rounded-xl active:scale-95 text-xs font-bold flex items-center justify-center gap-1.5 border transition-all cursor-pointer whitespace-nowrap ${
+                      openDropdown === 'finishing'
+                        ? 'bg-amber-600 text-white border-amber-400 shadow-md ring-2 ring-amber-500/40'
+                        : 'bg-neutral-800 hover:bg-neutral-700 text-amber-400 hover:text-white border-neutral-700 hover:border-amber-500'
+                    }`}
+                  >
+                    <Play className="w-3 h-3 fill-current" />
+                    <span>Games</span>
+                    {openDropdown === 'finishing' ? (
+                      <ChevronUp className="w-3.5 h-3.5 opacity-80" />
+                    ) : (
+                      <ChevronDown className="w-3.5 h-3.5 opacity-80" />
                     )}
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => handleStartGame('catch40')}
-                    className="w-full px-2 py-1.5 rounded-xl bg-neutral-800 hover:bg-yellow-600 active:scale-95 text-xs text-yellow-400 hover:text-white font-bold flex items-center justify-center gap-1 border border-neutral-700 hover:border-yellow-500 transition-all cursor-pointer whitespace-nowrap"
-                  >
-                    <Play className="w-2.5 h-2.5 fill-current" /> Catch 40
                   </button>
 
-                  <button
-                    type="button"
-                    id="launch-checkout-challenge-btn"
-                    onClick={() => handleStartGame('cochallenge')}
-                    className="w-full px-2 py-1.5 rounded-xl bg-neutral-800 hover:bg-cyan-600 active:scale-95 text-xs text-cyan-400 hover:text-white font-bold flex items-center justify-center gap-1 border border-neutral-700 hover:border-cyan-500 transition-all cursor-pointer whitespace-nowrap"
-                  >
-                    <Play className="w-2.5 h-2.5 fill-current" /> Checkout Challenge
-                  </button>
+                  {/* Falling Dropdown Menu */}
+                  {openDropdown === 'finishing' && (
+                    <div className="absolute right-0 top-full mt-1.5 w-72 sm:w-80 bg-[#14181d] border border-[#2b3542] rounded-xl shadow-2xl p-1.5 z-40 animate-fadeIn space-y-1">
+                      <div className="px-2 py-1 text-[10px] font-bold text-neutral-400 uppercase tracking-wider border-b border-[#222933]">
+                        Select Checkout Drill
+                      </div>
 
-                  <button
-                    type="button"
-                    id="launch-doubles-boomerang-btn"
-                    onClick={() => handleStartGame('boomerang')}
-                    className="w-full px-2 py-1.5 rounded-xl bg-neutral-800 hover:bg-sky-600 active:scale-95 text-xs text-sky-400 hover:text-white font-bold flex items-center justify-center gap-1 border border-neutral-700 hover:border-sky-500 transition-all cursor-pointer whitespace-nowrap"
-                  >
-                    <Play className="w-2.5 h-2.5 fill-current" /> Doubles Boomerang
-                  </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          handleStartGame('1219');
+                        }}
+                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-amber-500/20 active:bg-amber-500/30 text-xs text-white hover:text-amber-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs text-white group-hover:text-amber-300 font-bold flex items-center gap-1.5">
+                            <Play className="w-2.5 h-2.5 fill-current text-amber-400" /> 121 (9 Darts Mode)
+                          </span>
+                          <span className="text-[10px] text-neutral-400 font-normal">
+                            3 darts per attempt · 3 lives · Ladder 121→130
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-amber-400 border border-neutral-700">
+                          20m
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          handleStartGame('12112');
+                        }}
+                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-amber-500/20 active:bg-amber-500/30 text-xs text-white hover:text-amber-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs text-white group-hover:text-amber-300 font-bold flex items-center gap-1.5">
+                            <Play className="w-2.5 h-2.5 fill-current text-amber-400" /> 121 (12 Darts Mode)
+                          </span>
+                          <span className="text-[10px] text-neutral-400 font-normal">
+                            6 darts per attempt · 3 lives · Ladder 121→130
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-amber-400 border border-neutral-700">
+                          20m
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          handleStartGame('catch40');
+                        }}
+                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-yellow-500/20 active:bg-yellow-500/30 text-xs text-white hover:text-yellow-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs text-white group-hover:text-yellow-300 font-bold flex items-center gap-1.5">
+                            <Play className="w-2.5 h-2.5 fill-current text-yellow-400" /> Catch 40
+                          </span>
+                          <span className="text-[10px] text-neutral-400 font-normal">
+                            Master checkouts 61 to 100 with dart efficiency
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-yellow-400 border border-neutral-700">
+                          20m
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          handleStartGame('cochallenge');
+                        }}
+                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-cyan-500/20 active:bg-cyan-500/30 text-xs text-white hover:text-cyan-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs text-white group-hover:text-cyan-300 font-bold flex items-center gap-1.5">
+                            <Play className="w-2.5 h-2.5 fill-current text-cyan-400" /> Checkout Challenge
+                          </span>
+                          <span className="text-[10px] text-neutral-400 font-normal">
+                            Dynamic random match outshots from 41 to 120
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-cyan-400 border border-neutral-700">
+                          20m
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          handleStartGame('boomerang');
+                        }}
+                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-sky-500/20 active:bg-sky-500/30 text-xs text-white hover:text-sky-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs text-white group-hover:text-sky-300 font-bold flex items-center gap-1.5">
+                            <Play className="w-2.5 h-2.5 fill-current text-sky-400" /> Doubles Boomerang
+                          </span>
+                          <span className="text-[10px] text-neutral-400 font-normal">
+                            Round-the-board doubles D20 down to D1 & back
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-sky-400 border border-neutral-700">
+                          10m
+                        </span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -591,99 +801,118 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   </p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-1.5 shrink-0 pt-1 sm:pt-0">
-                  {/* Big Singles Dropdown Launcher */}
-                  <div className="relative">
-                    <button
-                      type="button"
-                      id="dropdown-bigsingles-btn"
-                      onClick={() => {
-                        setOpenDropdownBigSingles((prev) => !prev);
-                        setOpenDropdown121(false);
-                      }}
-                      className={`px-3 py-1.5 rounded-xl active:scale-95 text-xs font-bold flex items-center justify-center gap-1.5 border transition-all cursor-pointer whitespace-nowrap ${
-                        openDropdownBigSingles
-                          ? 'bg-cyan-600 text-white border-cyan-400 shadow-md ring-2 ring-cyan-500/40'
-                          : 'bg-neutral-800 hover:bg-neutral-700 text-cyan-400 hover:text-white border-neutral-700 hover:border-cyan-500'
-                      }`}
-                    >
-                      <Play className="w-2.5 h-2.5 fill-current" />
-                      <span>Big Singles</span>
-                      {openDropdownBigSingles ? (
-                        <ChevronUp className="w-3.5 h-3.5 opacity-80" />
-                      ) : (
-                        <ChevronDown className="w-3.5 h-3.5 opacity-80" />
-                      )}
-                    </button>
-
-                    {/* Falling Dropdown Menu */}
-                    {openDropdownBigSingles && (
-                      <div className="absolute left-0 sm:right-0 sm:left-auto top-full mt-1.5 w-64 bg-[#14181d] border border-[#2b3542] rounded-xl shadow-2xl p-1.5 z-40 animate-fadeIn space-y-1">
-                        <div className="px-2 py-1 text-[10px] font-bold text-neutral-400 uppercase tracking-wider border-b border-[#222933]">
-                          Choose Big Singles Level
-                        </div>
-
-                        <button
-                          type="button"
-                          id="select-bigsingles-intermediate-btn"
-                          onClick={() => {
-                            setOpenDropdownBigSingles(false);
-                            handleStartGame('bigsingles_intermediate');
-                          }}
-                          className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-cyan-500/20 active:bg-cyan-500/30 text-xs text-white hover:text-cyan-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
-                        >
-                          <div className="flex flex-col">
-                            <span className="text-xs text-white group-hover:text-cyan-300 font-bold flex items-center gap-1.5">
-                              <Play className="w-2.5 h-2.5 fill-current text-cyan-400" /> Intermediate Level
-                            </span>
-                            <span className="text-[10px] text-neutral-400 font-normal">
-                              2 or 3 hits: advance (+1) · 1 hit: stay (0) · 0 hits: back 1 (-1)
-                            </span>
-                          </div>
-                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-cyan-400 border border-neutral-700">
-                            Inter
-                          </span>
-                        </button>
-
-                        <button
-                          type="button"
-                          id="select-bigsingles-advanced-btn"
-                          onClick={() => {
-                            setOpenDropdownBigSingles(false);
-                            handleStartGame('bigsingles_advanced');
-                          }}
-                          className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-amber-500/20 active:bg-amber-500/30 text-xs text-white hover:text-amber-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
-                        >
-                          <div className="flex flex-col">
-                            <span className="text-xs text-white group-hover:text-amber-300 font-bold flex items-center gap-1.5">
-                              <Play className="w-2.5 h-2.5 fill-current text-amber-400" /> Advanced Level
-                            </span>
-                            <span className="text-[10px] text-neutral-400 font-normal">
-                              3 hits: +1 · 2 hits: 0 · 1 hit: -1 · 0 hits: -2
-                            </span>
-                          </div>
-                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-amber-400 border border-neutral-700">
-                            Adv
-                          </span>
-                        </button>
-                      </div>
+                <div className="relative shrink-0 pt-1 sm:pt-0" data-dropdown-container>
+                  <button
+                    type="button"
+                    id="dropdown-singles-btn"
+                    onClick={() => setOpenDropdown((prev) => (prev === 'singles' ? null : 'singles'))}
+                    className={`w-full sm:w-auto px-3.5 py-1.5 rounded-xl active:scale-95 text-xs font-bold flex items-center justify-center gap-1.5 border transition-all cursor-pointer whitespace-nowrap ${
+                      openDropdown === 'singles'
+                        ? 'bg-purple-600 text-white border-purple-400 shadow-md ring-2 ring-purple-500/40'
+                        : 'bg-neutral-800 hover:bg-neutral-700 text-purple-400 hover:text-white border-neutral-700 hover:border-purple-500'
+                    }`}
+                  >
+                    <Play className="w-3 h-3 fill-current" />
+                    <span>Games</span>
+                    {openDropdown === 'singles' ? (
+                      <ChevronUp className="w-3.5 h-3.5 opacity-80" />
+                    ) : (
+                      <ChevronDown className="w-3.5 h-3.5 opacity-80" />
                     )}
-                  </div>
+                  </button>
 
-                  <button
-                    type="button"
-                    onClick={() => handleStartGame('a1practice')}
-                    className="px-3 py-1.5 rounded-xl bg-neutral-800 hover:bg-amber-600 active:scale-95 text-xs text-amber-400 hover:text-white font-bold flex items-center justify-center gap-1 border border-neutral-700 hover:border-amber-500 transition-all cursor-pointer"
-                  >
-                    <Play className="w-3 h-3 fill-current" /> A1 Practice
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleStartGame('triple')}
-                    className="px-3 py-1.5 rounded-xl bg-neutral-800 hover:bg-purple-600 active:scale-95 text-xs text-purple-400 hover:text-white font-bold flex items-center justify-center gap-1 border border-neutral-700 hover:border-purple-500 transition-all cursor-pointer"
-                  >
-                    <Play className="w-3 h-3 fill-current" /> Triple Lock
-                  </button>
+                  {/* Falling Dropdown Menu */}
+                  {openDropdown === 'singles' && (
+                    <div className="absolute right-0 top-full mt-1.5 w-72 sm:w-80 bg-[#14181d] border border-[#2b3542] rounded-xl shadow-2xl p-1.5 z-40 animate-fadeIn space-y-1">
+                      <div className="px-2 py-1 text-[10px] font-bold text-neutral-400 uppercase tracking-wider border-b border-[#222933]">
+                        Select Precision Game
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          handleStartGame('bigsingles_intermediate');
+                        }}
+                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-cyan-500/20 active:bg-cyan-500/30 text-xs text-white hover:text-cyan-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs text-white group-hover:text-cyan-300 font-bold flex items-center gap-1.5">
+                            <Play className="w-2.5 h-2.5 fill-current text-cyan-400" /> Big Singles (Intermediate)
+                          </span>
+                          <span className="text-[10px] text-neutral-400 font-normal">
+                            2/3 hits advance (+1) · 1 hit stay (0) · 0 hits back 1 (-1)
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-cyan-400 border border-neutral-700">
+                          10m
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          handleStartGame('bigsingles_advanced');
+                        }}
+                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-amber-500/20 active:bg-amber-500/30 text-xs text-white hover:text-amber-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs text-white group-hover:text-amber-300 font-bold flex items-center gap-1.5">
+                            <Play className="w-2.5 h-2.5 fill-current text-amber-400" /> Big Singles (Advanced)
+                          </span>
+                          <span className="text-[10px] text-neutral-400 font-normal">
+                            3 hits: +1 · 2 hits: 0 · 1 hit: -1 · 0 hits: -2
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-amber-400 border border-neutral-700">
+                          10m
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          handleStartGame('a1practice');
+                        }}
+                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-amber-500/20 active:bg-amber-500/30 text-xs text-white hover:text-amber-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs text-white group-hover:text-amber-300 font-bold flex items-center gap-1.5">
+                            <Play className="w-2.5 h-2.5 fill-current text-amber-400" /> A1 Practice
+                          </span>
+                          <span className="text-[10px] text-neutral-400 font-normal">
+                            Singles grouping & scoring 20 down to 12
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-amber-400 border border-neutral-700">
+                          10m
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          handleStartGame('triple');
+                        }}
+                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-purple-500/20 active:bg-purple-500/30 text-xs text-white hover:text-purple-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs text-white group-hover:text-purple-300 font-bold flex items-center gap-1.5">
+                            <Play className="w-2.5 h-2.5 fill-current text-purple-400" /> Triple Lock
+                          </span>
+                          <span className="text-[10px] text-neutral-400 font-normal">
+                            Target treble precision 20 down to 1 + Bull
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-purple-400 border border-neutral-700">
+                          20m
+                        </span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -708,21 +937,76 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0 pt-1 sm:pt-0">
+                <div className="relative shrink-0 pt-1 sm:pt-0" data-dropdown-container>
                   <button
                     type="button"
-                    onClick={() => handleStartGame('301')}
-                    className="flex-1 sm:flex-initial px-3 py-1.5 rounded-xl bg-neutral-800 hover:bg-yellow-600 active:scale-95 text-xs text-yellow-400 hover:text-white font-bold flex items-center justify-center gap-1.5 border border-neutral-700 hover:border-yellow-500 transition-all cursor-pointer"
+                    id="dropdown-match-btn"
+                    onClick={() => setOpenDropdown((prev) => (prev === 'match' ? null : 'match'))}
+                    className={`w-full sm:w-auto px-3.5 py-1.5 rounded-xl active:scale-95 text-xs font-bold flex items-center justify-center gap-1.5 border transition-all cursor-pointer whitespace-nowrap ${
+                      openDropdown === 'match'
+                        ? 'bg-yellow-600 text-white border-yellow-400 shadow-md ring-2 ring-yellow-500/40'
+                        : 'bg-neutral-800 hover:bg-neutral-700 text-yellow-400 hover:text-white border-neutral-700 hover:border-yellow-500'
+                    }`}
                   >
-                    <Play className="w-3 h-3 fill-current" /> 301 Solo
+                    <Play className="w-3 h-3 fill-current" />
+                    <span>Games</span>
+                    {openDropdown === 'match' ? (
+                      <ChevronUp className="w-3.5 h-3.5 opacity-80" />
+                    ) : (
+                      <ChevronDown className="w-3.5 h-3.5 opacity-80" />
+                    )}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => handleStartGame('dartbot')}
-                    className="flex-1 sm:flex-initial px-3 py-1.5 rounded-xl bg-neutral-800 hover:bg-rose-600 active:scale-95 text-xs text-rose-400 hover:text-white font-bold flex items-center justify-center gap-1.5 border border-neutral-700 hover:border-rose-500 transition-all cursor-pointer"
-                  >
-                    <Play className="w-3 h-3 fill-current" /> X01 Match
-                  </button>
+
+                  {/* Falling Dropdown Menu */}
+                  {openDropdown === 'match' && (
+                    <div className="absolute right-0 top-full mt-1.5 w-72 sm:w-80 bg-[#14181d] border border-[#2b3542] rounded-xl shadow-2xl p-1.5 z-40 animate-fadeIn space-y-1">
+                      <div className="px-2 py-1 text-[10px] font-bold text-neutral-400 uppercase tracking-wider border-b border-[#222933]">
+                        Select Match Play Format
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          handleStartGame('301');
+                        }}
+                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-yellow-500/20 active:bg-yellow-500/30 text-xs text-white hover:text-yellow-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs text-white group-hover:text-yellow-300 font-bold flex items-center gap-1.5">
+                            <Play className="w-2.5 h-2.5 fill-current text-yellow-400" /> 301 Solo Practice
+                          </span>
+                          <span className="text-[10px] text-neutral-400 font-normal">
+                            Rapid double-out 301 legs solo training
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-yellow-400 border border-neutral-700">
+                          Solo
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          handleStartGame('dartbot');
+                        }}
+                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-rose-500/20 active:bg-rose-500/30 text-xs text-white hover:text-rose-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs text-white group-hover:text-rose-300 font-bold flex items-center gap-1.5">
+                            <Play className="w-2.5 h-2.5 fill-current text-rose-400" /> X01 Match Play
+                          </span>
+                          <span className="text-[10px] text-neutral-400 font-normal">
+                            Challenge AI DartBot in a 501 match
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-rose-400 border border-neutral-700">
+                          vs Bot
+                        </span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

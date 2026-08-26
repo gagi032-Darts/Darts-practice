@@ -414,7 +414,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
                             </>
                           );
                         })()
-                      ) : item.gameType === 'bigsingles' ? (
+                      ) : item.gameType === 'bigsingles' || item.gameType === 'bigsingles_intermediate' || item.gameType === 'bigsingles_advanced' ? (
                         (() => {
                           const bsRes = item.result as any;
                           return (

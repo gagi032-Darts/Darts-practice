@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Zap, Hourglass, Flag, RotateCcw, Check } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { PowerSwitchResult, PowerSwitchVisitRecord } from '../../types';
@@ -33,28 +33,23 @@ export const PowerSwitchGame: React.FC<PowerSwitchGameProps> = ({
 }) => {
   const [history, setHistory] = useState<PowerSwitchVisitRecord[]>([]);
   const [visitNumber, setVisitNumber] = useState<number>(1);
-  const [initialTargetForVisit, setInitialTargetForVisit] = useState<string>('T20');
 
   // 3-dart hits for active visit
   const [dart1Hit, setDart1Hit] = useState<HitType | null>(null);
   const [dart2Hit, setDart2Hit] = useState<HitType | null>(null);
   const [dart3Hit, setDart3Hit] = useState<HitType | null>(null);
 
-  // Compute dynamic targets for Dart 1, Dart 2, and Dart 3
-  const target1 = initialTargetForVisit;
+  // Every visit strictly starts at T20
+  const target1 = 'T20';
   const target2 =
-    dart1Hit === 'treble'
-      ? target1
-      : dart1Hit
-      ? getNextTarget(target1)
-      : getNextTarget(target1); // default preview
+    dart1Hit === 'treble' || dart1Hit === null
+      ? 'T20'
+      : getNextTarget('T20'); // 'T19'
 
   const target3 =
-    dart2Hit === 'treble'
+    dart2Hit === 'treble' || dart2Hit === null
       ? target2
-      : dart2Hit
-      ? getNextTarget(target2)
-      : getNextTarget(target2); // default preview
+      : getNextTarget(target2);
 
   const p1 = getPointsForHit(dart1Hit);
   const p2 = getPointsForHit(dart2Hit);
@@ -81,7 +76,6 @@ export const PowerSwitchGame: React.FC<PowerSwitchGameProps> = ({
   });
 
   const trebleRate = totalDarts > 0 ? parseFloat(((trebleHits / totalDarts) * 100).toFixed(1)) : 0;
-  const hitRate = totalDarts > 0 ? parseFloat((((trebleHits + doubleHits + singleHits) / totalDarts) * 100).toFixed(1)) : 0;
 
   const buildResult = (records: PowerSwitchVisitRecord[]): PowerSwitchResult => {
     const sum = records.reduce((acc, x) => acc + x.totalPoints, 0);
@@ -126,7 +120,7 @@ export const PowerSwitchGame: React.FC<PowerSwitchGameProps> = ({
     const h2 = dart2Hit || 'miss';
     const h3 = dart3Hit || 'miss';
 
-    const finalTarget1 = target1;
+    const finalTarget1 = 'T20';
     const finalTarget2 = h1 === 'treble' ? finalTarget1 : getNextTarget(finalTarget1);
     const finalTarget3 = h2 === 'treble' ? finalTarget2 : getNextTarget(finalTarget2);
 
@@ -148,8 +142,6 @@ export const PowerSwitchGame: React.FC<PowerSwitchGameProps> = ({
       sound.bust();
     }
 
-    const nextInitialTarget = h3 === 'treble' ? finalTarget3 : getNextTarget(finalTarget3);
-
     const newRecord: PowerSwitchVisitRecord = {
       visitNumber,
       darts: [
@@ -164,12 +156,11 @@ export const PowerSwitchGame: React.FC<PowerSwitchGameProps> = ({
     setHistory(nextHistory);
     storage.recordDartsThrown(3);
 
-    // Reset visit
+    // Reset visit state - next visit always starts at T20
     setDart1Hit(null);
     setDart2Hit(null);
     setDart3Hit(null);
     setVisitNumber((prev) => prev + 1);
-    setInitialTargetForVisit(nextInitialTarget);
 
     if (isFinalInput) {
       onFinish(buildResult(nextHistory));
@@ -187,11 +178,40 @@ export const PowerSwitchGame: React.FC<PowerSwitchGameProps> = ({
     const last = history[history.length - 1];
     setHistory((prev) => prev.slice(0, -1));
     setVisitNumber(last.visitNumber);
-    setInitialTargetForVisit(last.darts[0].target);
     setDart1Hit(last.darts[0].multiplier);
     setDart2Hit(last.darts[1].multiplier);
     setDart3Hit(last.darts[2].multiplier);
   };
+
+  // Keyboard shortcut listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const activeTag = (document.activeElement?.tagName || '').toLowerCase();
+      if (activeTag === 'input' || activeTag === 'textarea') return;
+
+      if (e.key === 'Enter' || e.code === 'Space') {
+        e.preventDefault();
+        handleRegisterVisit();
+      } else if (e.key === 'u' || e.key === 'U') {
+        handleUndo();
+      } else if (e.key === 'h' || e.key === 'H' || e.key === 't' || e.key === 'T') {
+        // Quick 3 Trebles shortcut
+        sound.tap();
+        setDart1Hit('treble');
+        setDart2Hit('treble');
+        setDart3Hit('treble');
+      } else if (e.key === 'm' || e.key === 'M' || e.key === '0') {
+        // Quick 3 Misses shortcut
+        sound.tap();
+        setDart1Hit('miss');
+        setDart2Hit('miss');
+        setDart3Hit('miss');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  });
 
   return (
     <div className="w-full max-w-xl mx-auto space-y-2 sm:space-y-3">
@@ -289,7 +309,7 @@ export const PowerSwitchGame: React.FC<PowerSwitchGameProps> = ({
       <div className="bg-[#121519] border border-[#232930] rounded-2xl p-3 sm:p-4 text-center shadow-lg">
         <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#232930] text-xs">
           <span className="font-bold text-neutral-400 uppercase tracking-wider text-[11px]">
-            Target Rule: Hit Treble = Stay · Miss/Single/Double = Switch
+            Rule: Starts at T20 · Treble = Stay · Miss/Single/Double = Switch (T20→T19→T18)
           </span>
           <span className="font-mono text-emerald-400 font-bold">
             Visit Score: +{currentVisitPoints} pts

@@ -638,7 +638,7 @@ export const DoublesBoomerangGame: React.FC<DoublesBoomerangGameProps> = ({
 
             <div>
               <span className="text-xs font-bold text-sky-400 uppercase tracking-widest block mb-1">
-                ⏱️ 20 Minutes Completed!
+                ⏱️ 10 Minutes Completed!
               </span>
               <h2 className="text-2xl font-black text-white">
                 Time is Up

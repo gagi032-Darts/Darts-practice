@@ -77,8 +77,8 @@ export const GAME_DEFINITIONS: Record<GameType, GameInfo> = {
     category: 'score',
     categoryLabel: 'Scoring',
     durationMinutes: 10,
-    description: '10 minutes dynamic target sequence (T20, T19, T18). Hit Treble (3 pts) to STAY on target with next dart; hit Single/Double or Miss to switch to the next target.',
-    subtitle: '10 min · T20 / T19 / T18 dynamic treble hold & switch',
+    description: 'Every visit starts at T20. Hit Treble (3 pts) to STAY on target; Miss, Single, or Double switches to the next target (T20→T19→T18). A perfect visit is 180.',
+    subtitle: '10 min · Every visit starts T20 · Treble stays, Miss switches',
     icon: 'Zap',
   },
   bigscores: {
@@ -136,9 +136,9 @@ export const GAME_DEFINITIONS: Record<GameType, GameInfo> = {
     title: 'Doubles Boomerang',
     category: 'finish',
     categoryLabel: 'Finishing',
-    durationMinutes: 20,
+    durationMinutes: 10,
     description: 'Hit each double clockwise starting with D1 (D1, D18, D4...). 1 dart per double. Hit locks the double and you move on; miss returns to it on the next throw. Use as few darts as possible to clear the board!',
-    subtitle: '20 min · Clockwise D1→D20 · Hit locks, Miss returns',
+    subtitle: '10 min · Clockwise D1→D20 · Hit locks, Miss returns',
     icon: 'RotateCw',
   },
   a1practice: {
