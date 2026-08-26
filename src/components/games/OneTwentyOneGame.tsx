@@ -483,58 +483,20 @@ export const OneTwentyOneGame: React.FC<OneTwentyOneGameProps> = ({
         </div>
       </div>
 
-      {/* Green Banner matching 121.jpg ("yes with 6 darts") */}
-      <div className="bg-[#183a22] border border-[#2d6a3f] rounded-xl py-2 px-3 text-center text-xs sm:text-sm font-bold text-emerald-200 shadow-xs flex items-center justify-center gap-2">
-        <Flame className="w-4 h-4 text-emerald-400" />
-        <span>
-          {currentAttemptDarts > 0
-            ? `Current Attempt: ${currentAttemptDarts} darts used (≤ ${cpThreshold} to lock)`
-            : `yes with ${cpThreshold} darts (locks new checkpoint)`}
-        </span>
-      </div>
-
-      {/* Prompt Subtitle matching 121.jpg */}
-      <div className="text-center text-xs sm:text-sm font-bold text-neutral-300">
-        checkout with max.{dartLimit} Darts?
-      </div>
-
-      {/* Two Large Action Buttons: [Yes] (green) and [No] (dark red) */}
-      <div className="grid grid-cols-2 gap-2.5">
-        <button
-          type="button"
-          id="one21-btn-yes"
-          onClick={handleDirectYesCheckout}
-          className="h-16 sm:h-18 rounded-2xl bg-[#1b4332] hover:bg-[#2d6a4f] active:scale-95 text-white font-black text-xl border border-[#40916c] flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
-        >
-          <Check className="w-6 h-6 stroke-[3]" />
-          <span>Yes</span>
-        </button>
-
-        <button
-          type="button"
-          id="one21-btn-no"
-          onClick={handleDirectNoFail}
-          className="h-16 sm:h-18 rounded-2xl bg-[#2e1d21] hover:bg-[#3d242a] active:scale-95 text-rose-200 hover:text-white font-black text-xl border border-[#522932] flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
-        >
-          <X className="w-6 h-6 stroke-[3]" />
-          <span>No</span>
-        </button>
-      </div>
-
-      {/* Suggested Checkout Route Bar */}
+      {/* Suggested Checkout Route Bar (Circled in yellow - Made bigger & more prominent) */}
       {suggestedRoute && (
-        <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-[#131916] border border-[#203a27] text-xs font-mono font-bold text-emerald-300">
-          <div className="flex items-center gap-1.5">
-            <Target className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Route: {suggestedRoute}</span>
+        <div className="flex items-center justify-between px-4 py-3 rounded-2xl bg-[#131d17] border border-[#234b30] text-sm sm:text-base font-mono font-bold text-emerald-300 shadow-md">
+          <div className="flex items-center gap-2">
+            <Target className="w-5 h-5 text-emerald-400 shrink-0" />
+            <span>Route: <b className="text-white tracking-wide">{suggestedRoute}</b></span>
           </div>
           {onOpenCheckoutAi && (
             <button
               type="button"
               onClick={() => onOpenCheckoutAi(scoreRemaining)}
-              className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-md hover:bg-emerald-500/30 flex items-center gap-1 cursor-pointer"
+              className="text-xs bg-emerald-500/25 hover:bg-emerald-500/40 text-emerald-300 hover:text-white px-3 py-1.5 rounded-lg flex items-center gap-1.5 border border-emerald-500/30 cursor-pointer font-sans font-semibold transition-all active:scale-95 shadow-xs"
             >
-              <Sparkles className="w-3 h-3 text-emerald-400" />
+              <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
               <span>AI Tip</span>
             </button>
           )}

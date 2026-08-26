@@ -653,52 +653,59 @@ export const RTWSinglesGame: React.FC<RTWSinglesGameProps> = ({
       </div>
 
       {/* Main Play Area */}
-      <div className="bg-[#111418] border border-[#222933] rounded-3xl p-5 sm:p-6 shadow-2xl space-y-6">
-        {/* Active Target Banner & Scoring HUD */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Target Box */}
-          <div className="bg-gradient-to-br from-neutral-850 to-neutral-900 border border-neutral-750 rounded-2xl p-5 text-center shadow-inner relative overflow-hidden flex flex-col justify-center items-center">
-            <span className="text-xs font-bold text-neutral-400 uppercase tracking-widest block mb-1">
-              Active Target (1 Dart)
-            </span>
-            <div className="text-4xl sm:text-5xl font-black font-mono text-cyan-400 tracking-tight flex items-center justify-center gap-2 my-1">
-              <span>{currentTarget.label}</span>
+      <div className="bg-[#111418] border border-[#222933] rounded-3xl p-3.5 sm:p-5 shadow-2xl space-y-3.5">
+        {/* Unified Compact Target & Miss Meter Card (Merged for Phone Screens) */}
+        <div className="bg-gradient-to-br from-neutral-850 to-neutral-900 border border-neutral-750 rounded-2xl p-3 sm:p-4 shadow-inner space-y-2.5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-800/80 pb-2.5">
+            {/* Target Display */}
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 flex items-center justify-center font-black font-mono text-xl sm:text-2xl shadow-inner shrink-0">
+                {currentTarget.shortLabel}
+              </div>
+              <div>
+                <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block">
+                  Active Target (1 Dart)
+                </span>
+                <div className="text-lg sm:text-xl font-black font-mono text-white tracking-tight leading-tight">
+                  {currentTarget.label}
+                </div>
+                <div className="text-[11px] text-neutral-400 font-medium">
+                  {currentStep === 21 ? (
+                    <span className="text-rose-400 font-bold">🎯 Hit Bull to Clear Round!</span>
+                  ) : (
+                    <span>Hit: <b className="text-emerald-400">S{currentStep + 1}</b> · Miss: <b className="text-rose-400">{currentStep === 1 ? 'S1' : `S${currentStep - 1}`}</b></span>
+                  )}
+                </div>
+              </div>
             </div>
-            <p className="text-xs text-neutral-400 font-medium">
-              {currentStep === 21 ? (
-                <b className="text-rose-400">Target the Bullseye to Clear the Round!</b>
-              ) : (
-                <>Throw at <b className="text-white">{currentTarget.label}</b> (Hit: S{currentStep + 1} · Miss: {currentStep === 1 ? 'S1' : `S${currentStep - 1}`})</>
-              )}
-            </p>
-          </div>
 
-          {/* Strikes / Misses Status Card */}
-          <div className="bg-gradient-to-br from-neutral-850 to-neutral-900 border border-neutral-750 rounded-2xl p-5 shadow-inner flex flex-col justify-between">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-neutral-400 uppercase tracking-widest block">
+            {/* Strikes/Miss Counter Badge */}
+            <div className="flex sm:flex-col items-center sm:items-end justify-between gap-1 shrink-0">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
                 {difficulty === 'intermediate' ? 'Strikeout Meter' : 'Miss Capacity'}
               </span>
-              <span className="text-xs font-mono font-bold text-amber-400">
+              <span className="text-xs sm:text-sm font-mono font-bold text-amber-400 px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800">
                 {difficulty === 'intermediate'
                   ? `${consecutiveMisses} / 3 Strikes`
                   : `${totalMissesInRun} / 5 Misses`}
               </span>
             </div>
+          </div>
 
-            {/* Visual Strike Pills */}
+          {/* Compact Strike / Miss Pills */}
+          <div>
             {difficulty === 'intermediate' ? (
-              <div className="my-2 space-y-1.5">
-                <div className="grid grid-cols-3 gap-2">
+              <div className="space-y-1">
+                <div className="grid grid-cols-3 gap-1.5">
                   {[1, 2, 3].map((strikeIndex) => {
                     const isTriggered = consecutiveMisses >= strikeIndex;
                     return (
                       <div
                         key={strikeIndex}
-                        className={`h-9 rounded-xl border flex items-center justify-center font-bold text-xs transition-all ${
+                        className={`h-7 sm:h-8 rounded-lg border flex items-center justify-center font-bold text-[11px] sm:text-xs transition-all ${
                           isTriggered
-                            ? 'bg-rose-600/90 border-rose-500 text-white shadow-lg animate-pulse'
-                            : 'bg-neutral-800 border-neutral-700 text-neutral-500'
+                            ? 'bg-rose-600/90 border-rose-500 text-white shadow-md animate-pulse'
+                            : 'bg-neutral-800/80 border-neutral-700 text-neutral-500'
                         }`}
                       >
                         {isTriggered ? `❌ Strike ${strikeIndex}` : `Safe ${strikeIndex}`}
@@ -706,26 +713,29 @@ export const RTWSinglesGame: React.FC<RTWSinglesGameProps> = ({
                     );
                   })}
                 </div>
-                <p className="text-[11px] text-neutral-400 text-center">
-                  {consecutiveMisses === 2 ? (
-                    <b className="text-rose-400">⚠️ DANGER: 1 miss away from Game Over!</b>
-                  ) : (
-                    '3 consecutive misses will end the run.'
-                  )}
-                </p>
+                <div className="flex items-center justify-between text-[10px] text-neutral-400 px-1 pt-0.5">
+                  <span>
+                    {consecutiveMisses === 2 ? (
+                      <b className="text-rose-400">⚠️ DANGER: 1 miss away from KO!</b>
+                    ) : (
+                      '3 misses in a row = Out'
+                    )}
+                  </span>
+                  <span className="text-neutral-500 text-[10px]">Bull misses drop to S20 (No KO)</span>
+                </div>
               </div>
             ) : (
-              <div className="my-2 space-y-1.5">
+              <div className="space-y-1">
                 <div className="grid grid-cols-5 gap-1.5">
                   {[1, 2, 3, 4, 5].map((missIndex) => {
                     const isTriggered = totalMissesInRun >= missIndex;
                     return (
                       <div
                         key={missIndex}
-                        className={`h-9 rounded-xl border flex items-center justify-center font-bold text-xs transition-all ${
+                        className={`h-7 sm:h-8 rounded-lg border flex items-center justify-center font-bold text-[11px] sm:text-xs transition-all ${
                           isTriggered
-                            ? 'bg-rose-600/90 border-rose-500 text-white shadow-lg'
-                            : 'bg-neutral-800 border-neutral-700 text-neutral-500'
+                            ? 'bg-rose-600/90 border-rose-500 text-white shadow-md'
+                            : 'bg-neutral-800/80 border-neutral-700 text-neutral-500'
                         }`}
                       >
                         {isTriggered ? '❌' : `M${missIndex}`}
@@ -733,36 +743,33 @@ export const RTWSinglesGame: React.FC<RTWSinglesGameProps> = ({
                     );
                   })}
                 </div>
-                <p className="text-[11px] text-neutral-400 text-center">
-                  {totalMissesInRun === 4 ? (
-                    <b className="text-rose-400">⚠️ FINAL CHANCE: 1 miss left before Game Over!</b>
-                  ) : (
-                    '5 total misses in the run will end the game.'
-                  )}
-                </p>
+                <div className="flex items-center justify-between text-[10px] text-neutral-400 px-1 pt-0.5">
+                  <span>
+                    {totalMissesInRun === 4 ? (
+                      <b className="text-rose-400">⚠️ FINAL CHANCE: 1 miss left before KO!</b>
+                    ) : (
+                      '5 total misses = Out'
+                    )}
+                  </span>
+                  <span className="text-neutral-500 text-[10px]">Bull misses drop to S20 (No KO)</span>
+                </div>
               </div>
             )}
-
-            {/* Bull Rule Notice */}
-            <div className="p-2 rounded-xl bg-neutral-900/90 border border-neutral-800 text-[11px] text-neutral-400 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span>Bull misses do NOT add strikes/misses, but drop you back to S20.</span>
-            </div>
           </div>
         </div>
 
-        {/* Current Visit Tracker (Dart 1, Dart 2, Dart 3) */}
-        <div className="bg-[#151921] border border-[#2b3542] rounded-2xl p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-neutral-300 uppercase tracking-wider block">
-              Visit #{visitNumber} — Darts at the Oche
+        {/* Compact Visit Tracker (Circled in yellow - Made smaller) */}
+        <div className="bg-[#151921] border border-[#2b3542] rounded-xl p-2.5 sm:p-3 space-y-2">
+          <div className="flex items-center justify-between text-[11px]">
+            <span className="font-bold text-neutral-300 uppercase tracking-wider">
+              Visit #{visitNumber} — Darts at Oche
             </span>
-            <span className="text-xs font-mono text-neutral-400">
-              Run Darts: <b className="text-white">{runDarts}</b> (Accuracy: {runDarts > 0 ? ((runHits / runDarts) * 100).toFixed(0) : 0}%)
+            <span className="font-mono text-neutral-400 text-[11px]">
+              Darts: <b className="text-white">{runDarts}</b> ({runDarts > 0 ? ((runHits / runDarts) * 100).toFixed(0) : 0}%)
             </span>
           </div>
 
-          <div className="grid grid-cols-3 gap-2.5">
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
             {[1, 2, 3].map((dNum) => {
               const isActive = runStatus === 'active' && dartInVisit === dNum;
               const pastDart = visitDartsHistory.find((h) => h.dartNumber === dNum);
@@ -770,7 +777,7 @@ export const RTWSinglesGame: React.FC<RTWSinglesGameProps> = ({
               return (
                 <div
                   key={dNum}
-                  className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all ${
+                  className={`p-1.5 sm:p-2 rounded-lg border flex flex-col items-center justify-center gap-0.5 transition-all ${
                     isActive
                       ? 'bg-cyan-950/70 border-cyan-500 text-cyan-200 ring-2 ring-cyan-500/30'
                       : pastDart
@@ -780,18 +787,18 @@ export const RTWSinglesGame: React.FC<RTWSinglesGameProps> = ({
                       : 'bg-neutral-850/70 border-neutral-750 text-neutral-500'
                   }`}
                 >
-                  <span className="text-[10px] uppercase font-bold tracking-wider">
-                    Dart {dNum} {isActive ? '• THROWING' : ''}
+                  <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider">
+                    Dart {dNum} {isActive ? '• NOW' : ''}
                   </span>
-                  <span className="font-mono text-sm sm:text-base font-black">
+                  <span className="font-mono text-xs sm:text-sm font-black">
                     {pastDart ? (
                       <span className="flex items-center gap-1">
                         {pastDart.result === 'hit' ? (
-                          <Check className="w-4 h-4 text-emerald-400" />
+                          <Check className="w-3.5 h-3.5 text-emerald-400" />
                         ) : (
-                          <X className="w-4 h-4 text-rose-400" />
+                          <X className="w-3.5 h-3.5 text-rose-400" />
                         )}
-                        {pastDart.target}: {pastDart.result.toUpperCase()}
+                        {pastDart.target}
                       </span>
                     ) : isActive ? (
                       <span className="text-cyan-300 font-bold">{currentTarget.shortLabel}</span>
@@ -807,21 +814,21 @@ export const RTWSinglesGame: React.FC<RTWSinglesGameProps> = ({
 
         {/* Action Controls: Dart-by-Dart Entry Buttons */}
         {runStatus === 'active' ? (
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          <div className="space-y-2 pt-0.5">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
               {/* HIT BUTTON */}
               <button
                 type="button"
                 onClick={() => handleDartThrow(true)}
-                className="h-20 sm:h-24 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-base sm:text-lg shadow-xl shadow-emerald-900/30 flex flex-col items-center justify-center gap-1 transition-all cursor-pointer border border-emerald-400/40 group"
+                className="h-16 sm:h-20 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-sm sm:text-base shadow-xl shadow-emerald-900/30 flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer border border-emerald-400/40 group"
               >
-                <div className="flex items-center gap-2">
-                  <Check className="w-6 h-6 stroke-[3] group-hover:scale-110 transition-transform" />
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-5 h-5 stroke-[3] group-hover:scale-110 transition-transform" />
                   <span>HIT {currentTarget.shortLabel}</span>
                 </div>
-                <span className="text-xs font-normal text-emerald-200 flex items-center gap-1">
+                <span className="text-[11px] font-normal text-emerald-200 flex items-center gap-1">
                   {currentStep === 21 ? (
-                    '🎉 WIN & CLEAR ROUND!'
+                    '🎉 WIN & CLEAR!'
                   ) : (
                     <>Advance to {RTW_TARGETS[currentStep]?.shortLabel} <ArrowRight className="w-3 h-3" /></>
                   )}
@@ -832,15 +839,15 @@ export const RTWSinglesGame: React.FC<RTWSinglesGameProps> = ({
               <button
                 type="button"
                 onClick={() => handleDartThrow(false)}
-                className="h-20 sm:h-24 rounded-2xl bg-neutral-800 hover:bg-rose-900/80 active:scale-95 text-neutral-200 hover:text-white font-black text-base sm:text-lg shadow-xl flex flex-col items-center justify-center gap-1 transition-all cursor-pointer border border-neutral-700 hover:border-rose-600 group"
+                className="h-16 sm:h-20 rounded-2xl bg-neutral-800 hover:bg-rose-900/80 active:scale-95 text-neutral-200 hover:text-white font-black text-sm sm:text-base shadow-xl flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer border border-neutral-700 hover:border-rose-600 group"
               >
-                <div className="flex items-center gap-2">
-                  <X className="w-6 h-6 stroke-[3] text-rose-400 group-hover:scale-110 transition-transform" />
+                <div className="flex items-center gap-1.5">
+                  <X className="w-5 h-5 stroke-[3] text-rose-400 group-hover:scale-110 transition-transform" />
                   <span>MISS {currentTarget.shortLabel}</span>
                 </div>
-                <span className="text-xs font-normal text-neutral-400 group-hover:text-rose-200 flex items-center gap-1">
+                <span className="text-[11px] font-normal text-neutral-400 group-hover:text-rose-200 flex items-center gap-1">
                   {currentStep === 21 ? (
-                    'Drops back to S20 (No strike)'
+                    'Drops to S20 (No strike)'
                   ) : currentStep === 1 ? (
                     'Stays at S1'
                   ) : (
@@ -851,12 +858,12 @@ export const RTWSinglesGame: React.FC<RTWSinglesGameProps> = ({
             </div>
 
             {/* Undo Button */}
-            <div className="flex justify-end pt-1">
+            <div className="flex justify-end pt-0.5">
               <button
                 type="button"
                 onClick={handleUndo}
                 disabled={history.length === 0}
-                className="px-3.5 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 disabled:opacity-30 disabled:pointer-events-none text-neutral-300 hover:text-white border border-neutral-700 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+                className="px-3 py-1.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 disabled:opacity-30 disabled:pointer-events-none text-neutral-300 hover:text-white border border-neutral-700 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
               >
                 <Undo2 className="w-3.5 h-3.5" />
                 <span>Undo Last Dart</span>
@@ -865,9 +872,9 @@ export const RTWSinglesGame: React.FC<RTWSinglesGameProps> = ({
           </div>
         ) : runStatus === 'cleared' ? (
           /* Run Cleared Card */
-          <div className="bg-emerald-950/60 border border-emerald-600 rounded-3xl p-6 text-center space-y-4 shadow-2xl">
-            <div className="w-16 h-16 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/40">
-              <Trophy className="w-8 h-8" />
+          <div className="bg-emerald-950/60 border border-emerald-600 rounded-3xl p-5 sm:p-6 text-center space-y-3.5 shadow-2xl">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/40">
+              <Trophy className="w-7 h-7" />
             </div>
             <div>
               <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest block mb-1">
@@ -881,11 +888,11 @@ export const RTWSinglesGame: React.FC<RTWSinglesGameProps> = ({
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 pt-1">
               <button
                 type="button"
                 onClick={handleStartNextRun}
-                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-neutral-950 font-black text-sm shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-all"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-neutral-950 font-black text-sm shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-all"
               >
                 <RotateCcw className="w-4 h-4" />
                 <span>Start Next Run (#{runNumber + 1})</span>
@@ -894,7 +901,7 @@ export const RTWSinglesGame: React.FC<RTWSinglesGameProps> = ({
               <button
                 type="button"
                 onClick={handleFinishSession}
-                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-white font-bold text-sm border border-neutral-700 flex items-center justify-center gap-2 cursor-pointer transition-all"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-white font-bold text-sm border border-neutral-700 flex items-center justify-center gap-2 cursor-pointer transition-all"
               >
                 <Award className="w-4 h-4 text-emerald-400" />
                 <span>Finish Session & View Summary</span>
@@ -903,15 +910,15 @@ export const RTWSinglesGame: React.FC<RTWSinglesGameProps> = ({
           </div>
         ) : (
           /* Game Over / Bust Card */
-          <div className="bg-rose-950/60 border border-rose-700 rounded-3xl p-6 text-center space-y-4 shadow-2xl">
-            <div className="w-16 h-16 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto border border-rose-500/40">
-              <AlertCircle className="w-8 h-8" />
+          <div className="bg-rose-950/60 border border-rose-700 rounded-3xl p-5 sm:p-6 text-center space-y-3.5 shadow-2xl">
+            <div className="w-14 h-14 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto border border-rose-500/40">
+              <AlertCircle className="w-7 h-7" />
             </div>
             <div>
               <span className="text-xs font-bold text-rose-400 uppercase tracking-widest block mb-1">
                 {gameOverReason === 'strikeout' ? '❌ Strikeout (3 Misses in a Row)' : '❌ Maximum Misses (5 Total Misses)'}
               </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-white">
+              <h2 className="text-xl sm:text-2xl font-black text-white">
                 Game Over — Run #{runNumber} Ended
               </h2>
               <p className="text-xs text-neutral-300 mt-1">
@@ -919,11 +926,11 @@ export const RTWSinglesGame: React.FC<RTWSinglesGameProps> = ({
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 pt-1">
               <button
                 type="button"
                 onClick={handleStartNextRun}
-                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-rose-600 hover:bg-rose-500 active:scale-95 text-white font-black text-sm shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-all"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 active:scale-95 text-white font-black text-sm shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-all"
               >
                 <RotateCcw className="w-4 h-4" />
                 <span>Try Again (Start Run #{runNumber + 1})</span>
@@ -932,7 +939,7 @@ export const RTWSinglesGame: React.FC<RTWSinglesGameProps> = ({
               <button
                 type="button"
                 onClick={handleUndo}
-                className="w-full sm:w-auto px-5 py-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-neutral-300 hover:text-white font-bold text-sm border border-neutral-700 flex items-center justify-center gap-2 cursor-pointer transition-all"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-neutral-300 hover:text-white font-bold text-sm border border-neutral-700 flex items-center justify-center gap-2 cursor-pointer transition-all"
               >
                 <Undo2 className="w-4 h-4" />
                 <span>Undo Last Dart</span>
@@ -940,51 +947,6 @@ export const RTWSinglesGame: React.FC<RTWSinglesGameProps> = ({
             </div>
           </div>
         )}
-
-        {/* Multi-Run Session Aggregate Summary */}
-        <div className="border-t border-[#1c222b] pt-4">
-          <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider block mb-3">
-            Session Performance (Multi-Run)
-          </span>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-            <div className="bg-neutral-850/80 border border-neutral-750/80 rounded-xl p-3 text-center">
-              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                Best Clear
-              </span>
-              <span className="text-xl sm:text-2xl font-mono font-black text-amber-400 mt-0.5 block">
-                {bestRunDarts ? `${bestRunDarts}d` : '—'}
-              </span>
-            </div>
-
-            <div className="bg-neutral-850/80 border border-neutral-750/80 rounded-xl p-3 text-center">
-              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                Runs Cleared
-              </span>
-              <span className="text-xl sm:text-2xl font-mono font-black text-emerald-400 mt-0.5 block">
-                {completedRuns.filter((r) => r.completed).length + (runStatus === 'cleared' ? 1 : 0)}
-              </span>
-            </div>
-
-            <div className="bg-neutral-850/80 border border-neutral-750/80 rounded-xl p-3 text-center">
-              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                Total Darts
-              </span>
-              <span className="text-xl sm:text-2xl font-mono font-black text-white mt-0.5 block">
-                {sessionTotalDarts}
-              </span>
-            </div>
-
-            <div className="bg-neutral-850/80 border border-neutral-750/80 rounded-xl p-3 text-center">
-              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                Session Accuracy
-              </span>
-              <span className="text-xl sm:text-2xl font-mono font-black text-cyan-400 mt-0.5 block">
-                {sessionTotalDarts > 0 ? ((sessionTotalHits / sessionTotalDarts) * 100).toFixed(1) : 0}%
-              </span>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* 10-Min Cutoff Timer Modal */}

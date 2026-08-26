@@ -454,29 +454,6 @@ export const A1PracticeGame: React.FC<A1PracticeGameProps> = ({
         </button>
       </div>
 
-      {/* HUD Metrics & Finish Bar */}
-      <div className="flex items-center justify-between gap-3 pt-2">
-        <div className="flex items-center gap-3 text-xs text-neutral-400">
-          <span>
-            Total Visits: <b className="text-white font-mono">{totalVisits}</b> ({totalDarts} darts)
-          </span>
-          <span>•</span>
-          <span>
-            Hit Rate: <b className="text-emerald-400 font-mono">{accuracy}%</b>
-          </span>
-        </div>
-
-        <button
-          type="button"
-          id="a1-finish-early-btn"
-          onClick={() => finalizeGame(allCompleted)}
-          className="px-3.5 py-2 rounded-xl bg-neutral-850 hover:bg-neutral-800 active:scale-95 text-xs text-neutral-300 hover:text-white font-bold border border-neutral-750 flex items-center gap-1.5 transition-all cursor-pointer"
-        >
-          <Flag className="w-3.5 h-3.5 text-amber-400" />
-          <span>Finish & Scorecard</span>
-        </button>
-      </div>
-
       {/* 10-Minute Timer Expired Popup Modal */}
       {showTimeUpModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-fadeIn">

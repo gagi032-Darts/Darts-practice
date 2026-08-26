@@ -613,25 +613,13 @@ export const BigSinglesGame: React.FC<BigSinglesGameProps> = ({
         </span>
       </div>
 
-      {/* Primary Action Button: "Register hits" (Matching user's photo) */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
-        <div className="w-full sm:w-auto flex-1 flex justify-center sm:justify-start">
-          <button
-            type="button"
-            id="bigsingles-finish-early-btn"
-            onClick={finalizeGame}
-            className="px-4 py-3 rounded-xl bg-neutral-850 hover:bg-neutral-800 active:scale-95 text-xs text-neutral-300 hover:text-white font-bold border border-neutral-750 flex items-center gap-2 transition-all cursor-pointer shadow-sm"
-          >
-            <Flag className="w-4 h-4 text-amber-400" />
-            <span>Finish & Scorecard</span>
-          </button>
-        </div>
-
+      {/* Primary Action Button: "Register hits" */}
+      <div className="pt-2">
         <button
           type="button"
           id="bigsingles-register-hits-btn"
           onClick={handleRegisterHits}
-          className="w-full sm:w-auto sm:min-w-[240px] py-3.5 px-6 rounded-xl bg-[#132238] hover:bg-[#1a2f4d] active:scale-95 text-white font-black text-base sm:text-lg border border-[#263e63] hover:border-cyan-400 shadow-xl shadow-cyan-950/30 transition-all cursor-pointer flex items-center justify-center gap-2"
+          className="w-full py-4 px-6 rounded-2xl bg-[#132238] hover:bg-[#1a2f4d] active:scale-95 text-white font-black text-base sm:text-lg border border-[#263e63] hover:border-cyan-400 shadow-xl shadow-cyan-950/30 transition-all cursor-pointer flex items-center justify-center gap-2"
         >
           <span>Register hits</span>
           <ChevronRight className="w-5 h-5 text-cyan-400" />

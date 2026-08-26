@@ -184,52 +184,59 @@ export const AlignGame: React.FC<AlignGameProps> = ({
       <div className="space-y-1.5">
         <div className="flex items-center justify-between px-1 text-xs">
           <span className="font-bold uppercase tracking-wider text-neutral-400">
-            Record Hits This Visit
+            Record Results of 3 Darts:
           </span>
           <span className="text-[11px] text-neutral-500 font-mono">
             Any segment = Valid Hit
           </span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <button
-            type="button"
-            id="align-hits-3"
-            onClick={() => handleHitsInput(3)}
-            className="h-16 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-lg shadow-md border border-emerald-400/50 flex flex-col items-center justify-center transition-all cursor-pointer"
-          >
-            <span className="leading-tight">3 HITS</span>
-            <span className="text-[10px] font-bold text-emerald-200 opacity-90">100% Perfect</span>
-          </button>
-
-          <button
-            type="button"
-            id="align-hits-2"
-            onClick={() => handleHitsInput(2)}
-            className="h-16 rounded-xl bg-teal-700 hover:bg-teal-600 active:scale-95 text-white font-black text-lg shadow-md border border-teal-500/50 flex flex-col items-center justify-center transition-all cursor-pointer"
-          >
-            <span className="leading-tight">2 HITS</span>
-            <span className="text-[10px] font-bold text-teal-200 opacity-90">66.7%</span>
-          </button>
-
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          {/* 1 HIT */}
           <button
             type="button"
             id="align-hits-1"
             onClick={() => handleHitsInput(1)}
-            className="h-16 rounded-xl bg-cyan-800 hover:bg-cyan-700 active:scale-95 text-white font-black text-lg shadow-md border border-cyan-600/50 flex flex-col items-center justify-center transition-all cursor-pointer"
+            className="h-16 sm:h-20 rounded-2xl bg-neutral-800 hover:bg-neutral-750 active:scale-95 text-emerald-300 hover:text-emerald-200 font-black text-lg sm:text-xl border border-neutral-700 hover:border-emerald-500/60 shadow-md flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer"
           >
-            <span className="leading-tight">1 HIT</span>
-            <span className="text-[10px] font-bold text-cyan-200 opacity-90">33.3%</span>
+            <span>1 HIT</span>
+            <span className="text-[10px] text-neutral-400 font-normal">1 / 3 target hit</span>
           </button>
 
+          {/* 2 HITS */}
+          <button
+            type="button"
+            id="align-hits-2"
+            onClick={() => handleHitsInput(2)}
+            className="h-16 sm:h-20 rounded-2xl bg-emerald-950/70 hover:bg-emerald-900/80 active:scale-95 text-emerald-300 hover:text-emerald-100 font-black text-lg sm:text-xl border border-emerald-700/70 hover:border-emerald-500 shadow-md flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer"
+          >
+            <span>2 HITS</span>
+            <span className="text-[10px] text-emerald-400/80 font-normal">2 / 3 targets hit</span>
+          </button>
+
+          {/* 3 HITS */}
+          <button
+            type="button"
+            id="align-hits-3"
+            onClick={() => handleHitsInput(3)}
+            className="h-16 sm:h-20 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-lg sm:text-xl border border-emerald-400/60 shadow-lg flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer"
+          >
+            <div className="flex items-center gap-1">
+              <Sparkles className="w-4 h-4 text-yellow-300" />
+              <span>3 HITS</span>
+            </div>
+            <span className="text-[10px] text-emerald-100 font-medium">All 3 targets hit!</span>
+          </button>
+
+          {/* MISS */}
           <button
             type="button"
             id="align-hits-0"
             onClick={() => handleHitsInput(0)}
-            className="h-16 rounded-xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-neutral-300 hover:text-white font-black text-lg shadow-md border border-neutral-700 flex flex-col items-center justify-center transition-all cursor-pointer"
+            className="h-16 sm:h-20 rounded-2xl bg-neutral-900 hover:bg-neutral-850 active:scale-95 text-rose-300 hover:text-rose-200 font-black text-lg sm:text-xl border border-rose-900/60 hover:border-rose-700/80 shadow-md flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer"
           >
-            <span className="leading-tight">0 MISS</span>
-            <span className="text-[10px] font-semibold text-neutral-400">0.0%</span>
+            <span>MISS</span>
+            <span className="text-[10px] text-neutral-500 font-normal">0 / 3 hits</span>
           </button>
         </div>
       </div>

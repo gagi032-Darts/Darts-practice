@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Target, RotateCcw, CheckCircle2, Award } from 'lucide-react';
+import { Target, RotateCcw, CheckCircle2, Award, Sparkles } from 'lucide-react';
 import { ArmCalResult } from '../../types';
 import { sound } from '../../utils/sound';
 import { storage } from '../../utils/storage';
@@ -113,48 +113,55 @@ export const ArmCalibrationGame: React.FC<ArmCalibrationGameProps> = ({
 
       {/* Large Input Actions */}
       <div className="space-y-2">
-        <span className="text-xs font-bold uppercase tracking-wider text-neutral-400 block px-1">
-          Record Visit Hits
-        </span>
+        <div className="text-center text-xs font-bold text-neutral-400 uppercase tracking-wider">
+          Record Results of 3 Darts:
+        </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-          <button
-            type="button"
-            id="arm-cal-3"
-            onClick={() => handleHitsInput(3)}
-            className="h-16 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-lg shadow-md border border-emerald-400/40 flex flex-col items-center justify-center transition-all"
-          >
-            <span>3 HITS</span>
-            <span className="text-[10px] font-semibold text-emerald-200 opacity-90">100% Perfect</span>
-          </button>
-
-          <button
-            type="button"
-            id="arm-cal-2"
-            onClick={() => handleHitsInput(2)}
-            className="h-16 rounded-xl bg-teal-700 hover:bg-teal-600 active:scale-95 text-white font-black text-lg shadow-md border border-teal-500/40 flex flex-col items-center justify-center transition-all"
-          >
-            <span>2 HITS</span>
-            <span className="text-[10px] font-semibold text-teal-200 opacity-90">66.7%</span>
-          </button>
-
+          {/* 1 HIT */}
           <button
             type="button"
             id="arm-cal-1"
             onClick={() => handleHitsInput(1)}
-            className="h-16 rounded-xl bg-neutral-700 hover:bg-neutral-600 active:scale-95 text-white font-black text-lg shadow-md border border-neutral-600/60 flex flex-col items-center justify-center transition-all"
+            className="h-16 sm:h-20 rounded-2xl bg-neutral-800 hover:bg-neutral-750 active:scale-95 text-emerald-300 hover:text-emerald-200 font-black text-lg sm:text-xl border border-neutral-700 hover:border-emerald-500/60 shadow-md flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer"
           >
             <span>1 HIT</span>
-            <span className="text-[10px] font-semibold text-neutral-300 opacity-90">33.3%</span>
+            <span className="text-[10px] text-neutral-400 font-normal">1 / 3 target hit</span>
           </button>
 
+          {/* 2 HITS */}
+          <button
+            type="button"
+            id="arm-cal-2"
+            onClick={() => handleHitsInput(2)}
+            className="h-16 sm:h-20 rounded-2xl bg-emerald-950/70 hover:bg-emerald-900/80 active:scale-95 text-emerald-300 hover:text-emerald-100 font-black text-lg sm:text-xl border border-emerald-700/70 hover:border-emerald-500 shadow-md flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer"
+          >
+            <span>2 HITS</span>
+            <span className="text-[10px] text-emerald-400/80 font-normal">2 / 3 targets hit</span>
+          </button>
+
+          {/* 3 HITS */}
+          <button
+            type="button"
+            id="arm-cal-3"
+            onClick={() => handleHitsInput(3)}
+            className="h-16 sm:h-20 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-lg sm:text-xl border border-emerald-400/60 shadow-lg flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer"
+          >
+            <div className="flex items-center gap-1">
+              <Sparkles className="w-4 h-4 text-yellow-300" />
+              <span>3 HITS</span>
+            </div>
+            <span className="text-[10px] text-emerald-100 font-medium">All 3 targets hit!</span>
+          </button>
+
+          {/* MISS */}
           <button
             type="button"
             id="arm-cal-0"
             onClick={() => handleHitsInput(0)}
-            className="h-16 rounded-xl bg-rose-900/60 hover:bg-rose-800/80 active:scale-95 text-rose-200 font-black text-lg shadow-md border border-rose-700/50 flex flex-col items-center justify-center transition-all"
+            className="h-16 sm:h-20 rounded-2xl bg-neutral-900 hover:bg-neutral-850 active:scale-95 text-rose-300 hover:text-rose-200 font-black text-lg sm:text-xl border border-rose-900/60 hover:border-rose-700/80 shadow-md flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer"
           >
-            <span>0 HITS</span>
-            <span className="text-[10px] font-semibold text-rose-300 opacity-90">Missed all</span>
+            <span>MISS</span>
+            <span className="text-[10px] text-neutral-500 font-normal">0 / 3 hits</span>
           </button>
         </div>
       </div>
