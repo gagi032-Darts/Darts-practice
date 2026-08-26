@@ -614,85 +614,27 @@ export const BigSinglesGame: React.FC<BigSinglesGameProps> = ({
       </div>
 
       {/* Primary Action Button: "Register hits" (Matching user's photo) */}
-      <div className="flex justify-center">
-        <button
-          type="button"
-          id="bigsingles-register-hits-btn"
-          onClick={handleRegisterHits}
-          className="w-full max-w-sm py-4 px-6 rounded-xl bg-[#132238] hover:bg-[#1a2f4d] active:scale-95 text-white font-black text-lg border border-[#263e63] hover:border-cyan-400 shadow-xl shadow-cyan-950/30 transition-all cursor-pointer flex items-center justify-center gap-2"
-        >
-          <span>Register hits</span>
-          <ChevronRight className="w-5 h-5 text-cyan-400" />
-        </button>
-      </div>
-
-      {/* Quick Hit Helpers */}
-      <div className="flex items-center justify-center gap-2 pt-1">
-        <button
-          type="button"
-          onClick={() => handleSetAllHits(0)}
-          className="px-2.5 py-1 rounded-lg bg-neutral-850 hover:bg-neutral-800 text-[11px] font-bold text-rose-400 border border-neutral-750 transition-all cursor-pointer"
-        >
-          0 Hits (Key: 0/M)
-        </button>
-        <button
-          type="button"
-          onClick={() => handleSetAllHits(1)}
-          className="px-2.5 py-1 rounded-lg bg-neutral-850 hover:bg-neutral-800 text-[11px] font-bold text-amber-400 border border-neutral-750 transition-all cursor-pointer"
-        >
-          1 Hit
-        </button>
-        <button
-          type="button"
-          onClick={() => handleSetAllHits(2)}
-          className="px-2.5 py-1 rounded-lg bg-neutral-850 hover:bg-neutral-800 text-[11px] font-bold text-cyan-400 border border-neutral-750 transition-all cursor-pointer"
-        >
-          2 Hits
-        </button>
-        <button
-          type="button"
-          onClick={() => handleSetAllHits(3)}
-          className="px-2.5 py-1 rounded-lg bg-neutral-850 hover:bg-neutral-800 text-[11px] font-bold text-emerald-400 border border-neutral-750 transition-all cursor-pointer"
-        >
-          3 Hits (Key: H)
-        </button>
-      </div>
-
-      {/* Level Rules Reference Panel */}
-      <div className="bg-neutral-900/60 border border-neutral-800/80 rounded-2xl p-3 text-xs text-neutral-400 space-y-1">
-        <span className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider block">
-          Current Rules ({level === 'advanced' ? 'Advanced' : 'Intermediate'} Level):
-        </span>
-        {level === 'advanced' ? (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-[11px] font-mono">
-            <span className="text-emerald-400">3 hits = next (+1)</span>
-            <span className="text-amber-400">2 hits = stay (+0)</span>
-            <span className="text-rose-400">1 hit = back 1 (-1)</span>
-            <span className="text-red-500">0 hits = back 2 (-2)</span>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 text-[11px] font-mono">
-            <span className="text-emerald-400">2 or 3 hits = next (+1)</span>
-            <span className="text-amber-400">1 hit = stay (+0)</span>
-            <span className="text-rose-400">0 hits = back 1 (-1)</span>
-          </div>
-        )}
-      </div>
-
-      {/* Bottom Controls (Finish & Scorecard) */}
-      <div className="flex items-center justify-between gap-3 pt-2">
-        <div className="text-xs text-neutral-400">
-          Dart Hit Accuracy: <b className="text-emerald-400 font-mono">{dartHitAccuracy}%</b> ({totalDartHits}/{totalDarts})
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+        <div className="w-full sm:w-auto flex-1 flex justify-center sm:justify-start">
+          <button
+            type="button"
+            id="bigsingles-finish-early-btn"
+            onClick={finalizeGame}
+            className="px-4 py-3 rounded-xl bg-neutral-850 hover:bg-neutral-800 active:scale-95 text-xs text-neutral-300 hover:text-white font-bold border border-neutral-750 flex items-center gap-2 transition-all cursor-pointer shadow-sm"
+          >
+            <Flag className="w-4 h-4 text-amber-400" />
+            <span>Finish & Scorecard</span>
+          </button>
         </div>
 
         <button
           type="button"
-          id="bigsingles-finish-early-btn"
-          onClick={finalizeGame}
-          className="px-3.5 py-2 rounded-xl bg-neutral-850 hover:bg-neutral-800 active:scale-95 text-xs text-neutral-300 hover:text-white font-bold border border-neutral-750 flex items-center gap-1.5 transition-all cursor-pointer"
+          id="bigsingles-register-hits-btn"
+          onClick={handleRegisterHits}
+          className="w-full sm:w-auto sm:min-w-[240px] py-3.5 px-6 rounded-xl bg-[#132238] hover:bg-[#1a2f4d] active:scale-95 text-white font-black text-base sm:text-lg border border-[#263e63] hover:border-cyan-400 shadow-xl shadow-cyan-950/30 transition-all cursor-pointer flex items-center justify-center gap-2"
         >
-          <Flag className="w-3.5 h-3.5 text-amber-400" />
-          <span>Finish & Scorecard</span>
+          <span>Register hits</span>
+          <ChevronRight className="w-5 h-5 text-cyan-400" />
         </button>
       </div>
 
