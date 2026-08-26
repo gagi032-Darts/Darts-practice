@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
-import { Trophy, CheckCircle2, RotateCcw, Home, BarChart2, Share2, Bot, User, Award, TrendingUp, BarChart3, Flame, Zap, Lock, Crosshair, ShieldAlert, Hourglass } from 'lucide-react';
+import { Trophy, CheckCircle2, RotateCcw, Home, BarChart2, Share2, Bot, User, Award, TrendingUp, BarChart3, Flame, Zap, Lock, Crosshair, ShieldAlert, Hourglass, Compass } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { GameType, GameResultData, DartBotMatchResult, HighscoreResult, TripleLockResult, Solo301Result, SwitchbladeResult, PowerSwitchResult, BigScoresResult, CheckoutChallengeResult, DoublesBoomerangResult, A1PracticeResult, BigSinglesResult } from '../../types';
+import { GameType, GameResultData, DartBotMatchResult, HighscoreResult, TripleLockResult, Solo301Result, SwitchbladeResult, PowerSwitchResult, BigScoresResult, CheckoutChallengeResult, DoublesBoomerangResult, Bobs27Result, A1PracticeResult, BigSinglesResult, RTWSinglesResult } from '../../types';
 import { GAME_DEFINITIONS } from '../../utils/gamesData';
 import { sound } from '../../utils/sound';
 import { LegBreakdownView } from '../common/LegBreakdownView';
@@ -1335,6 +1335,166 @@ export const SummaryModal: React.FC<SummaryModalProps> = ({
     );
   }
 
+  // Dedicated scorecard rendering for Bob's 27
+  if (gameType === 'bobs27') {
+    const bobsRes = result as Bobs27Result;
+
+    return (
+      <div className="w-full max-w-xl mx-auto space-y-4">
+        <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-6 text-center shadow-2xl relative overflow-hidden">
+          {/* Header Icon */}
+          <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto mb-3 shadow-inner">
+            <Trophy className="w-8 h-8" />
+          </div>
+
+          <span className="text-xs font-bold text-amber-400 uppercase tracking-widest block mb-1">
+            Session Completed
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-black text-white">
+            Bob's 27 Summary
+          </h2>
+          <p className="text-xs text-neutral-400 mt-1 font-mono">
+            {durationFormatted} · {bobsRes.runsPlayed} Run{bobsRes.runsPlayed !== 1 ? 's' : ''} Played
+          </p>
+
+          {/* Core Metric Banner: Best Score */}
+          <div className="my-5 p-4 rounded-2xl bg-[#141922] border border-[#2b3542] relative">
+            <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider block">
+              Best Score in Session
+            </span>
+            <div className="text-4xl sm:text-5xl font-black text-amber-400 font-mono tracking-tight my-1">
+              {bobsRes.bestScore} <span className="text-sm font-sans font-normal text-neutral-400">pts</span>
+            </div>
+            <div className="flex items-center justify-center gap-3 text-xs font-mono text-neutral-300 mt-1">
+              <span>Avg Score: <b className="text-white">{bobsRes.averageScore} pts</b></span>
+              <span>·</span>
+              <span>Cleared: <b className="text-emerald-400">{bobsRes.completedRuns}</b> / {bobsRes.runsPlayed}</span>
+            </div>
+          </div>
+
+          {/* 3-Column Key Stat Grid */}
+          <div className="grid grid-cols-3 gap-2.5 my-4">
+            <div className="p-3 rounded-xl bg-neutral-850 border border-neutral-800">
+              <span className="text-[10px] text-neutral-400 uppercase tracking-wider block font-bold">
+                Runs Cleared
+              </span>
+              <span className="text-base sm:text-lg font-black font-mono text-emerald-400">
+                {bobsRes.completedRuns}
+              </span>
+              <span className="text-[10px] text-neutral-500 block font-mono">
+                {bobsRes.bustedRuns} busted
+              </span>
+            </div>
+
+            <div className="p-3 rounded-xl bg-neutral-850 border border-neutral-800">
+              <span className="text-[10px] text-neutral-400 uppercase tracking-wider block font-bold">
+                Doubles Hit
+              </span>
+              <span className="text-base sm:text-lg font-black font-mono text-teal-400">
+                {bobsRes.totalHits}
+              </span>
+              <span className="text-[10px] text-neutral-500 block font-mono">
+                / {bobsRes.totalDarts} darts
+              </span>
+            </div>
+
+            <div className="p-3 rounded-xl bg-neutral-850 border border-neutral-800">
+              <span className="text-[10px] text-neutral-400 uppercase tracking-wider block font-bold">
+                Accuracy
+              </span>
+              <span className="text-base sm:text-lg font-black font-mono text-cyan-400">
+                {bobsRes.overallAccuracy}%
+              </span>
+              <span className="text-[10px] text-neutral-500 block font-mono">
+                doubles hit %
+              </span>
+            </div>
+          </div>
+
+          {/* Run-by-Run Breakdown */}
+          {bobsRes.runDetails && bobsRes.runDetails.length > 0 && (
+            <div className="my-4 text-left">
+              <span className="text-xs font-bold text-neutral-300 uppercase tracking-wider block mb-2">
+                Run-by-Run Log
+              </span>
+              <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                {bobsRes.runDetails.map((r) => (
+                  <div
+                    key={r.runNumber}
+                    className={`p-2.5 rounded-xl border flex items-center justify-between font-mono text-xs ${
+                      r.completed
+                        ? 'bg-emerald-950/30 border-emerald-800/50'
+                        : 'bg-neutral-850 border-neutral-800'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-md bg-neutral-800 text-neutral-300 flex items-center justify-center text-[10px] font-bold">
+                        #{r.runNumber}
+                      </span>
+                      <div>
+                        <span className="font-bold text-white block font-sans text-xs">
+                          {r.completed ? '🏆 Full Board Cleared' : `Busted on ${r.bustedAtTarget || 'Target'}`}
+                        </span>
+                        <span className="text-[10px] text-neutral-400 font-sans">
+                          {r.targetsAttempted}/21 targets · {r.totalHits}/{r.totalDarts} hits ({r.accuracy}%)
+                        </span>
+                      </div>
+                    </div>
+
+                    <span
+                      className={`font-black text-sm ${
+                        r.completed
+                          ? 'text-emerald-400'
+                          : r.finalScore <= 0
+                          ? 'text-rose-400'
+                          : 'text-amber-400'
+                      }`}
+                    >
+                      {r.finalScore} pts
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="grid grid-cols-2 gap-3 mt-6">
+            <button
+              type="button"
+              id="summary-play-again"
+              onClick={onPlayAgain}
+              className="py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-95 text-neutral-950 font-bold text-sm shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <RotateCcw className="w-4 h-4" />
+              <span>Play Again</span>
+            </button>
+
+            <button
+              type="button"
+              id="summary-go-home"
+              onClick={onGoHome}
+              className="py-3 px-4 rounded-xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-white font-bold text-sm border border-neutral-700 flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <Home className="w-4 h-4" />
+              <span>Dashboard</span>
+            </button>
+          </div>
+
+          <button
+            type="button"
+            id="summary-view-history"
+            onClick={onOpenHistory}
+            className="mt-3 text-xs text-neutral-400 hover:text-amber-400 font-semibold flex items-center justify-center gap-1.5 mx-auto py-1 transition-colors cursor-pointer"
+          >
+            <BarChart2 className="w-3.5 h-3.5" />
+            <span>View All Saved History & Records →</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // Dedicated scorecard rendering for A1 - Practice routine
   if (gameType === 'a1practice') {
     const a1Res = result as A1PracticeResult;
@@ -1565,6 +1725,174 @@ export const SummaryModal: React.FC<SummaryModalProps> = ({
               id="summary-play-again"
               onClick={onPlayAgain}
               className="h-13 rounded-xl bg-cyan-600 hover:bg-cyan-500 active:scale-95 text-white font-black text-base shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <RotateCcw className="w-5 h-5" />
+              <span>Practice Again</span>
+            </button>
+
+            <button
+              type="button"
+              id="summary-go-home"
+              onClick={onGoHome}
+              className="h-13 rounded-xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-neutral-200 hover:text-white font-bold text-base border border-neutral-700 flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <Home className="w-5 h-5" />
+              <span>Dashboard</span>
+            </button>
+          </div>
+
+          <button
+            type="button"
+            id="summary-view-history"
+            onClick={onOpenHistory}
+            className="mt-3 text-xs text-neutral-400 hover:text-cyan-400 font-semibold flex items-center justify-center gap-1.5 mx-auto py-1 transition-colors cursor-pointer"
+          >
+            <BarChart2 className="w-3.5 h-3.5" />
+            <span>View All Saved History & Records →</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Dedicated scorecard rendering for Round the World Singles
+  if (
+    gameType === 'rtwsingles' ||
+    gameType === 'rtwsingles_intermediate' ||
+    gameType === 'rtwsingles_advanced'
+  ) {
+    const rtwRes = result as RTWSinglesResult;
+    const isCompletedAny = rtwRes.completedRuns > 0;
+
+    return (
+      <div className="w-full max-w-xl mx-auto space-y-4">
+        <div className="bg-[#0e131b] border border-[#222d3d] rounded-3xl p-6 text-center shadow-2xl relative overflow-hidden">
+          {/* Header Icon */}
+          <div
+            className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-inner ${
+              isCompletedAny
+                ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400'
+                : 'bg-cyan-500/10 border border-cyan-500/30 text-cyan-400'
+            }`}
+          >
+            {isCompletedAny ? <Trophy className="w-8 h-8" /> : <Compass className="w-8 h-8" />}
+          </div>
+
+          <span className="text-xs font-bold text-cyan-400 uppercase tracking-widest block mb-1">
+            🎯 Round the World Singles Summary
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            {rtwRes.completedRuns > 0
+              ? `${rtwRes.completedRuns} ${rtwRes.completedRuns === 1 ? 'Run' : 'Runs'} Cleared!`
+              : 'Practice Session Completed'}
+          </h2>
+          <p className="text-xs text-neutral-400 mt-1 font-mono">
+            Mode: <b className="text-cyan-300 capitalize font-sans">{rtwRes.difficulty}</b> · Duration:{' '}
+            <b className="text-neutral-200">{durationFormatted}</b> · Total Darts:{' '}
+            <b className="text-white">{rtwRes.totalDarts}</b>
+          </p>
+
+          {/* Primary KPI Metrics */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 my-4">
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Best Clear
+              </span>
+              <span className="text-xl sm:text-2xl font-mono font-black text-amber-400 mt-0.5 block tracking-tight">
+                {rtwRes.bestRunDarts ? `${rtwRes.bestRunDarts}d` : '—'}
+              </span>
+            </div>
+
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Runs Cleared
+              </span>
+              <span className="text-xl sm:text-2xl font-mono font-black text-emerald-400 mt-0.5 block tracking-tight">
+                {rtwRes.completedRuns} <span className="text-xs text-neutral-500 font-sans font-normal">/ {rtwRes.runsPlayed}</span>
+              </span>
+            </div>
+
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Furthest Target
+              </span>
+              <span className="text-xl sm:text-2xl font-mono font-black text-cyan-400 mt-0.5 block tracking-tight">
+                {rtwRes.highestTargetEver || 'S1'}
+              </span>
+            </div>
+
+            <div className="bg-neutral-850 border border-neutral-750 rounded-2xl p-3 text-center shadow-inner">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Accuracy
+              </span>
+              <span className="text-xl sm:text-2xl font-mono font-black text-emerald-400 mt-0.5 block tracking-tight">
+                {rtwRes.overallAccuracy}%
+              </span>
+            </div>
+          </div>
+
+          {/* Secondary stats bar */}
+          <div className="bg-neutral-850/70 border border-neutral-750/70 rounded-xl p-2.5 text-xs flex items-center justify-around text-neutral-300 font-mono">
+            <div>
+              <span className="text-neutral-500 text-[10px] uppercase font-sans font-bold block">Hits / Misses</span>
+              <b className="text-white">{rtwRes.totalHits}</b> hits · <b className="text-rose-400">{rtwRes.totalMisses}</b> misses
+            </div>
+            <div className="h-6 w-px bg-neutral-700/60" />
+            <div>
+              <span className="text-neutral-500 text-[10px] uppercase font-sans font-bold block">Failed Runs</span>
+              <b className="text-rose-400">{rtwRes.failedRuns}</b> busted
+            </div>
+          </div>
+
+          {/* Run-by-Run Breakdown List */}
+          {rtwRes.runDetails && rtwRes.runDetails.length > 0 && (
+            <div className="bg-neutral-850/80 border border-neutral-750/80 rounded-2xl p-4 text-left shadow-inner my-3 space-y-2">
+              <span className="text-xs font-bold text-neutral-300 uppercase tracking-wider block border-b border-neutral-700/60 pb-2 flex items-center justify-between">
+                <span>Run-by-Run Performance</span>
+                <span className="text-[11px] text-neutral-400 font-normal">1 to 20 + Bull</span>
+              </span>
+              <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                {rtwRes.runDetails.map((rd) => (
+                  <div
+                    key={rd.runNumber}
+                    className={`flex items-center justify-between p-2.5 rounded-xl border text-xs font-mono ${
+                      rd.completed
+                        ? 'bg-emerald-950/40 border-emerald-700/70 text-emerald-200'
+                        : 'bg-neutral-900/90 border-neutral-800 text-neutral-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-md bg-neutral-800 text-neutral-300 flex items-center justify-center text-[10px] font-bold">
+                        #{rd.runNumber}
+                      </span>
+                      <div>
+                        <span className="font-bold text-white block font-sans text-xs">
+                          {rd.completed
+                            ? '🏆 Full Round Cleared (Bull Hit!)'
+                            : `Ended on ${rd.finalTargetReached} (Peak: ${rd.highestTargetReached})`}
+                        </span>
+                        <span className="text-[10px] text-neutral-400 font-sans">
+                          {rd.hits} hits, {rd.misses} misses ({rd.accuracy}%) · {rd.reasonEnded === 'strikeout' ? '3 misses in a row' : rd.reasonEnded === 'max_misses' ? '5 misses limit' : 'Cleared'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <span className="font-bold text-sm text-cyan-300">
+                      {rd.dartsThrown}d
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6 pt-4 border-t border-neutral-800">
+            <button
+              type="button"
+              id="summary-play-again"
+              onClick={onPlayAgain}
+              className="h-13 rounded-xl bg-cyan-500 hover:bg-cyan-400 active:scale-95 text-neutral-950 font-black text-base shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
             >
               <RotateCcw className="w-5 h-5" />
               <span>Practice Again</span>

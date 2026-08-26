@@ -13,10 +13,14 @@ export type GameType =
   | 'catch40'
   | 'cochallenge'
   | 'boomerang'
+  | 'bobs27'
   | 'a1practice'
   | 'bigsingles'
   | 'bigsingles_intermediate'
   | 'bigsingles_advanced'
+  | 'rtwsingles'
+  | 'rtwsingles_intermediate'
+  | 'rtwsingles_advanced'
   | 'bull'
   | 'triple'
   | '301'
@@ -130,6 +134,41 @@ export interface DoublesBoomerangResult {
   targetStats?: Record<number, { attempts: number; hits: number }>;
 }
 
+export interface Bobs27TargetAttempt {
+  target: string; // 'D1' to 'D20', 'Bull'
+  doubleValue: number; // 2, 4, 6... 40, 50
+  hits: number; // 0, 1, 2, 3
+  scoreBefore: number;
+  scoreAfter: number;
+  pointsDelta: number;
+}
+
+export interface Bobs27RunRecord {
+  runNumber: number;
+  finalScore: number;
+  completed: boolean;
+  bustedAtTarget?: string | null;
+  targetsAttempted: number; // out of 21
+  totalDarts: number;
+  totalHits: number;
+  accuracy: number;
+  targetHistory?: Bobs27TargetAttempt[];
+}
+
+export interface Bobs27Result {
+  runsPlayed: number;
+  completedRuns: number;
+  bustedRuns: number;
+  bestScore: number;
+  averageScore: number;
+  totalDarts: number;
+  totalHits: number;
+  overallAccuracy: number;
+  highestTargetReachedOnBust?: string | null;
+  runDetails: Bobs27RunRecord[];
+  targetStats?: Record<string, { attempts: number; hits: number }>;
+}
+
 export interface A1PracticeResult {
   completed: boolean;
   targetsCleared: number; // 0 to 9
@@ -161,6 +200,37 @@ export interface BigSinglesResult {
   totalDartHits: number; // actual individual dart hits (0 to 3 per visit)
   dartHitAccuracy: number; // (totalDartHits / totalDarts) * 100
   roundDetails?: BigSinglesRoundRecord[];
+}
+
+export type RTWSinglesDifficulty = 'intermediate' | 'advanced';
+
+export interface RTWSinglesRunRecord {
+  runNumber: number;
+  completed: boolean; // true if cleared Bull
+  finalTargetReached: string; // e.g. "Bull", "20", "15"
+  highestTargetReached: string; // e.g. "Bull", "20"
+  highestStepReached: number; // 1 to 21 (where 21 is Bull)
+  dartsThrown: number;
+  hits: number;
+  misses: number;
+  accuracy: number;
+  reasonEnded?: 'cleared' | 'strikeout' | 'max_misses' | 'time_up';
+}
+
+export interface RTWSinglesResult {
+  difficulty: RTWSinglesDifficulty;
+  runsPlayed: number;
+  completedRuns: number; // Cleared 1->20->Bull
+  failedRuns: number;
+  bestRunDarts: number | null; // Lowest darts to clear Bull
+  highestTargetEver: string; // e.g. "Bull" or "20"
+  highestStepEver: number;
+  totalDarts: number;
+  totalHits: number;
+  totalMisses: number;
+  overallAccuracy: number;
+  runDetails: RTWSinglesRunRecord[];
+  targetStats?: Record<string, { attempts: number; hits: number; misses: number }>;
 }
 
 export interface BullResult {
@@ -394,8 +464,10 @@ export type GameResultData =
   | CatchFortyResult
   | CheckoutChallengeResult
   | DoublesBoomerangResult
+  | Bobs27Result
   | A1PracticeResult
   | BigSinglesResult
+  | RTWSinglesResult
   | BullResult
   | TripleLockResult
   | Solo301Result

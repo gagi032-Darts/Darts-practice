@@ -58,12 +58,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   const [openDropdown, setOpenDropdown] = useState<
     'warmup' | 'scoring' | 'finishing' | 'singles' | 'match' | null
   >(null);
+  const [openSubmenu, setOpenSubmenu] = useState<'121' | 'rtwsingles' | 'bigsingles' | null>(null);
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (!target.closest('[data-dropdown-container]')) {
         setOpenDropdown(null);
+        setOpenSubmenu(null);
       }
     };
     window.addEventListener('click', handleOutsideClick);
@@ -586,11 +588,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                       Finishing & Outshots — 20 min
                     </h3>
                     <span className="px-1.5 sm:px-2 py-0.5 rounded bg-neutral-800 text-[10px] font-bold text-amber-300 border border-neutral-700 whitespace-nowrap">
-                      Choose 1 of 4
+                      Choose 1 of 5
                     </span>
                   </div>
                   <p className="text-xs text-neutral-400 leading-relaxed">
-                    Choose one 20 min drill to master crucial checkout routes, combinations, and doubles.
+                    Choose one drill to master crucial checkout routes, combinations, and doubles pressure.
                   </p>
                 </div>
 
@@ -598,7 +600,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   <button
                     type="button"
                     id="dropdown-finishing-btn"
-                    onClick={() => setOpenDropdown((prev) => (prev === 'finishing' ? null : 'finishing'))}
+                    onClick={() => {
+                      setOpenDropdown((prev) => (prev === 'finishing' ? null : 'finishing'));
+                      setOpenSubmenu(null);
+                    }}
                     className={`w-full sm:w-auto px-3.5 py-1.5 rounded-xl active:scale-95 text-xs font-bold flex items-center justify-center gap-1.5 border transition-all cursor-pointer whitespace-nowrap ${
                       openDropdown === 'finishing'
                         ? 'bg-amber-600 text-white border-amber-400 shadow-md ring-2 ring-amber-500/40'
@@ -621,47 +626,89 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                         Select Checkout Drill
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOpenDropdown(null);
-                          handleStartGame('1219');
-                        }}
-                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-amber-500/20 active:bg-amber-500/30 text-xs text-white hover:text-amber-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
-                      >
-                        <div className="flex flex-col">
-                          <span className="text-xs text-white group-hover:text-amber-300 font-bold flex items-center gap-1.5">
-                            <Play className="w-2.5 h-2.5 fill-current text-amber-400" /> 121 (9 Darts Mode)
-                          </span>
-                          <span className="text-[10px] text-neutral-400 font-normal">
-                            3 darts per attempt · 3 lives · Ladder 121→130
-                          </span>
-                        </div>
-                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-amber-400 border border-neutral-700">
-                          20m
-                        </span>
-                      </button>
+                      {/* 121 Drill with Falling Submenu */}
+                      <div className="rounded-lg overflow-hidden border border-[#2b3542] bg-[#0f141a]/90 transition-all">
+                        <button
+                          type="button"
+                          onClick={() => setOpenSubmenu((prev) => (prev === '121' ? null : '121'))}
+                          className={`w-full text-left px-2.5 py-2 rounded-lg text-xs font-bold flex items-center justify-between transition-all cursor-pointer group ${
+                            openSubmenu === '121'
+                              ? 'bg-amber-500/20 text-amber-300'
+                              : 'hover:bg-amber-500/15 text-white hover:text-amber-300'
+                          }`}
+                        >
+                          <div className="flex flex-col">
+                            <span className="text-xs font-bold flex items-center gap-1.5">
+                              <Play className="w-2.5 h-2.5 fill-current text-amber-400" /> 121 Checkout Drill
+                            </span>
+                            <span className="text-[10px] text-neutral-400 font-normal">
+                              Ladder 121→130 · Select 9 or 12 Darts mode
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-amber-400 border border-neutral-700">
+                              20m
+                            </span>
+                            {openSubmenu === '121' ? (
+                              <ChevronUp className="w-3.5 h-3.5 text-amber-400" />
+                            ) : (
+                              <ChevronDown className="w-3.5 h-3.5 text-neutral-400 group-hover:text-amber-300" />
+                            )}
+                          </div>
+                        </button>
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOpenDropdown(null);
-                          handleStartGame('12112');
-                        }}
-                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-amber-500/20 active:bg-amber-500/30 text-xs text-white hover:text-amber-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
-                      >
-                        <div className="flex flex-col">
-                          <span className="text-xs text-white group-hover:text-amber-300 font-bold flex items-center gap-1.5">
-                            <Play className="w-2.5 h-2.5 fill-current text-amber-400" /> 121 (12 Darts Mode)
-                          </span>
-                          <span className="text-[10px] text-neutral-400 font-normal">
-                            6 darts per attempt · 3 lives · Ladder 121→130
-                          </span>
-                        </div>
-                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-amber-400 border border-neutral-700">
-                          20m
-                        </span>
-                      </button>
+                        {/* Extra Falling Submenu */}
+                        {openSubmenu === '121' && (
+                          <div className="px-2 pb-2 pt-1 space-y-1 bg-neutral-900/90 border-t border-[#222933] animate-fadeIn">
+                            <div className="text-[9px] font-bold text-amber-400/80 uppercase tracking-wider px-1">
+                              Select Mode:
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setOpenDropdown(null);
+                                setOpenSubmenu(null);
+                                handleStartGame('1219');
+                              }}
+                              className="w-full text-left px-2 py-1.5 rounded-md hover:bg-amber-500/25 active:bg-amber-500/35 text-xs text-white hover:text-amber-200 flex items-center justify-between transition-all cursor-pointer group/sub"
+                            >
+                              <div>
+                                <span className="font-bold block text-xs group-hover/sub:text-amber-300">
+                                  9 Darts Mode
+                                </span>
+                                <span className="text-[10px] text-neutral-400 block font-normal">
+                                  3 darts per attempt · 3 lives · Ladder 121→130
+                                </span>
+                              </div>
+                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-neutral-300 border border-neutral-700">
+                                9 darts
+                              </span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setOpenDropdown(null);
+                                setOpenSubmenu(null);
+                                handleStartGame('12112');
+                              }}
+                              className="w-full text-left px-2 py-1.5 rounded-md hover:bg-amber-500/25 active:bg-amber-500/35 text-xs text-white hover:text-amber-200 flex items-center justify-between transition-all cursor-pointer group/sub"
+                            >
+                              <div>
+                                <span className="font-bold block text-xs group-hover/sub:text-amber-300">
+                                  12 Darts Mode
+                                </span>
+                                <span className="text-[10px] text-neutral-400 block font-normal">
+                                  6 darts per attempt · 3 lives · Ladder 121→130
+                                </span>
+                              </div>
+                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-neutral-300 border border-neutral-700">
+                                12 darts
+                              </span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
 
                       <button
                         type="button"
@@ -725,6 +772,27 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                           10m
                         </span>
                       </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          handleStartGame('bobs27');
+                        }}
+                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-amber-500/20 active:bg-amber-500/30 text-xs text-white hover:text-amber-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs text-white group-hover:text-amber-300 font-bold flex items-center gap-1.5">
+                            <Play className="w-2.5 h-2.5 fill-current text-amber-400" /> Bob's 27
+                          </span>
+                          <span className="text-[10px] text-neutral-400 font-normal">
+                            Start at 27 · D1 to Bullseye · Don't drop to 0
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-amber-400 border border-neutral-700">
+                          10m
+                        </span>
+                      </button>
                     </div>
                   )}
                 </div>
@@ -765,7 +833,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                     </span>
                   </div>
                   <p className="text-xs text-neutral-400 leading-relaxed">
-                    Use the 10-minute Bull Warm Up to get back into your rhythm post-break. Tighten center grouping and outer/inner bull precision.
+                    Use the 10-minute Bull Warm Up to get back into your rhythm post-break.
                   </p>
                 </div>
 
@@ -781,7 +849,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               </div>
             </div>
 
-            {/* Step 6: Single Numbers & Precision */}
+            {/* Step 6: Single Numbers & Grouping */}
             <div className="bg-neutral-900/95 border border-neutral-800 rounded-2xl p-3.5 sm:p-4 hover:border-purple-500/40 transition-all">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-1">
@@ -790,14 +858,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                       6
                     </span>
                     <h3 className="text-sm sm:text-base font-bold text-white">
-                      Single Numbers & Precision
+                      Single Numbers & Grouping — 20 min
                     </h3>
                     <span className="px-2 py-0.5 rounded bg-neutral-800 text-[10px] font-bold text-purple-300 border border-neutral-700">
-                      Choose 1 of 3
+                      Choose 1 of 4
                     </span>
                   </div>
                   <p className="text-xs text-neutral-400 leading-relaxed">
-                    Practice large singles: <b className="text-cyan-400">Big Singles</b> (1→20 grouping), <b className="text-purple-300">Triple Lock</b> (20 down to 1 + Bull), or <b className="text-amber-400">A1 - Practice</b> (20 to 12).
+                    Practice Singles and grouping: play 1 20-minute game or 2 10-minute games.
                   </p>
                 </div>
 
@@ -805,7 +873,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   <button
                     type="button"
                     id="dropdown-singles-btn"
-                    onClick={() => setOpenDropdown((prev) => (prev === 'singles' ? null : 'singles'))}
+                    onClick={() => {
+                      setOpenDropdown((prev) => (prev === 'singles' ? null : 'singles'));
+                      setOpenSubmenu(null);
+                    }}
                     className={`w-full sm:w-auto px-3.5 py-1.5 rounded-xl active:scale-95 text-xs font-bold flex items-center justify-center gap-1.5 border transition-all cursor-pointer whitespace-nowrap ${
                       openDropdown === 'singles'
                         ? 'bg-purple-600 text-white border-purple-400 shadow-md ring-2 ring-purple-500/40'
@@ -828,47 +899,173 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                         Select Precision Game
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOpenDropdown(null);
-                          handleStartGame('bigsingles_intermediate');
-                        }}
-                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-cyan-500/20 active:bg-cyan-500/30 text-xs text-white hover:text-cyan-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
-                      >
-                        <div className="flex flex-col">
-                          <span className="text-xs text-white group-hover:text-cyan-300 font-bold flex items-center gap-1.5">
-                            <Play className="w-2.5 h-2.5 fill-current text-cyan-400" /> Big Singles (Intermediate)
-                          </span>
-                          <span className="text-[10px] text-neutral-400 font-normal">
-                            2/3 hits advance (+1) · 1 hit stay (0) · 0 hits back 1 (-1)
-                          </span>
-                        </div>
-                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-cyan-400 border border-neutral-700">
-                          10m
-                        </span>
-                      </button>
+                      {/* RTW Singles with Falling Submenu */}
+                      <div className="rounded-lg overflow-hidden border border-[#2b3542] bg-[#0f141a]/90 transition-all">
+                        <button
+                          type="button"
+                          onClick={() => setOpenSubmenu((prev) => (prev === 'rtwsingles' ? null : 'rtwsingles'))}
+                          className={`w-full text-left px-2.5 py-2 rounded-lg text-xs font-bold flex items-center justify-between transition-all cursor-pointer group ${
+                            openSubmenu === 'rtwsingles'
+                              ? 'bg-cyan-500/20 text-cyan-300'
+                              : 'hover:bg-cyan-500/15 text-white hover:text-cyan-300'
+                          }`}
+                        >
+                          <div className="flex flex-col">
+                            <span className="text-xs font-bold flex items-center gap-1.5">
+                              <Play className="w-2.5 h-2.5 fill-current text-cyan-400" /> Round the World Singles
+                            </span>
+                            <span className="text-[10px] text-neutral-400 font-normal">
+                              1 dart per target 1→20 + Bull · Select Mode
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-cyan-400 border border-neutral-700">
+                              10m
+                            </span>
+                            {openSubmenu === 'rtwsingles' ? (
+                              <ChevronUp className="w-3.5 h-3.5 text-cyan-400" />
+                            ) : (
+                              <ChevronDown className="w-3.5 h-3.5 text-neutral-400 group-hover:text-cyan-300" />
+                            )}
+                          </div>
+                        </button>
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOpenDropdown(null);
-                          handleStartGame('bigsingles_advanced');
-                        }}
-                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-amber-500/20 active:bg-amber-500/30 text-xs text-white hover:text-amber-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
-                      >
-                        <div className="flex flex-col">
-                          <span className="text-xs text-white group-hover:text-amber-300 font-bold flex items-center gap-1.5">
-                            <Play className="w-2.5 h-2.5 fill-current text-amber-400" /> Big Singles (Advanced)
-                          </span>
-                          <span className="text-[10px] text-neutral-400 font-normal">
-                            3 hits: +1 · 2 hits: 0 · 1 hit: -1 · 0 hits: -2
-                          </span>
-                        </div>
-                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-amber-400 border border-neutral-700">
-                          10m
-                        </span>
-                      </button>
+                        {/* Extra Falling Submenu */}
+                        {openSubmenu === 'rtwsingles' && (
+                          <div className="px-2 pb-2 pt-1 space-y-1 bg-neutral-900/90 border-t border-[#222933] animate-fadeIn">
+                            <div className="text-[9px] font-bold text-cyan-400/80 uppercase tracking-wider px-1">
+                              Select RTW Mode:
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setOpenDropdown(null);
+                                setOpenSubmenu(null);
+                                handleStartGame('rtwsingles_intermediate');
+                              }}
+                              className="w-full text-left px-2 py-1.5 rounded-md hover:bg-cyan-500/25 active:bg-cyan-500/35 text-xs text-white hover:text-cyan-200 flex items-center justify-between transition-all cursor-pointer group/sub"
+                            >
+                              <div>
+                                <span className="font-bold block text-xs group-hover/sub:text-cyan-300">
+                                  Intermediate
+                                </span>
+                                <span className="text-[10px] text-neutral-400 block font-normal">
+                                  Hit +1 / Miss -1 · 3 misses in row = KO
+                                </span>
+                              </div>
+                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-cyan-300 border border-neutral-700">
+                                3 strikes
+                              </span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setOpenDropdown(null);
+                                setOpenSubmenu(null);
+                                handleStartGame('rtwsingles_advanced');
+                              }}
+                              className="w-full text-left px-2 py-1.5 rounded-md hover:bg-cyan-500/25 active:bg-cyan-500/35 text-xs text-white hover:text-cyan-200 flex items-center justify-between transition-all cursor-pointer group/sub"
+                            >
+                              <div>
+                                <span className="font-bold block text-xs group-hover/sub:text-cyan-300">
+                                  Advanced
+                                </span>
+                                <span className="text-[10px] text-neutral-400 block font-normal">
+                                  Hit +1 / Miss -1 · 5 total misses = KO
+                                </span>
+                              </div>
+                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-cyan-300 border border-neutral-700">
+                                5 misses
+                              </span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Big Singles with Falling Submenu */}
+                      <div className="rounded-lg overflow-hidden border border-[#2b3542] bg-[#0f141a]/90 transition-all">
+                        <button
+                          type="button"
+                          onClick={() => setOpenSubmenu((prev) => (prev === 'bigsingles' ? null : 'bigsingles'))}
+                          className={`w-full text-left px-2.5 py-2 rounded-lg text-xs font-bold flex items-center justify-between transition-all cursor-pointer group ${
+                            openSubmenu === 'bigsingles'
+                              ? 'bg-cyan-500/20 text-cyan-300'
+                              : 'hover:bg-cyan-500/15 text-white hover:text-cyan-300'
+                          }`}
+                        >
+                          <div className="flex flex-col">
+                            <span className="text-xs font-bold flex items-center gap-1.5">
+                              <Play className="w-2.5 h-2.5 fill-current text-cyan-400" /> Big Singles
+                            </span>
+                            <span className="text-[10px] text-neutral-400 font-normal">
+                              1→20 grouping ladder · Select Mode
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-cyan-400 border border-neutral-700">
+                              10m
+                            </span>
+                            {openSubmenu === 'bigsingles' ? (
+                              <ChevronUp className="w-3.5 h-3.5 text-cyan-400" />
+                            ) : (
+                              <ChevronDown className="w-3.5 h-3.5 text-neutral-400 group-hover:text-cyan-300" />
+                            )}
+                          </div>
+                        </button>
+
+                        {/* Extra Falling Submenu */}
+                        {openSubmenu === 'bigsingles' && (
+                          <div className="px-2 pb-2 pt-1 space-y-1 bg-neutral-900/90 border-t border-[#222933] animate-fadeIn">
+                            <div className="text-[9px] font-bold text-cyan-400/80 uppercase tracking-wider px-1">
+                              Select Big Singles Mode:
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setOpenDropdown(null);
+                                setOpenSubmenu(null);
+                                handleStartGame('bigsingles_intermediate');
+                              }}
+                              className="w-full text-left px-2 py-1.5 rounded-md hover:bg-cyan-500/25 active:bg-cyan-500/35 text-xs text-white hover:text-cyan-200 flex items-center justify-between transition-all cursor-pointer group/sub"
+                            >
+                              <div>
+                                <span className="font-bold block text-xs group-hover/sub:text-cyan-300">
+                                  Intermediate
+                                </span>
+                                <span className="text-[10px] text-neutral-400 block font-normal">
+                                  2/3 hits advance (+1) · 1 stay (0) · 0 back 1 (-1)
+                                </span>
+                              </div>
+                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-cyan-300 border border-neutral-700">
+                                2/3 hits
+                              </span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setOpenDropdown(null);
+                                setOpenSubmenu(null);
+                                handleStartGame('bigsingles_advanced');
+                              }}
+                              className="w-full text-left px-2 py-1.5 rounded-md hover:bg-amber-500/25 active:bg-amber-500/35 text-xs text-white hover:text-amber-200 flex items-center justify-between transition-all cursor-pointer group/sub"
+                            >
+                              <div>
+                                <span className="font-bold block text-xs group-hover/sub:text-amber-300">
+                                  Advanced
+                                </span>
+                                <span className="text-[10px] text-neutral-400 block font-normal">
+                                  3 hits: +1 · 2 hits: 0 · 1 hit: -1 · 0 hits: -2
+                                </span>
+                              </div>
+                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-amber-300 border border-neutral-700">
+                                3/3 hits
+                              </span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
 
                       <button
                         type="button"

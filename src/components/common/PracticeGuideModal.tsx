@@ -186,8 +186,8 @@ export const PracticeGuideModal: React.FC<PracticeGuideModalProps> = ({
                   {/* Step 3: Finishing */}
                   <div className="pt-2 flex items-start justify-between gap-2">
                     <div>
-                      <b className="text-white text-xs sm:text-sm block">Finishing — 20 min</b>
-                      <p className="text-neutral-400">Choose one: 121 in 9, 121 in 12, Catch 40, Checkout Challenge, or Doubles Boomerang.</p>
+                      <b className="text-white text-xs sm:text-sm block">Finishing & Doubles</b>
+                      <p className="text-neutral-400">Choose one: 121 (9/12), Catch 40, Checkout Challenge, Doubles Boomerang, or Bob's 27.</p>
                     </div>
                     <div className="flex items-center gap-1 shrink-0 pt-0.5 flex-wrap">
                       <button
@@ -225,6 +225,13 @@ export const PracticeGuideModal: React.FC<PracticeGuideModalProps> = ({
                       >
                         <Play className="w-2.5 h-2.5" /> Boomerang
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => handleStartDrill('bobs27')}
+                        className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-amber-400 font-bold flex items-center gap-1 border border-neutral-700"
+                      >
+                        <Play className="w-2.5 h-2.5" /> Bob's 27
+                      </button>
                     </div>
                   </div>
 
@@ -238,7 +245,7 @@ export const PracticeGuideModal: React.FC<PracticeGuideModalProps> = ({
                   <div className="pt-2 flex items-start justify-between gap-2">
                     <div>
                       <b className="text-white text-xs sm:text-sm block">Bull Warm Up — 10 min</b>
-                      <p className="text-neutral-400">Use the 10-minute Bull Warm Up to get back into your rhythm.</p>
+                      <p className="text-neutral-400">Use the 10-minute Bull Warm Up to get back into your rhythm post-break.</p>
                     </div>
                     <div className="shrink-0 pt-0.5">
                       <button
@@ -254,10 +261,26 @@ export const PracticeGuideModal: React.FC<PracticeGuideModalProps> = ({
                   {/* Step 6: Single Numbers */}
                   <div className="pt-2 flex flex-col sm:flex-row sm:items-start justify-between gap-2">
                     <div>
-                      <b className="text-white text-xs sm:text-sm block">Single Numbers & Grouping — 10–20 min</b>
-                      <p className="text-neutral-400">Play Big Singles (1 to 20), Triple Lock (20 to Bull), or A1 Practice routine (20 to 12).</p>
+                      <b className="text-white text-xs sm:text-sm block">Single Numbers & Grouping — 20 min</b>
+                      <p className="text-neutral-400">Practice Singles and grouping: 1 20-min game or 2 10-min ones.</p>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0 pt-0.5 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={() => handleStartDrill('rtwsingles_intermediate')}
+                        className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-cyan-400 font-bold flex items-center gap-1 border border-neutral-700"
+                        title="RTW Singles Intermediate: 1 dart per target 1 to Bull, hit +1, miss -1, 3 misses in row KO"
+                      >
+                        <Play className="w-2.5 h-2.5" /> RTW Singles (Inter)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleStartDrill('rtwsingles_advanced')}
+                        className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-cyan-400 font-bold flex items-center gap-1 border border-neutral-700"
+                        title="RTW Singles Advanced: 1 dart per target 1 to Bull, hit +1, miss -1, 5 total misses KO"
+                      >
+                        <Play className="w-2.5 h-2.5" /> RTW Singles (Adv)
+                      </button>
                       <button
                         type="button"
                         onClick={() => handleStartDrill('bigsingles_intermediate')}

@@ -373,6 +373,30 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
                             </>
                           );
                         })()
+                      ) : item.gameType === 'bobs27' ? (
+                        (() => {
+                          const bobsRes = item.result as any;
+                          return (
+                            <>
+                              <span className="px-2.5 py-1 rounded-lg bg-amber-950/90 border border-amber-700/80 text-amber-300 text-xs font-bold font-mono">
+                                Best: {bobsRes.bestScore} pts
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Avg:</span>
+                                <b className="text-white font-mono">{bobsRes.averageScore} pts</b>
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Runs:</span>
+                                <b className="text-emerald-400 font-mono">{bobsRes.completedRuns} cleared</b>
+                                <span className="text-neutral-500 font-mono"> / {bobsRes.runsPlayed} played</span>
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Accuracy:</span>
+                                <b className="text-cyan-400 font-mono">{bobsRes.overallAccuracy}% ({bobsRes.totalHits}/{bobsRes.totalDarts}d)</b>
+                              </span>
+                            </>
+                          );
+                        })()
                       ) : item.gameType === 'boomerang' ? (
                         (() => {
                           const boomRes = item.result as any;
@@ -433,6 +457,34 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
                               <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
                                 <span className="text-neutral-500 mr-1">Accuracy:</span>
                                 <b className="text-emerald-400 font-mono">{bsRes.dartHitAccuracy || 0}%</b>
+                              </span>
+                            </>
+                          );
+                        })()
+                      ) : item.gameType === 'rtwsingles' || item.gameType === 'rtwsingles_intermediate' || item.gameType === 'rtwsingles_advanced' ? (
+                        (() => {
+                          const rtwRes = item.result as any;
+                          return (
+                            <>
+                              <span className="px-2 py-0.5 rounded-md bg-cyan-950/90 border border-cyan-700/80 text-cyan-300 text-xs font-bold uppercase">
+                                {rtwRes.difficulty || 'Intermediate'}
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Cleared:</span>
+                                <b className="text-emerald-400 font-mono">{rtwRes.completedRuns || 0}</b>
+                                <span className="text-neutral-500 font-mono"> / {rtwRes.runsPlayed || 1}</span>
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Best Clear:</span>
+                                <b className="text-amber-400 font-mono">{rtwRes.bestRunDarts ? `${rtwRes.bestRunDarts}d` : '—'}</b>
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Furthest:</span>
+                                <b className="text-cyan-300 font-mono">{rtwRes.highestTargetEver || 'S1'}</b>
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
+                                <span className="text-neutral-500 mr-1">Accuracy:</span>
+                                <b className="text-emerald-400 font-mono">{rtwRes.overallAccuracy || 0}%</b>
                               </span>
                             </>
                           );

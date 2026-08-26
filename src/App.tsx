@@ -17,8 +17,10 @@ import { PowerSwitchGame } from './components/games/PowerSwitchGame';
 import { BigScoresGame } from './components/games/BigScoresGame';
 import { CheckoutChallengeGame } from './components/games/CheckoutChallengeGame';
 import { DoublesBoomerangGame } from './components/games/DoublesBoomerangGame';
+import { Bobs27Game } from './components/games/Bobs27Game';
 import { A1PracticeGame } from './components/games/A1PracticeGame';
 import { BigSinglesGame } from './components/games/BigSinglesGame';
+import { RTWSinglesGame } from './components/games/RTWSinglesGame';
 import { SummaryModal } from './components/games/SummaryModal';
 import { HistoryModal } from './components/games/HistoryModal';
 import { DailyCountModal } from './components/games/DailyCountModal';
@@ -430,6 +432,13 @@ export default function App() {
           />
         )}
 
+        {view === 'game' && selectedGame === 'bobs27' && (
+          <Bobs27Game
+            isFinalInput={isFinalInput}
+            onFinish={handleGameFinish}
+          />
+        )}
+
         {view === 'game' && selectedGame === 'a1practice' && (
           <A1PracticeGame
             isFinalInput={isFinalInput}
@@ -440,6 +449,14 @@ export default function App() {
         {view === 'game' && (selectedGame === 'bigsingles' || selectedGame === 'bigsingles_intermediate' || selectedGame === 'bigsingles_advanced') && (
           <BigSinglesGame
             initialLevel={selectedGame === 'bigsingles_advanced' ? 'advanced' : 'intermediate'}
+            isFinalInput={isFinalInput}
+            onFinish={handleGameFinish}
+          />
+        )}
+
+        {view === 'game' && (selectedGame === 'rtwsingles' || selectedGame === 'rtwsingles_intermediate' || selectedGame === 'rtwsingles_advanced') && (
+          <RTWSinglesGame
+            initialDifficulty={selectedGame === 'rtwsingles_advanced' ? 'advanced' : 'intermediate'}
             isFinalInput={isFinalInput}
             onFinish={handleGameFinish}
           />
