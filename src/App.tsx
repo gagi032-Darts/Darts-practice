@@ -439,8 +439,9 @@ export default function App() {
           />
         )}
 
-        {view === 'game' && selectedGame === 'a1practice' && (
+        {view === 'game' && (selectedGame === 'a1practice' || selectedGame === 'a1practice_top' || selectedGame === 'a1practice_bottom') && (
           <A1PracticeGame
+            initialMode={selectedGame === 'a1practice_bottom' ? '1_10' : '20_11'}
             isFinalInput={isFinalInput}
             onFinish={handleGameFinish}
           />

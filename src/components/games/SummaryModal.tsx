@@ -1496,8 +1496,12 @@ export const SummaryModal: React.FC<SummaryModalProps> = ({
   }
 
   // Dedicated scorecard rendering for A1 - Practice routine
-  if (gameType === 'a1practice') {
+  if (gameType === 'a1practice' || gameType === 'a1practice_top' || gameType === 'a1practice_bottom') {
     const a1Res = result as A1PracticeResult;
+    const setsDone = a1Res.setsCompleted || 0;
+
+    // Extract all recorded target keys sorted numerically from highest to lowest
+    const recordedTargetKeys = Object.keys(a1Res.targetStats || {}).sort((a, b) => Number(b) - Number(a));
 
     return (
       <div className="w-full max-w-xl mx-auto space-y-4">
@@ -1510,10 +1514,10 @@ export const SummaryModal: React.FC<SummaryModalProps> = ({
           <span className="text-xs font-bold text-amber-400 uppercase tracking-widest block mb-1">
             🎯 A1 Practice Completed
           </span>
-          <h2 className="text-3xl sm:text-4xl font-black font-mono text-white tracking-tight">
-            {a1Res.targetsCleared === 9
-              ? 'Full Board Cleared!'
-              : `${a1Res.targetsCleared} of 9 Targets Cleared`}
+          <h2 className="text-2xl sm:text-3xl font-black font-mono text-white tracking-tight">
+            {setsDone > 0
+              ? `${setsDone} Full Set${setsDone > 1 ? 's' : ''} Cleared!`
+              : `${a1Res.targetsCleared} Targets Cleared`}
           </h2>
           <p className="text-xs text-neutral-400 mt-1">
             Duration: <b className="text-neutral-200 font-mono">{durationFormatted}</b> · Total Darts: <b className="text-amber-300 font-mono">{a1Res.totalDarts}</b>
@@ -1526,7 +1530,7 @@ export const SummaryModal: React.FC<SummaryModalProps> = ({
                 Targets Cleared
               </span>
               <span className="text-2xl font-mono font-black text-amber-400 mt-1 block tracking-tight">
-                {a1Res.targetsCleared} <span className="text-xs text-neutral-400 font-sans font-normal">/ 9</span>
+                {a1Res.targetsCleared}
               </span>
             </div>
 
@@ -1559,14 +1563,14 @@ export const SummaryModal: React.FC<SummaryModalProps> = ({
           </div>
 
           {/* Target Breakdown Grid */}
-          {a1Res.targetStats && (
+          {recordedTargetKeys.length > 0 && (
             <div className="bg-neutral-850/80 border border-neutral-750/80 rounded-2xl p-4 text-left shadow-inner my-3 space-y-2">
               <span className="text-xs font-bold text-neutral-300 uppercase tracking-wider block border-b border-neutral-700/60 pb-2 flex items-center justify-between">
-                <span>Targets Breakdown (20 to 12)</span>
+                <span>Targets Breakdown</span>
                 <span className="text-[11px] text-neutral-400 font-normal">3 hits to lock</span>
               </span>
-              <div className="grid grid-cols-3 gap-2 pt-1">
-                {['20', '19', '18', '17', '16', '15', '14', '13', '12'].map((key) => {
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1">
+                {recordedTargetKeys.map((key) => {
                   const stat = a1Res.targetStats[key];
                   if (!stat) return null;
                   return (
@@ -1580,7 +1584,7 @@ export const SummaryModal: React.FC<SummaryModalProps> = ({
                     >
                       <b className="text-sm font-bold text-white">{key}</b>
                       <span className="text-[11px] mt-0.5">
-                        {stat.hits}/3 hits ({stat.attempts}v)
+                        {stat.hits}/3 ({stat.attempts}v)
                       </span>
                     </div>
                   );

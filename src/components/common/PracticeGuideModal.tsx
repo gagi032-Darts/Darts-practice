@@ -299,10 +299,19 @@ export const PracticeGuideModal: React.FC<PracticeGuideModalProps> = ({
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleStartDrill('a1practice')}
+                        onClick={() => handleStartDrill('a1practice_top')}
                         className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-amber-400 font-bold flex items-center gap-1 border border-neutral-700"
+                        title="A1 Practice 20 to 11: 3 hits to clear, auto-rotates to 1-10"
                       >
-                        <Play className="w-2.5 h-2.5" /> A1 Practice
+                        <Play className="w-2.5 h-2.5" /> A1 (20–11)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleStartDrill('a1practice_bottom')}
+                        className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-amber-400 font-bold flex items-center gap-1 border border-neutral-700"
+                        title="A1 Practice 1 to 10: 3 hits to clear, auto-rotates to 20-11"
+                      >
+                        <Play className="w-2.5 h-2.5" /> A1 (1–10)
                       </button>
                       <button
                         type="button"

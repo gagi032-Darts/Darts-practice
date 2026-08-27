@@ -15,6 +15,8 @@ export type GameType =
   | 'boomerang'
   | 'bobs27'
   | 'a1practice'
+  | 'a1practice_top'
+  | 'a1practice_bottom'
   | 'bigsingles'
   | 'bigsingles_intermediate'
   | 'bigsingles_advanced'
@@ -171,13 +173,16 @@ export interface Bobs27Result {
 
 export interface A1PracticeResult {
   completed: boolean;
-  targetsCleared: number; // 0 to 9
-  totalTargets: number; // 9
+  targetsCleared: number; // e.g. 10 or more if sets rotated
+  totalTargets: number; // 10 per set
   totalVisits: number;
   totalDarts: number; // totalVisits * 3
   successfulVisits: number; // hits (2 or 3 in large single)
   accuracy: number; // (successfulVisits / totalVisits) * 100
   targetStats: Record<string, { attempts: number; hits: number; completed: boolean }>;
+  setsCompleted?: number;
+  startingSet?: '20_11' | '1_10';
+  setsClearedLabels?: string[];
 }
 
 export type BigSinglesLevel = 'intermediate' | 'advanced';

@@ -1067,26 +1067,89 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                         )}
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOpenDropdown(null);
-                          handleStartGame('a1practice');
-                        }}
-                        className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-amber-500/20 active:bg-amber-500/30 text-xs text-white hover:text-amber-300 font-bold flex items-center justify-between transition-all cursor-pointer group"
-                      >
-                        <div className="flex flex-col">
-                          <span className="text-xs text-white group-hover:text-amber-300 font-bold flex items-center gap-1.5">
-                            <Play className="w-2.5 h-2.5 fill-current text-amber-400" /> A1 Practice
-                          </span>
-                          <span className="text-[10px] text-neutral-400 font-normal">
-                            Singles grouping & scoring 20 down to 12
-                          </span>
-                        </div>
-                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-amber-400 border border-neutral-700">
-                          10m
-                        </span>
-                      </button>
+                      {/* A1 Practice with Falling Submenu */}
+                      <div className="rounded-lg overflow-hidden border border-[#2b3542] bg-[#0f141a]/90 transition-all">
+                        <button
+                          type="button"
+                          onClick={() => setOpenSubmenu((prev) => (prev === 'a1practice' ? null : 'a1practice'))}
+                          className={`w-full text-left px-2.5 py-2 rounded-lg text-xs font-bold flex items-center justify-between transition-all cursor-pointer group ${
+                            openSubmenu === 'a1practice'
+                              ? 'bg-amber-500/20 text-amber-300'
+                              : 'hover:bg-amber-500/15 text-white hover:text-amber-300'
+                          }`}
+                        >
+                          <div className="flex flex-col">
+                            <span className="text-xs font-bold flex items-center gap-1.5">
+                              <Play className="w-2.5 h-2.5 fill-current text-amber-400" /> A1 Practice
+                            </span>
+                            <span className="text-[10px] text-neutral-400 font-normal">
+                              Singles routine · 20→11 or 1→10 · Select Set
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-amber-400 border border-neutral-700">
+                              10m
+                            </span>
+                            {openSubmenu === 'a1practice' ? (
+                              <ChevronUp className="w-3.5 h-3.5 text-amber-400" />
+                            ) : (
+                              <ChevronDown className="w-3.5 h-3.5 text-neutral-400 group-hover:text-amber-300" />
+                            )}
+                          </div>
+                        </button>
+
+                        {/* Extra Falling Submenu */}
+                        {openSubmenu === 'a1practice' && (
+                          <div className="px-2 pb-2 pt-1 space-y-1 bg-neutral-900/90 border-t border-[#222933] animate-fadeIn">
+                            <div className="text-[9px] font-bold text-amber-400/80 uppercase tracking-wider px-1">
+                              Select Starting Set:
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setOpenDropdown(null);
+                                setOpenSubmenu(null);
+                                handleStartGame('a1practice_top');
+                              }}
+                              className="w-full text-left px-2 py-1.5 rounded-md hover:bg-amber-500/25 active:bg-amber-500/35 text-xs text-white hover:text-amber-200 flex items-center justify-between transition-all cursor-pointer group/sub"
+                            >
+                              <div>
+                                <span className="font-bold block text-xs group-hover/sub:text-amber-300">
+                                  Numbers 20 to 11
+                                </span>
+                                <span className="text-[10px] text-neutral-400 block font-normal">
+                                  Upper half · 3 clears per number · Auto-switch to 1–10
+                                </span>
+                              </div>
+                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-amber-300 border border-neutral-700">
+                                20→11
+                              </span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setOpenDropdown(null);
+                                setOpenSubmenu(null);
+                                handleStartGame('a1practice_bottom');
+                              }}
+                              className="w-full text-left px-2 py-1.5 rounded-md hover:bg-amber-500/25 active:bg-amber-500/35 text-xs text-white hover:text-amber-200 flex items-center justify-between transition-all cursor-pointer group/sub"
+                            >
+                              <div>
+                                <span className="font-bold block text-xs group-hover/sub:text-amber-300">
+                                  Numbers 1 to 10
+                                </span>
+                                <span className="text-[10px] text-neutral-400 block font-normal">
+                                  Lower half · 3 clears per number · Auto-switch to 20–11
+                                </span>
+                              </div>
+                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-amber-300 border border-neutral-700">
+                                1→10
+                              </span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
 
                       <button
                         type="button"
