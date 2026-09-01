@@ -54,6 +54,16 @@ export const TripleLockGame: React.FC<TripleLockGameProps> = ({
   const [totalDarts, setTotalDarts] = useState<number>(0);
   const [lastFeedback, setLastFeedback] = useState<string | null>(null);
 
+  // Per-target hits and misses
+  const [targetStats, setTargetStats] = useState<Record<string, { target: string; attempts: number; hits: number; misses: number; accuracy: number }>>(() => {
+    const init: Record<string, { target: string; attempts: number; hits: number; misses: number; accuracy: number }> = {};
+    for (let i = 20; i >= 1; i--) {
+      init[`${i}`] = { target: `${i}`, attempts: 0, hits: 0, misses: 0, accuracy: 0 };
+    }
+    init['Bull'] = { target: 'Bull', attempts: 0, hits: 0, misses: 0, accuracy: 0 };
+    return init;
+  });
+
   // History stack for Undo
   const [historyStack, setHistoryStack] = useState<UndoHistoryState[]>([]);
 
@@ -137,6 +147,7 @@ export const TripleLockGame: React.FC<TripleLockGameProps> = ({
       totalVisits: overrideVisits,
       dartsThrown: overrideDarts,
       stagesCompleted: calculateStages(isWon),
+      targetStats,
     });
   };
 
@@ -151,6 +162,19 @@ export const TripleLockGame: React.FC<TripleLockGameProps> = ({
     } else {
       sound.miss();
     }
+
+    // Update target stats for this number
+    const key = `${target}`;
+    const prevStat = targetStats[key] || { target: key, attempts: 0, hits: 0, misses: 0, accuracy: 0 };
+    const att = prevStat.attempts + 3;
+    const h = prevStat.hits + hits;
+    const m = prevStat.misses + (3 - hits);
+    const acc = att > 0 ? Math.round((h / att) * 100) : 0;
+
+    setTargetStats((prev) => ({
+      ...prev,
+      [key]: { target: key, attempts: att, hits: h, misses: m, accuracy: acc },
+    }));
 
     storage.recordDartsThrown(3);
     const nextVisits = totalVisits + 1;
@@ -217,6 +241,18 @@ export const TripleLockGame: React.FC<TripleLockGameProps> = ({
     } else {
       sound.miss();
     }
+
+    setTargetStats((prev) => {
+      const prevB = prev['Bull'] || { target: 'Bull', attempts: 0, hits: 0, misses: 0, accuracy: 0 };
+      const att = prevB.attempts + 1;
+      const h = prevB.hits + (dartValue > 0 ? 1 : 0);
+      const m = prevB.misses + (dartValue === 0 ? 1 : 0);
+      const acc = att > 0 ? Math.round((h / att) * 100) : 0;
+      return {
+        ...prev,
+        Bull: { target: 'Bull', attempts: att, hits: h, misses: m, accuracy: acc },
+      };
+    });
 
     const nextDartsInVisit = [...bullVisitDarts, dartValue];
     const visitHits = nextDartsInVisit.filter((d) => d > 0).length;

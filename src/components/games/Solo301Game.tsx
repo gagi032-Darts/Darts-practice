@@ -11,7 +11,7 @@ import { Solo301Result } from '../../types';
 import { DartsMatchKeypad } from '../common/DartsMatchKeypad';
 import { DartsAtDoubleModal } from '../common/DartsAtDoubleModal';
 import { CheckoutDartsModal } from '../common/CheckoutDartsModal';
-import { getCheckoutRoute, BOGEY_NUMBERS } from '../../utils/checkouts';
+import { getCheckoutRoute, BOGEY_NUMBERS, canVisitHaveDoubleShot } from '../../utils/checkouts';
 import { sound } from '../../utils/sound';
 import { storage } from '../../utils/storage';
 
@@ -107,8 +107,8 @@ export const Solo301Game: React.FC<Solo301GameProps> = ({
     const isBust = endScore < 0 || endScore === 1;
     const isCheckout = endScore === 0;
 
-    // Check if score was typed on a finish range
-    const wasOnDoubleRange = startScore <= 170 && startScore >= 2 && !BOGEY_NUMBERS.includes(startScore);
+    // Check if visit could mathematically have had at least one dart aimed at a double
+    const hadDoubleOpportunity = canVisitHaveDoubleShot(startScore, rawVal, isCheckout, 3);
 
     const pending: PendingVisit = {
       val: rawVal,
@@ -124,7 +124,7 @@ export const Solo301Game: React.FC<Solo301GameProps> = ({
       // Modal to record 1, 2, or 3 darts for the finish
       setLastCheckoutScore(startScore);
       setShowCheckoutDartsModal(true);
-    } else if (wasOnDoubleRange) {
+    } else if (!isBust && hadDoubleOpportunity) {
       // Prompt darts aimed at double (0, 1, 2, 3)
       setShowDartsAtDoubleModal(true);
     } else {

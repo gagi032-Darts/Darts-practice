@@ -1,10 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Trash2, Download, Upload, Filter, Calendar, Award, RotateCcw, ChevronDown, ChevronUp, BarChart3 } from 'lucide-react';
+import {
+  ArrowLeft,
+  Trash2,
+  Download,
+  Upload,
+  Calendar,
+  ChevronDown,
+  ChevronUp,
+  BarChart3,
+  ListFilter,
+  CheckCircle2,
+  Sparkles,
+  Layers,
+} from 'lucide-react';
 import { SessionHistoryItem, GameType } from '../../types';
 import { storage } from '../../utils/storage';
 import { GAME_DEFINITIONS } from '../../utils/gamesData';
 import { sound } from '../../utils/sound';
-import { LegBreakdownView } from '../common/LegBreakdownView';
+import { AdvancedSessionBreakdown } from '../common/AdvancedSessionBreakdown';
 
 interface HistoryModalProps {
   onClose: () => void;
@@ -20,9 +33,17 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
   const [confirmClear, setConfirmClear] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [expandedSessions, setExpandedSessions] = useState<Record<string, boolean>>({});
+  const [allExpanded, setAllExpanded] = useState<boolean>(true); // Default to detailed view per user request
 
   useEffect(() => {
-    setHistory(storage.getHistory());
+    const data = storage.getHistory();
+    setHistory(data);
+    // Initialize all sessions as expanded by default so user immediately gets advanced stats
+    const initialMap: Record<string, boolean> = {};
+    data.forEach((item) => {
+      initialMap[item.id] = true;
+    });
+    setExpandedSessions(initialMap);
   }, []);
 
   const toggleSessionExpand = (id: string) => {
@@ -31,6 +52,17 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
       ...prev,
       [id]: !prev[id],
     }));
+  };
+
+  const toggleAllExpanded = () => {
+    sound.tap();
+    const nextState = !allExpanded;
+    setAllExpanded(nextState);
+    const map: Record<string, boolean> = {};
+    history.forEach((h) => {
+      map[h.id] = nextState;
+    });
+    setExpandedSessions(map);
   };
 
   const handleDeleteSession = (id: string) => {
@@ -67,7 +99,13 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
     reader.onload = (event) => {
       const content = event.target?.result as string;
       if (content && storage.importBackupJSON(content)) {
-        setHistory(storage.getHistory());
+        const fresh = storage.getHistory();
+        setHistory(fresh);
+        const map: Record<string, boolean> = {};
+        fresh.forEach((h) => {
+          map[h.id] = true;
+        });
+        setExpandedSessions(map);
         setStatusMessage('Backup restored successfully!');
         sound.lock();
       } else {
@@ -97,15 +135,29 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
 
         <div className="text-center sm:text-left">
           <h1 className="text-lg sm:text-xl font-black text-white flex items-center justify-center sm:justify-start gap-2">
-            <span>Drill History & Records</span>
+            <span>Drill History & Advanced Stats</span>
           </h1>
           <span className="text-xs text-neutral-400 font-medium">
             Profile: <b className="text-emerald-400 font-bold">{storage.getActiveAccount().name}</b>
           </span>
         </div>
 
-        {/* Data Tools: Export / Import */}
+        {/* Data Tools: Export / Import & View Mode Toggle */}
         <div className="flex items-center gap-2">
+          {history.length > 0 && (
+            <button
+              type="button"
+              onClick={toggleAllExpanded}
+              title="Toggle Detailed / Compact Breakdown"
+              className="p-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white border border-neutral-700 text-xs font-semibold flex items-center gap-1.5 transition-all"
+            >
+              <BarChart3 className="w-3.5 h-3.5 text-amber-400" />
+              <span className="hidden sm:inline">
+                {allExpanded ? 'Collapse All' : 'Expand All Stats'}
+              </span>
+            </button>
+          )}
+
           <button
             type="button"
             id="history-export-btn"
@@ -177,8 +229,9 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
           </p>
         </div>
       ) : (
-        <div className="space-y-2.5">
+        <div className="space-y-3">
           {filteredHistory.map((item) => {
+            const isExpanded = expandedSessions[item.id] ?? false;
             const dateStr = new Date(item.date).toLocaleDateString(undefined, {
               month: 'short',
               day: 'numeric',
@@ -190,383 +243,57 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
             return (
               <div
                 key={item.id}
-                className="bg-neutral-900 border border-neutral-800 hover:border-neutral-700 rounded-2xl p-4 transition-all"
+                className="bg-neutral-900 border border-neutral-800 hover:border-neutral-700/90 rounded-2xl p-4 transition-all shadow-md"
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800/60">
-                        {item.gameTitle}
-                      </span>
-                      <span className="text-xs text-neutral-500 font-medium">{dateStr}</span>
-                    </div>
-
-                    {/* Formatted stats summary chips */}
-                    <div className="flex flex-wrap gap-2 mt-3">
-                      {item.gameType === 'dartbot' ? (
-                        (() => {
-                          const botRes = item.result as any;
-                          const won = botRes.winner === 'player';
-                          return (
-                            <>
-                              <span
-                                className={`px-2.5 py-1 rounded-lg text-xs font-bold ${
-                                  won
-                                    ? 'bg-emerald-950/90 border border-emerald-700/80 text-emerald-300'
-                                    : 'bg-rose-950/90 border border-rose-700/80 text-rose-300'
-                                }`}
-                              >
-                                {won ? 'Won' : 'Lost'} {botRes.playerLegs}–{botRes.botLegs} vs {botRes.botLevelLabel}
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Your Avg:</span>
-                                <b className="text-emerald-400 font-mono">{botRes.playerStats?.threeDartAvg ?? '-'}</b>
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Bot Avg:</span>
-                                <b className="text-rose-400 font-mono">{botRes.botStats?.threeDartAvg ?? '-'}</b>
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Checkout %:</span>
-                                <b className="text-cyan-400 font-mono">{botRes.playerStats?.doublePercentage ?? 0}%</b>
-                              </span>
-                              {botRes.playerStats?.highestCheckout > 0 && (
-                                <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                  <span className="text-neutral-500 mr-1">High Out:</span>
-                                  <b className="text-amber-400 font-mono">{botRes.playerStats.highestCheckout}</b>
-                                </span>
-                              )}
-                              {botRes.playerStats?.bestLegDarts && (
-                                <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                  <span className="text-neutral-500 mr-1">Best Leg:</span>
-                                  <b className="text-white font-mono">{botRes.playerStats.bestLegDarts} darts</b>
-                                </span>
-                              )}
-                            </>
-                          );
-                        })()
-                      ) : item.gameType === 'triple' ? (
-                        (() => {
-                          const tripRes = item.result as any;
-                          const isCompleted = tripRes.completed;
-                          return (
-                            <>
-                              <span
-                                className={`px-2.5 py-1 rounded-lg text-xs font-bold ${
-                                  isCompleted
-                                    ? 'bg-emerald-950/90 border border-emerald-700/80 text-emerald-300'
-                                    : 'bg-cyan-950/90 border border-cyan-700/80 text-cyan-300'
-                                }`}
-                              >
-                                {isCompleted ? `🎯 Completed (${tripRes.completionTime || 'Finished'})` : '⏱️ 20m Expired'}
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Locked:</span>
-                                <b className="text-emerald-400 font-mono">{tripRes.lockedThrough ?? 'None'}</b>
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Progress:</span>
-                                <b className="text-white font-mono">{tripRes.stagesCompleted ? `${tripRes.stagesCompleted}/21 stages` : tripRes.targetReached}</b>
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Resets:</span>
-                                <b className="text-rose-400 font-mono">{tripRes.resets}</b>
-                              </span>
-                              {tripRes.dartsThrown > 0 && (
-                                <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                  <span className="text-neutral-500 mr-1">Darts:</span>
-                                  <b className="text-white font-mono">{tripRes.dartsThrown}</b>
-                                </span>
-                              )}
-                            </>
-                          );
-                        })()
-                      ) : item.gameType === 'switchblade' ? (
-                        (() => {
-                          const sbRes = item.result as any;
-                          return (
-                            <>
-                              <span className="px-2.5 py-1 rounded-lg bg-rose-950/90 border border-rose-700/80 text-rose-300 text-xs font-bold font-mono">
-                                {sbRes.totalPoints?.toLocaleString()} pts
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Avg/Throw:</span>
-                                <b className="text-emerald-400 font-mono">{sbRes.averageScorePerVisit}</b>
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Rounds:</span>
-                                <b className="text-amber-400 font-mono">{sbRes.cyclesCompleted}</b>
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Darts:</span>
-                                <b className="text-white font-mono">{sbRes.darts}</b>
-                              </span>
-                            </>
-                          );
-                        })()
-                      ) : item.gameType === 'powerswitch' ? (
-                        (() => {
-                          const psRes = item.result as any;
-                          return (
-                            <>
-                              <span className="px-2.5 py-1 rounded-lg bg-amber-950/90 border border-amber-700/80 text-amber-300 text-xs font-bold font-mono">
-                                {psRes.totalPoints?.toLocaleString()} pts
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Avg/Visit:</span>
-                                <b className="text-emerald-400 font-mono">{psRes.pointsPerVisitAvg}</b>
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Treble %:</span>
-                                <b className="text-cyan-400 font-mono">{psRes.trebleRate}%</b>
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Visits:</span>
-                                <b className="text-white font-mono">{psRes.visits}</b>
-                              </span>
-                            </>
-                          );
-                        })()
-                      ) : item.gameType === 'bigscores' ? (
-                        (() => {
-                          const bsRes = item.result as any;
-                          return (
-                            <>
-                              <span className="px-2.5 py-1 rounded-lg bg-violet-950/90 border border-violet-700/80 text-violet-300 text-xs font-bold font-mono">
-                                {bsRes.totalPoints?.toLocaleString()} pts
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Avg/Visit:</span>
-                                <b className="text-emerald-400 font-mono">{bsRes.averageScorePerVisit}</b>
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">3-Dart:</span>
-                                <b className="text-cyan-400 font-mono">{bsRes.threeDartAvg}</b>
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Rounds:</span>
-                                <b className="text-amber-400 font-mono">{bsRes.cyclesCompleted}</b>
-                              </span>
-                            </>
-                          );
-                        })()
-                      ) : item.gameType === 'cochallenge' ? (
-                        (() => {
-                          const coRes = item.result as any;
-                          return (
-                            <>
-                              <span className="px-2.5 py-1 rounded-lg bg-amber-950/90 border border-amber-700/80 text-amber-300 text-xs font-bold font-mono">
-                                High Out: {coRes.highestCheckout > 0 ? coRes.highestCheckout : '—'}
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Checkouts:</span>
-                                <b className="text-cyan-400 font-mono">{coRes.checkoutsMade} / {coRes.attempts}</b>
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Rate:</span>
-                                <b className="text-emerald-400 font-mono">{coRes.checkoutRate}%</b>
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Best Streak:</span>
-                                <b className="text-amber-400 font-mono">{coRes.bestStreak || 0} 🔥</b>
-                              </span>
-                            </>
-                          );
-                        })()
-                      ) : item.gameType === 'bobs27' ? (
-                        (() => {
-                          const bobsRes = item.result as any;
-                          return (
-                            <>
-                              <span className="px-2.5 py-1 rounded-lg bg-amber-950/90 border border-amber-700/80 text-amber-300 text-xs font-bold font-mono">
-                                Best: {bobsRes.bestScore} pts
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Avg:</span>
-                                <b className="text-white font-mono">{bobsRes.averageScore} pts</b>
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Runs:</span>
-                                <b className="text-emerald-400 font-mono">{bobsRes.completedRuns} cleared</b>
-                                <span className="text-neutral-500 font-mono"> / {bobsRes.runsPlayed} played</span>
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Accuracy:</span>
-                                <b className="text-cyan-400 font-mono">{bobsRes.overallAccuracy}% ({bobsRes.totalHits}/{bobsRes.totalDarts}d)</b>
-                              </span>
-                            </>
-                          );
-                        })()
-                      ) : item.gameType === 'boomerang' ? (
-                        (() => {
-                          const boomRes = item.result as any;
-                          return (
-                            <>
-                              <span className="px-2.5 py-1 rounded-lg bg-sky-950/90 border border-sky-700/80 text-sky-300 text-xs font-bold font-mono">
-                                Rounds: {boomRes.roundsCompleted || 0}
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-amber-950/90 border border-amber-700/80 text-amber-300 text-xs font-bold font-mono">
-                                Best: {boomRes.bestRoundDarts ? `${boomRes.bestRoundDarts}d` : '—'}
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Hits:</span>
-                                <b className="text-emerald-400 font-mono">{boomRes.totalHits} / {boomRes.totalDarts}</b>
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Accuracy:</span>
-                                <b className="text-emerald-400 font-mono">{boomRes.overallAccuracy}%</b>
-                              </span>
-                            </>
-                          );
-                        })()
-                      ) : item.gameType === 'a1practice' ? (
-                        (() => {
-                          const a1Res = item.result as any;
-                          return (
-                            <>
-                              <span className="px-2.5 py-1 rounded-lg bg-amber-950/90 border border-amber-700/80 text-amber-300 text-xs font-bold font-mono">
-                                Cleared: {a1Res.targetsCleared || 0} / 9
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Visits:</span>
-                                <b className="text-white font-mono">{a1Res.successfulVisits} / {a1Res.totalVisits} ({a1Res.totalDarts}d)</b>
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Accuracy:</span>
-                                <b className="text-emerald-400 font-mono">{a1Res.accuracy}%</b>
-                              </span>
-                            </>
-                          );
-                        })()
-                      ) : item.gameType === 'bigsingles' || item.gameType === 'bigsingles_intermediate' || item.gameType === 'bigsingles_advanced' ? (
-                        (() => {
-                          const bsRes = item.result as any;
-                          return (
-                            <>
-                              <span className="px-2 py-0.5 rounded-md bg-cyan-950/90 border border-cyan-700/80 text-cyan-300 text-xs font-bold uppercase">
-                                {bsRes.level || 'Intermediate'}
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Progress:</span>
-                                <b className="text-white font-mono">{bsRes.completedRounds > 0 ? `${bsRes.completedRounds} rnds + #${bsRes.currentNumberReached}` : `Reached #${bsRes.highestNumberReached || bsRes.currentNumberReached || 1}`}</b>
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Darts:</span>
-                                <b className="text-cyan-300 font-mono">{bsRes.totalDarts || 0} ({bsRes.totalDartHits || 0} hits)</b>
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Accuracy:</span>
-                                <b className="text-emerald-400 font-mono">{bsRes.dartHitAccuracy || 0}%</b>
-                              </span>
-                            </>
-                          );
-                        })()
-                      ) : item.gameType === 'rtwsingles' || item.gameType === 'rtwsingles_intermediate' || item.gameType === 'rtwsingles_advanced' ? (
-                        (() => {
-                          const rtwRes = item.result as any;
-                          return (
-                            <>
-                              <span className="px-2 py-0.5 rounded-md bg-cyan-950/90 border border-cyan-700/80 text-cyan-300 text-xs font-bold uppercase">
-                                {rtwRes.difficulty || 'Intermediate'}
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Cleared:</span>
-                                <b className="text-emerald-400 font-mono">{rtwRes.completedRuns || 0}</b>
-                                <span className="text-neutral-500 font-mono"> / {rtwRes.runsPlayed || 1}</span>
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Best Clear:</span>
-                                <b className="text-amber-400 font-mono">{rtwRes.bestRunDarts ? `${rtwRes.bestRunDarts}d` : '—'}</b>
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Furthest:</span>
-                                <b className="text-cyan-300 font-mono">{rtwRes.highestTargetEver || 'S1'}</b>
-                              </span>
-                              <span className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300">
-                                <span className="text-neutral-500 mr-1">Accuracy:</span>
-                                <b className="text-emerald-400 font-mono">{rtwRes.overallAccuracy || 0}%</b>
-                              </span>
-                            </>
-                          );
-                        })()
-                      ) : (
-                        Object.entries(item.result)
-                          .filter(([k, v]) => k !== 'distribution' && !Array.isArray(v) && v !== null && v !== undefined)
-                          .map(([k, v]) => {
-                            const label = k
-                              .replace(/([A-Z])/g, ' $1')
-                              .replace(/^./, (str) => str.toUpperCase());
-                            let valStr = String(v);
-                            if (k === 'accuracy' || k === 'bullRate' || k === 'checkoutRate' || k === 'doublePercentage') {
-                              valStr = `${v}%`;
-                            }
-                            return (
-                              <span
-                                key={k}
-                                className="px-2.5 py-1 rounded-lg bg-neutral-800/90 border border-neutral-700/50 text-xs font-medium text-neutral-300"
-                              >
-                                <span className="text-neutral-500 mr-1">{label}:</span>
-                                <b className="text-white font-mono">{valStr}</b>
-                              </span>
-                            );
-                          })
-                      )}
-                    </div>
-
-                    {/* Expandable Leg Breakdown for DartBot Matches */}
-                    {item.gameType === 'dartbot' && (() => {
-                      const botRes = item.result as any;
-                      const hasLegs = botRes.legs && Array.isArray(botRes.legs) && botRes.legs.length > 0;
-                      const isExpanded = !!expandedSessions[item.id];
-                      const isSolo = botRes.botLevelLabel === 'Solo Practice' || botRes.botLegs === undefined || botRes.botStats?.totalDarts === 0;
-
-                      if (!hasLegs) return null;
-
-                      return (
-                        <div className="mt-3.5">
-                          <button
-                            type="button"
-                            onClick={() => toggleSessionExpand(item.id)}
-                            className="px-3 py-1.5 rounded-xl bg-neutral-800/90 hover:bg-neutral-750 text-xs font-bold text-emerald-400 hover:text-emerald-300 border border-neutral-700/80 flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
-                          >
-                            <BarChart3 className="w-3.5 h-3.5" />
-                            <span>
-                              {isExpanded
-                                ? 'Hide Leg Breakdown'
-                                : `View Leg Breakdown (${botRes.legs.length} Leg${botRes.legs.length > 1 ? 's' : ''})`}
-                            </span>
-                            {isExpanded ? (
-                              <ChevronUp className="w-3.5 h-3.5 text-neutral-400" />
-                            ) : (
-                              <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
-                            )}
-                          </button>
-
-                          {isExpanded && (
-                            <div className="mt-3 pt-3 border-t border-neutral-800">
-                              <LegBreakdownView
-                                legs={botRes.legs}
-                                botLevelLabel={botRes.botLevelLabel}
-                                isSolo={isSolo}
-                                defaultExpanded={false}
-                              />
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })()}
+                {/* Header Row */}
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800/60">
+                      {item.gameTitle}
+                    </span>
+                    <span className="text-xs text-neutral-500 font-medium">{dateStr}</span>
                   </div>
 
-                  {/* Delete individual session */}
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteSession(item.id)}
-                    title="Delete Session"
-                    className="text-neutral-500 hover:text-rose-400 p-1.5 rounded-lg hover:bg-neutral-800 transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => toggleSessionExpand(item.id)}
+                      className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-xl transition-all ${
+                        isExpanded
+                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                          : 'bg-neutral-800 text-neutral-300 hover:text-white border border-neutral-700'
+                      }`}
+                    >
+                      <BarChart3 className="w-3.5 h-3.5 text-amber-400" />
+                      <span>{isExpanded ? 'Hide Breakdown' : 'Advanced Stats'}</span>
+                      {isExpanded ? (
+                        <ChevronUp className="w-3.5 h-3.5 ml-0.5" />
+                      ) : (
+                        <ChevronDown className="w-3.5 h-3.5 ml-0.5" />
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteSession(item.id)}
+                      title="Delete Session"
+                      className="text-neutral-500 hover:text-rose-400 p-1.5 rounded-lg hover:bg-neutral-800 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
+
+                {/* Expanded Detailed Breakdown View */}
+                {isExpanded && (
+                  <div className="mt-3.5 pt-3.5 border-t border-neutral-800/80">
+                    <AdvancedSessionBreakdown
+                      gameType={item.gameType}
+                      result={item.result}
+                      dateStr={dateStr}
+                    />
+                  </div>
+                )}
               </div>
             );
           })}

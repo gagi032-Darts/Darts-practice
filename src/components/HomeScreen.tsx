@@ -30,7 +30,7 @@ import { PlayerAvatar } from './common/PlayerAvatar';
 import { GameInstructionModal } from './common/GameInstructionModal';
 
 interface HomeScreenProps {
-  onSelectGame: (type: GameType) => void;
+  onSelectGame: (type: GameType, customDurationMinutes?: number, subMode?: string) => void;
   onOpenDaily: () => void;
   onOpenHistory: () => void;
   onOpenGuide: () => void;
@@ -55,6 +55,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   const [historyCount, setHistoryCount] = useState<number>(0);
   const [todayVolume, setTodayVolume] = useState<number>(0);
   const [instructionGame, setInstructionGame] = useState<GameType | null>(null);
+  const [instructionSubMode, setInstructionSubMode] = useState<string | undefined>(undefined);
   const [openDropdown, setOpenDropdown] = useState<
     'warmup' | 'scoring' | 'finishing' | 'singles' | 'match' | null
   >(null);
@@ -96,14 +97,17 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     setWakeLockActive(next);
   };
 
-  const handleStartGame = (gameId: GameType) => {
+  const handleStartGame = (gameId: GameType, subMode?: string) => {
     sound.tap();
+    setInstructionSubMode(subMode);
     setInstructionGame(gameId);
   };
 
   const handleConfirmStart = (gameId: GameType) => {
+    const subMode = instructionSubMode;
     setInstructionGame(null);
-    onSelectGame(gameId);
+    setInstructionSubMode(undefined);
+    onSelectGame(gameId, undefined, subMode);
   };
 
   return (
@@ -291,7 +295,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   2-Hour Darts Practice Routine
                 </h2>
                 <p className="text-xs text-neutral-400 mt-1">
-                  Structured progression divided into 7 focused blocks: warm-up, scoring, checkout ladders, break, bull calibration, triple progression, and X01 match play.
+                  Structured progression divided into 7 focused blocks: warm-up, scoring, checkout ladders, break, bull calibration, single number practice, and X01 match play.
                 </p>
               </div>
               <div className="shrink-0 hidden sm:block text-right">
@@ -941,7 +945,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                               onClick={() => {
                                 setOpenDropdown(null);
                                 setOpenSubmenu(null);
-                                handleStartGame('rtwsingles_intermediate');
+                                handleStartGame('rtwsingles', 'intermediate');
                               }}
                               className="w-full text-left px-2 py-1.5 rounded-md hover:bg-cyan-500/25 active:bg-cyan-500/35 text-xs text-white hover:text-cyan-200 flex items-center justify-between transition-all cursor-pointer group/sub"
                             >
@@ -963,7 +967,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                               onClick={() => {
                                 setOpenDropdown(null);
                                 setOpenSubmenu(null);
-                                handleStartGame('rtwsingles_advanced');
+                                handleStartGame('rtwsingles', 'advanced');
                               }}
                               className="w-full text-left px-2 py-1.5 rounded-md hover:bg-cyan-500/25 active:bg-cyan-500/35 text-xs text-white hover:text-cyan-200 flex items-center justify-between transition-all cursor-pointer group/sub"
                             >
@@ -1025,7 +1029,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                               onClick={() => {
                                 setOpenDropdown(null);
                                 setOpenSubmenu(null);
-                                handleStartGame('bigsingles_intermediate');
+                                handleStartGame('bigsingles', 'intermediate');
                               }}
                               className="w-full text-left px-2 py-1.5 rounded-md hover:bg-cyan-500/25 active:bg-cyan-500/35 text-xs text-white hover:text-cyan-200 flex items-center justify-between transition-all cursor-pointer group/sub"
                             >
@@ -1047,7 +1051,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                               onClick={() => {
                                 setOpenDropdown(null);
                                 setOpenSubmenu(null);
-                                handleStartGame('bigsingles_advanced');
+                                handleStartGame('bigsingles', 'advanced');
                               }}
                               className="w-full text-left px-2 py-1.5 rounded-md hover:bg-amber-500/25 active:bg-amber-500/35 text-xs text-white hover:text-amber-200 flex items-center justify-between transition-all cursor-pointer group/sub"
                             >
@@ -1109,7 +1113,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                               onClick={() => {
                                 setOpenDropdown(null);
                                 setOpenSubmenu(null);
-                                handleStartGame('a1practice_top');
+                                handleStartGame('a1practice', '20_11');
                               }}
                               className="w-full text-left px-2 py-1.5 rounded-md hover:bg-amber-500/25 active:bg-amber-500/35 text-xs text-white hover:text-amber-200 flex items-center justify-between transition-all cursor-pointer group/sub"
                             >
@@ -1131,7 +1135,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                               onClick={() => {
                                 setOpenDropdown(null);
                                 setOpenSubmenu(null);
-                                handleStartGame('a1practice_bottom');
+                                handleStartGame('a1practice', '1_10');
                               }}
                               className="w-full text-left px-2 py-1.5 rounded-md hover:bg-amber-500/25 active:bg-amber-500/35 text-xs text-white hover:text-amber-200 flex items-center justify-between transition-all cursor-pointer group/sub"
                             >

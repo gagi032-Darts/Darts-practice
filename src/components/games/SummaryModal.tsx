@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Trophy, CheckCircle2, RotateCcw, Home, BarChart2, Share2, Bot, User, Award, TrendingUp, BarChart3, Flame, Zap, Lock, Crosshair, ShieldAlert, Hourglass, Compass } from 'lucide-react';
+import { Trophy, CheckCircle2, RotateCcw, Home, BarChart2, Share2, Bot, User, Award, TrendingUp, BarChart3, Flame, Zap, Lock, Crosshair, ShieldAlert, Hourglass, Compass, Target } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { GameType, GameResultData, DartBotMatchResult, HighscoreResult, TripleLockResult, Solo301Result, SwitchbladeResult, PowerSwitchResult, BigScoresResult, CheckoutChallengeResult, DoublesBoomerangResult, Bobs27Result, A1PracticeResult, BigSinglesResult, RTWSinglesResult } from '../../types';
 import { GAME_DEFINITIONS } from '../../utils/gamesData';
@@ -899,6 +899,117 @@ export const SummaryModal: React.FC<SummaryModalProps> = ({
               </div>
             </div>
           </div>
+
+          {/* Target Precision Breakdown: T20 vs T19 vs T18 */}
+          {(() => {
+            let targetStats = psRes.targetStats;
+            if (!targetStats && psRes.history && psRes.history.length > 0) {
+              const map: Record<string, any> = {
+                T20: { target: 'T20', attempts: 0, trebles: 0, doubles: 0, singles: 0, misses: 0, points: 0, trebleRate: 0, hitRate: 0 },
+                T19: { target: 'T19', attempts: 0, trebles: 0, doubles: 0, singles: 0, misses: 0, points: 0, trebleRate: 0, hitRate: 0 },
+                T18: { target: 'T18', attempts: 0, trebles: 0, doubles: 0, singles: 0, misses: 0, points: 0, trebleRate: 0, hitRate: 0 },
+              };
+              psRes.history.forEach((rec) => {
+                rec.darts.forEach((d) => {
+                  if (!map[d.target]) map[d.target] = { target: d.target, attempts: 0, trebles: 0, doubles: 0, singles: 0, misses: 0, points: 0, trebleRate: 0, hitRate: 0 };
+                  map[d.target].attempts++;
+                  map[d.target].points += d.points;
+                  if (d.multiplier === 'treble') map[d.target].trebles++;
+                  else if (d.multiplier === 'double') map[d.target].doubles++;
+                  else if (d.multiplier === 'single') map[d.target].singles++;
+                  else map[d.target].misses++;
+                });
+              });
+              Object.values(map).forEach((item) => {
+                if (item.attempts > 0) {
+                  item.trebleRate = parseFloat(((item.trebles / item.attempts) * 100).toFixed(1));
+                  item.hitRate = parseFloat((((item.trebles + item.doubles + item.singles) / item.attempts) * 100).toFixed(1));
+                }
+              });
+              targetStats = map;
+            }
+
+            if (!targetStats) return null;
+
+            return (
+              <div className="bg-neutral-850/80 border border-neutral-750/80 rounded-2xl p-4 text-left shadow-inner my-3 space-y-2.5">
+                <div className="flex items-center justify-between border-b border-neutral-700/60 pb-2">
+                  <span className="text-xs font-bold text-neutral-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <Target className="w-3.5 h-3.5 text-amber-400" /> Target Precision Breakdown
+                  </span>
+                  <span className="text-[11px] text-neutral-400 font-mono">
+                    {psRes.darts} total darts
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  {['T20', 'T19', 'T18'].map((tKey) => {
+                    const stat = targetStats![tKey] || { attempts: 0, trebles: 0, doubles: 0, singles: 0, misses: 0, points: 0, trebleRate: 0, hitRate: 0 };
+                    return (
+                      <div key={tKey} className="bg-neutral-900/90 border border-neutral-800 rounded-xl p-3 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-black text-amber-300 font-mono">{tKey}</span>
+                          <span className="text-xs font-bold text-neutral-400 font-mono">{stat.attempts} darts</span>
+                        </div>
+                        <div className="space-y-1 text-xs font-mono">
+                          <div className="flex justify-between">
+                            <span className="text-neutral-400 font-sans">Treble %:</span>
+                            <b className="text-emerald-400">{stat.trebleRate}% ({stat.trebles})</b>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-neutral-400 font-sans">Target Hit %:</span>
+                            <b className="text-cyan-400">{stat.hitRate}%</b>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-neutral-400 font-sans">Points:</span>
+                            <b className="text-amber-400">{stat.points} pts</b>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between text-[10px] font-mono pt-1.5 border-t border-neutral-800 text-neutral-400">
+                          <span className="text-emerald-400 font-bold">T:{stat.trebles}</span>
+                          <span className="text-cyan-400 font-bold">D:{stat.doubles}</span>
+                          <span className="text-neutral-300 font-bold">S:{stat.singles}</span>
+                          <span className="text-rose-400 font-bold">M:{stat.misses}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Throw Sequence Breakdown Log */}
+          {psRes.history && psRes.history.length > 0 && (
+            <div className="bg-neutral-850/80 border border-neutral-750/80 rounded-2xl p-4 text-left shadow-inner my-3 space-y-2">
+              <span className="text-xs font-bold text-neutral-300 uppercase tracking-wider block border-b border-neutral-700/60 pb-2">
+                Visit-by-Visit Throw Sequence ({psRes.history.length} Visits)
+              </span>
+              <div className="space-y-1.5 max-h-44 overflow-y-auto p-1 scrollbar-thin font-mono text-xs">
+                {psRes.history.map((rec) => (
+                  <div key={rec.visitNumber} className="flex items-center justify-between py-1.5 px-2.5 rounded-lg bg-neutral-900/80 border border-neutral-800">
+                    <span className="text-neutral-500 font-bold w-12">#{rec.visitNumber}</span>
+                    <div className="flex items-center gap-2 flex-1 justify-center">
+                      {rec.darts.map((d, dIdx) => {
+                        let badge = 'bg-neutral-800 text-neutral-400 border-neutral-700';
+                        if (d.multiplier === 'treble') badge = 'bg-emerald-950 text-emerald-300 border-emerald-700 font-bold';
+                        else if (d.multiplier === 'double') badge = 'bg-cyan-950 text-cyan-300 border-cyan-700 font-bold';
+                        else if (d.multiplier === 'single') badge = 'bg-neutral-850 text-neutral-200 border-neutral-700';
+                        else badge = 'bg-rose-950/80 text-rose-400 border-rose-800';
+
+                        return (
+                          <span key={dIdx} className={`px-2 py-0.5 rounded border text-[11px] ${badge}`}>
+                            {d.target}: <b className="capitalize">{d.multiplier}</b>
+                          </span>
+                        );
+                      })}
+                    </div>
+                    <span className="w-14 text-right font-bold text-amber-300">+{rec.totalPoints} pts</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6 pt-4 border-t border-neutral-800">

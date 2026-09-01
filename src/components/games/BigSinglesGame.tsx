@@ -81,6 +81,13 @@ export const BigSinglesGame: React.FC<BigSinglesGameProps> = ({
   const [totalVisits, setTotalVisits] = useState<number>(0);
   const [totalDartHits, setTotalDartHits] = useState<number>(0);
   const [roundDetails, setRoundDetails] = useState<BigSinglesRoundRecord[]>([]);
+  const [targetStats, setTargetStats] = useState<Record<number, { number: number; visits: number; attempts: number; hits: number; misses: number; accuracy: number }>>(() => {
+    const initial: Record<number, { number: number; visits: number; attempts: number; hits: number; misses: number; accuracy: number }> = {};
+    for (let i = 1; i <= 20; i++) {
+      initial[i] = { number: i, visits: 0, attempts: 0, hits: 0, misses: 0, accuracy: 0 };
+    }
+    return initial;
+  });
 
   // Undo history
   const [history, setHistory] = useState<VisitHistoryItem[]>([]);
@@ -132,6 +139,7 @@ export const BigSinglesGame: React.FC<BigSinglesGameProps> = ({
       totalDartHits,
       dartHitAccuracy: totalVisits > 0 ? Math.round((totalDartHits / (totalVisits * 3)) * 100) : 0,
       roundDetails,
+      targetStats,
     };
     onFinish(res);
   }, [
@@ -142,6 +150,7 @@ export const BigSinglesGame: React.FC<BigSinglesGameProps> = ({
     totalVisits,
     totalDartHits,
     roundDetails,
+    targetStats,
     onFinish,
   ]);
 
@@ -187,6 +196,26 @@ export const BigSinglesGame: React.FC<BigSinglesGameProps> = ({
 
     const newHighest = Math.max(highestNumberReached, nextNumber);
 
+    // Update target stats for the number just thrown at
+    const prevStat = targetStats[currentNumber] || { number: currentNumber, visits: 0, attempts: 0, hits: 0, misses: 0, accuracy: 0 };
+    const updatedVisits = prevStat.visits + 1;
+    const updatedAttempts = prevStat.attempts + 3;
+    const updatedHits = prevStat.hits + hitsThisVisit;
+    const updatedMisses = prevStat.misses + (3 - hitsThisVisit);
+    const updatedAcc = updatedAttempts > 0 ? Math.round((updatedHits / updatedAttempts) * 100) : 0;
+
+    const nextTargetStats = {
+      ...targetStats,
+      [currentNumber]: {
+        number: currentNumber,
+        visits: updatedVisits,
+        attempts: updatedAttempts,
+        hits: updatedHits,
+        misses: updatedMisses,
+        accuracy: updatedAcc,
+      },
+    };
+
     // Save for undo
     setHistory((prev) => [
       ...prev,
@@ -203,6 +232,7 @@ export const BigSinglesGame: React.FC<BigSinglesGameProps> = ({
       },
     ]);
 
+    setTargetStats(nextTargetStats);
     setCurrentNumber(nextNumber);
     setCompletedRounds(nextCompletedRounds);
     setHighestNumberReached(newHighest);
@@ -223,6 +253,7 @@ export const BigSinglesGame: React.FC<BigSinglesGameProps> = ({
     currentNumber,
     completedRounds,
     roundDetails,
+    targetStats,
     highestNumberReached,
     totalVisits,
     totalDartHits,

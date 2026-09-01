@@ -88,13 +88,47 @@ export const PowerSwitchGame: React.FC<PowerSwitchGameProps> = ({
     let sHits = 0;
     let mHits = 0;
 
+    const targetMap: Record<string, { attempts: number; trebles: number; doubles: number; singles: number; misses: number; points: number }> = {
+      T20: { attempts: 0, trebles: 0, doubles: 0, singles: 0, misses: 0, points: 0 },
+      T19: { attempts: 0, trebles: 0, doubles: 0, singles: 0, misses: 0, points: 0 },
+      T18: { attempts: 0, trebles: 0, doubles: 0, singles: 0, misses: 0, points: 0 },
+    };
+
     records.forEach((r) => {
       r.darts.forEach((d) => {
-        if (d.multiplier === 'treble') tHits++;
-        else if (d.multiplier === 'double') dHits++;
-        else if (d.multiplier === 'single') sHits++;
-        else mHits++;
+        if (!targetMap[d.target]) {
+          targetMap[d.target] = { attempts: 0, trebles: 0, doubles: 0, singles: 0, misses: 0, points: 0 };
+        }
+        targetMap[d.target].attempts++;
+        targetMap[d.target].points += d.points;
+
+        if (d.multiplier === 'treble') {
+          tHits++;
+          targetMap[d.target].trebles++;
+        } else if (d.multiplier === 'double') {
+          dHits++;
+          targetMap[d.target].doubles++;
+        } else if (d.multiplier === 'single') {
+          sHits++;
+          targetMap[d.target].singles++;
+        } else {
+          mHits++;
+          targetMap[d.target].misses++;
+        }
       });
+    });
+
+    const targetStats: Record<string, any> = {};
+    Object.entries(targetMap).forEach(([tKey, stats]) => {
+      const att = stats.attempts;
+      const tPct = att > 0 ? parseFloat(((stats.trebles / att) * 100).toFixed(1)) : 0;
+      const hPct = att > 0 ? parseFloat((((stats.trebles + stats.doubles + stats.singles) / att) * 100).toFixed(1)) : 0;
+      targetStats[tKey] = {
+        target: tKey,
+        ...stats,
+        trebleRate: tPct,
+        hitRate: hPct,
+      };
     });
 
     const tRate = dCount > 0 ? parseFloat(((tHits / dCount) * 100).toFixed(1)) : 0;
@@ -112,6 +146,7 @@ export const PowerSwitchGame: React.FC<PowerSwitchGameProps> = ({
       trebleRate: tRate,
       hitRate: hRate,
       history: records,
+      targetStats,
     };
   };
 

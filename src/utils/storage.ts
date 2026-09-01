@@ -26,6 +26,31 @@ function getDailyKey(accountId: string): string {
   return `dp_daily_${accountId}`;
 }
 
+function normalizeHistoryItem(item: any): SessionHistoryItem {
+  let gameType: GameType = item.gameType;
+  let gameTitle: string = item.gameTitle || 'Practice Session';
+
+  if (gameType === ('score1' as any) || gameType === ('score2' as any)) {
+    gameType = 'score';
+    gameTitle = 'High Score';
+  } else if (gameType === ('a1practice_top' as any) || gameType === ('a1practice_bottom' as any)) {
+    gameType = 'a1practice';
+    gameTitle = 'A1 Practice';
+  } else if (gameType === ('bigsingles_intermediate' as any) || gameType === ('bigsingles_advanced' as any)) {
+    gameType = 'bigsingles';
+    gameTitle = 'Big Singles';
+  } else if (gameType === ('rtwsingles_intermediate' as any) || gameType === ('rtwsingles_advanced' as any)) {
+    gameType = 'rtwsingles';
+    gameTitle = 'Round the World Singles';
+  }
+
+  return {
+    ...item,
+    gameType,
+    gameTitle,
+  };
+}
+
 export const storage = {
   // -------------------------------------------------------------
   // ACCOUNT & PROFILE MANAGEMENT
@@ -206,15 +231,19 @@ export const storage = {
     try {
       // Check account-specific storage first
       const raw = localStorage.getItem(getHistoryKey(accId));
-      if (raw) return JSON.parse(raw);
+      if (raw) {
+        const parsed: any[] = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed.map(normalizeHistoryItem) : [];
+      }
 
       // Backwards compatibility migration from single-user legacy storage
       if (accId === 'guest_default') {
         const legacyRaw = localStorage.getItem('dp_history');
         if (legacyRaw) {
-          const legacyItems: SessionHistoryItem[] = JSON.parse(legacyRaw);
-          localStorage.setItem(getHistoryKey('guest_default'), legacyRaw);
-          return legacyItems;
+          const legacyItems: any[] = JSON.parse(legacyRaw);
+          const normalized = Array.isArray(legacyItems) ? legacyItems.map(normalizeHistoryItem) : [];
+          localStorage.setItem(getHistoryKey('guest_default'), JSON.stringify(normalized));
+          return normalized;
         }
       }
       return [];
@@ -226,7 +255,7 @@ export const storage = {
   saveSession(gameType: GameType, gameTitle: string, durationSeconds: number, result: GameResultData): SessionHistoryItem {
     const activeAcc = this.getActiveAccount();
     const history = this.getHistory(activeAcc.id);
-    const item: SessionHistoryItem = {
+    const rawItem: any = {
       id: `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
       accountId: activeAcc.id,
       gameType,
@@ -235,6 +264,7 @@ export const storage = {
       durationSeconds,
       result,
     };
+    const item = normalizeHistoryItem(rawItem);
     history.unshift(item);
     // keep up to 300 recent sessions per account
     const trimmed = history.slice(0, 300);

@@ -25,7 +25,7 @@ import { DartBotMatchResult, DartBotStats, LegStats, LegVisitTurn, VisitRecord }
 import { DartsMatchKeypad } from '../common/DartsMatchKeypad';
 import { DartsAtDoubleModal } from '../common/DartsAtDoubleModal';
 import { CheckoutDartsModal } from '../common/CheckoutDartsModal';
-import { getCheckoutRoute } from '../../utils/checkouts';
+import { getCheckoutRoute, canVisitHaveDoubleShot } from '../../utils/checkouts';
 import { sound } from '../../utils/sound';
 import { storage } from '../../utils/storage';
 import { PlayerAvatar } from '../common/PlayerAvatar';
@@ -465,7 +465,7 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
     const scoreAfter = playerScore - val;
     const isBust = scoreAfter < 0 || scoreAfter === 1;
     const isCheckout = scoreAfter === 0;
-    const isDoubleStart = playerScore <= 50;
+    const hadDoubleOpportunity = canVisitHaveDoubleShot(playerScore, val, isCheckout, 3);
 
     const actualPoints = isBust ? 0 : val;
     const nextScore = isBust ? playerScore : (isCheckout ? 0 : scoreAfter);
@@ -485,7 +485,7 @@ export const DartBotMatchGame: React.FC<DartBotMatchGameProps> = ({
       // Prompt for how many darts used to checkout (Screenshot 1)
       setPendingCheckoutVisit(visitData);
       setIsCheckoutModalOpen(true);
-    } else if (isDoubleStart && !isBust) {
+    } else if (hadDoubleOpportunity && !isBust) {
       // If threw at double without checking out
       setPendingPlayerVisit(visitData);
     } else {

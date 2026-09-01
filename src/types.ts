@@ -3,8 +3,6 @@ export type GameType =
   | 'wheel'
   | 'align'
   | 'score'
-  | 'score1'
-  | 'score2'
   | 'switchblade'
   | 'powerswitch'
   | 'bigscores'
@@ -15,14 +13,8 @@ export type GameType =
   | 'boomerang'
   | 'bobs27'
   | 'a1practice'
-  | 'a1practice_top'
-  | 'a1practice_bottom'
   | 'bigsingles'
-  | 'bigsingles_intermediate'
-  | 'bigsingles_advanced'
   | 'rtwsingles'
-  | 'rtwsingles_intermediate'
-  | 'rtwsingles_advanced'
   | 'bull'
   | 'triple'
   | '301'
@@ -205,6 +197,7 @@ export interface BigSinglesResult {
   totalDartHits: number; // actual individual dart hits (0 to 3 per visit)
   dartHitAccuracy: number; // (totalDartHits / totalDarts) * 100
   roundDetails?: BigSinglesRoundRecord[];
+  targetStats?: Record<number, { number: number; visits: number; attempts: number; hits: number; misses: number; accuracy: number }>;
 }
 
 export type RTWSinglesDifficulty = 'intermediate' | 'advanced';
@@ -261,6 +254,7 @@ export interface TripleLockResult {
   totalVisits: number;
   dartsThrown: number;
   stagesCompleted: number;
+  targetStats?: Record<string, { target: string; attempts: number; hits: number; misses: number; accuracy: number }>;
 }
 
 export interface Solo301Result {
@@ -377,6 +371,18 @@ export interface SwitchbladeThrowRecord {
   totalScore: number;
 }
 
+export interface SwitchbladeTargetStats {
+  target: string; // 'T20', 'T19', 'T18', 'T17', 'Bull'
+  attempts: number;
+  trebles: number;
+  doubles: number;
+  singles: number;
+  misses: number;
+  points: number;
+  hitRate: number;
+  trebleRate: number;
+}
+
 export interface SwitchbladeResult {
   totalPoints: number;
   darts: number;
@@ -390,8 +396,21 @@ export interface SwitchbladeResult {
   dart2TreblePct: number;
   dart3TreblePct: number;
   targetScores: Record<string, { totalScore: number; count: number; avgScore: number }>;
+  targetStats?: Record<string, SwitchbladeTargetStats>;
   throwsHistory: SwitchbladeThrowRecord[];
   cycleScores: number[]; // total score per 5-throw cycle
+}
+
+export interface PowerSwitchTargetStats {
+  target: string; // 'T20', 'T19', 'T18'
+  attempts: number;
+  trebles: number;
+  doubles: number;
+  singles: number;
+  misses: number;
+  points: number;
+  trebleRate: number;
+  hitRate: number;
 }
 
 export interface PowerSwitchVisitRecord {
@@ -416,6 +435,7 @@ export interface PowerSwitchResult {
   trebleRate: number;
   hitRate: number;
   history: PowerSwitchVisitRecord[];
+  targetStats?: Record<string, PowerSwitchTargetStats>;
 }
 
 export interface BigScoresThrowRecord {

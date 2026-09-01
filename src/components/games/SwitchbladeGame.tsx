@@ -86,6 +86,24 @@ export const SwitchbladeGame: React.FC<SwitchbladeGameProps> = ({
 
     const cycleMap: Record<number, number> = {};
 
+    const targetStatsMap: Record<string, {
+      target: string;
+      attempts: number;
+      trebles: number;
+      doubles: number;
+      singles: number;
+      misses: number;
+      points: number;
+      hitRate: number;
+      trebleRate: number;
+    }> = {
+      T20: { target: 'T20', attempts: 0, trebles: 0, doubles: 0, singles: 0, misses: 0, points: 0, hitRate: 0, trebleRate: 0 },
+      T19: { target: 'T19', attempts: 0, trebles: 0, doubles: 0, singles: 0, misses: 0, points: 0, hitRate: 0, trebleRate: 0 },
+      T18: { target: 'T18', attempts: 0, trebles: 0, doubles: 0, singles: 0, misses: 0, points: 0, hitRate: 0, trebleRate: 0 },
+      T17: { target: 'T17', attempts: 0, trebles: 0, doubles: 0, singles: 0, misses: 0, points: 0, hitRate: 0, trebleRate: 0 },
+      Bull: { target: 'Bull', attempts: 0, trebles: 0, doubles: 0, singles: 0, misses: 0, points: 0, hitRate: 0, trebleRate: 0 },
+    };
+
     records.forEach((r) => {
       const h1 = r.hits[0];
       const h2 = r.hits[1];
@@ -101,6 +119,36 @@ export const SwitchbladeGame: React.FC<SwitchbladeGameProps> = ({
         d3Trebles++;
       }
 
+      // Record per-dart target statistics
+      r.targets.forEach((tgt, dartIdx) => {
+        const hit = r.hits[dartIdx];
+        const pts = r.dartPoints[dartIdx];
+        const stat = targetStatsMap[tgt] || {
+          target: tgt,
+          attempts: 0,
+          trebles: 0,
+          doubles: 0,
+          singles: 0,
+          misses: 0,
+          points: 0,
+          hitRate: 0,
+          trebleRate: 0,
+        };
+
+        stat.attempts += 1;
+        stat.points += pts;
+        if (hit === 'treble' || (tgt === 'Bull' && hit === 'double')) {
+          stat.trebles += 1;
+        } else if (hit === 'double' || (tgt === 'Bull' && hit === 'single')) {
+          stat.doubles += 1;
+        } else if (hit === 'single') {
+          stat.singles += 1;
+        } else {
+          stat.misses += 1;
+        }
+        targetStatsMap[tgt] = stat;
+      });
+
       if (!targetMap[r.targetLabel]) {
         targetMap[r.targetLabel] = { totalScore: 0, count: 0, avgScore: 0 };
       }
@@ -108,6 +156,14 @@ export const SwitchbladeGame: React.FC<SwitchbladeGameProps> = ({
       targetMap[r.targetLabel].count += 1;
 
       cycleMap[r.cycleIndex] = (cycleMap[r.cycleIndex] || 0) + r.totalScore;
+    });
+
+    Object.keys(targetStatsMap).forEach((k) => {
+      const st = targetStatsMap[k];
+      if (st.attempts > 0) {
+        st.hitRate = parseFloat((((st.attempts - st.misses) / st.attempts) * 100).toFixed(1));
+        st.trebleRate = parseFloat(((st.trebles / st.attempts) * 100).toFixed(1));
+      }
     });
 
     Object.keys(targetMap).forEach((k) => {
@@ -131,6 +187,7 @@ export const SwitchbladeGame: React.FC<SwitchbladeGameProps> = ({
       dart2TreblePct: visitsCount > 0 ? parseFloat(((d2Trebles / visitsCount) * 100).toFixed(1)) : 0,
       dart3TreblePct: visitsCount > 0 ? parseFloat(((d3Trebles / visitsCount) * 100).toFixed(1)) : 0,
       targetScores: targetMap,
+      targetStats: targetStatsMap,
       throwsHistory: records,
       cycleScores,
     };

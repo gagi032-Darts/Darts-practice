@@ -39,6 +39,7 @@ type ViewMode = 'home' | 'game' | 'daily' | 'history' | 'summary';
 export default function App() {
   const [view, setView] = useState<ViewMode>('home');
   const [selectedGame, setSelectedGame] = useState<GameType | null>(null);
+  const [gameSubMode, setGameSubMode] = useState<string | undefined>(undefined);
 
   // User Account & Profile State
   const [activeAccount, setActiveAccount] = useState<UserAccount>(() => storage.getActiveAccount());
@@ -146,11 +147,12 @@ export default function App() {
   };
 
   // Start or reset a game drill
-  const startGame = (type: GameType, customDurationMinutes?: number) => {
+  const startGame = (type: GameType, customDurationMinutes?: number, subMode?: string) => {
     clearTimer();
     wakeLock.request();
     const def = GAME_DEFINITIONS[type];
     setSelectedGame(type);
+    setGameSubMode(subMode);
     setIsPaused(false);
     setIsFinalInput(false);
     setSessionResult(null);
@@ -233,10 +235,11 @@ export default function App() {
     clearTimer();
     if (!selectedGame) return;
     const def = GAME_DEFINITIONS[selectedGame];
+    const gameTitle = def ? def.title : 'Practice Drill';
 
     setSessionResult(result);
     // Save to durable local storage
-    storage.saveSession(selectedGame, def.title, secondsElapsed, result);
+    storage.saveSession(selectedGame, gameTitle, secondsElapsed, result);
     setView('summary');
   };
 
@@ -369,7 +372,7 @@ export default function App() {
           />
         )}
 
-        {view === 'game' && (selectedGame === 'score' || selectedGame === 'score1' || selectedGame === 'score2') && (
+        {view === 'game' && selectedGame === 'score' && (
           <HighscoreGame
             isFinalInput={isFinalInput}
             onFinish={handleGameFinish}
@@ -439,25 +442,25 @@ export default function App() {
           />
         )}
 
-        {view === 'game' && (selectedGame === 'a1practice' || selectedGame === 'a1practice_top' || selectedGame === 'a1practice_bottom') && (
+        {view === 'game' && selectedGame === 'a1practice' && (
           <A1PracticeGame
-            initialMode={selectedGame === 'a1practice_bottom' ? '1_10' : '20_11'}
+            initialMode={gameSubMode === '1_10' ? '1_10' : '20_11'}
             isFinalInput={isFinalInput}
             onFinish={handleGameFinish}
           />
         )}
 
-        {view === 'game' && (selectedGame === 'bigsingles' || selectedGame === 'bigsingles_intermediate' || selectedGame === 'bigsingles_advanced') && (
+        {view === 'game' && selectedGame === 'bigsingles' && (
           <BigSinglesGame
-            initialLevel={selectedGame === 'bigsingles_advanced' ? 'advanced' : 'intermediate'}
+            initialLevel={gameSubMode === 'advanced' ? 'advanced' : 'intermediate'}
             isFinalInput={isFinalInput}
             onFinish={handleGameFinish}
           />
         )}
 
-        {view === 'game' && (selectedGame === 'rtwsingles' || selectedGame === 'rtwsingles_intermediate' || selectedGame === 'rtwsingles_advanced') && (
+        {view === 'game' && selectedGame === 'rtwsingles' && (
           <RTWSinglesGame
-            initialDifficulty={selectedGame === 'rtwsingles_advanced' ? 'advanced' : 'intermediate'}
+            initialDifficulty={gameSubMode === 'advanced' ? 'advanced' : 'intermediate'}
             isFinalInput={isFinalInput}
             onFinish={handleGameFinish}
           />

@@ -13,7 +13,7 @@ import { sound } from '../../utils/sound';
 interface PracticeGuideModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelectGame: (type: GameType) => void;
+  onSelectGame: (type: GameType, subMode?: string) => void;
   onOpenCheckoutAi?: () => void;
 }
 
@@ -27,10 +27,10 @@ export const PracticeGuideModal: React.FC<PracticeGuideModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleStartDrill = (gameId: GameType) => {
+  const handleStartDrill = (gameId: GameType, subMode?: string) => {
     sound.tap();
     onClose();
-    onSelectGame(gameId);
+    onSelectGame(gameId, subMode);
   };
 
   return (
@@ -267,7 +267,7 @@ export const PracticeGuideModal: React.FC<PracticeGuideModalProps> = ({
                     <div className="flex items-center gap-1.5 shrink-0 pt-0.5 flex-wrap">
                       <button
                         type="button"
-                        onClick={() => handleStartDrill('rtwsingles_intermediate')}
+                        onClick={() => handleStartDrill('rtwsingles', 'intermediate')}
                         className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-cyan-400 font-bold flex items-center gap-1 border border-neutral-700"
                         title="RTW Singles Intermediate: 1 dart per target 1 to Bull, hit +1, miss -1, 3 misses in row KO"
                       >
@@ -275,7 +275,7 @@ export const PracticeGuideModal: React.FC<PracticeGuideModalProps> = ({
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleStartDrill('rtwsingles_advanced')}
+                        onClick={() => handleStartDrill('rtwsingles', 'advanced')}
                         className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-cyan-400 font-bold flex items-center gap-1 border border-neutral-700"
                         title="RTW Singles Advanced: 1 dart per target 1 to Bull, hit +1, miss -1, 5 total misses KO"
                       >
@@ -283,7 +283,7 @@ export const PracticeGuideModal: React.FC<PracticeGuideModalProps> = ({
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleStartDrill('bigsingles_intermediate')}
+                        onClick={() => handleStartDrill('bigsingles', 'intermediate')}
                         className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-cyan-400 font-bold flex items-center gap-1 border border-neutral-700"
                         title="Intermediate: 2/3 hits advance, 1 stay, 0 back 1"
                       >
@@ -291,7 +291,7 @@ export const PracticeGuideModal: React.FC<PracticeGuideModalProps> = ({
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleStartDrill('bigsingles_advanced')}
+                        onClick={() => handleStartDrill('bigsingles', 'advanced')}
                         className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-amber-400 font-bold flex items-center gap-1 border border-neutral-700"
                         title="Advanced: 3 hits advance, 2 stay, 1 back 1, 0 back 2"
                       >
@@ -299,7 +299,7 @@ export const PracticeGuideModal: React.FC<PracticeGuideModalProps> = ({
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleStartDrill('a1practice_top')}
+                        onClick={() => handleStartDrill('a1practice', '20-11')}
                         className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-amber-400 font-bold flex items-center gap-1 border border-neutral-700"
                         title="A1 Practice 20 to 11: 3 hits to clear, auto-rotates to 1-10"
                       >
@@ -307,7 +307,7 @@ export const PracticeGuideModal: React.FC<PracticeGuideModalProps> = ({
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleStartDrill('a1practice_bottom')}
+                        onClick={() => handleStartDrill('a1practice', '1-10')}
                         className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] text-amber-400 font-bold flex items-center gap-1 border border-neutral-700"
                         title="A1 Practice 1 to 10: 3 hits to clear, auto-rotates to 20-11"
                       >

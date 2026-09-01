@@ -25,6 +25,39 @@ export interface DetailedCheckout {
 // Bogey numbers: Mathematical impossibilities to check out in 3 darts from 170 down
 export const BOGEY_NUMBERS = [159, 162, 163, 165, 166, 168, 169];
 
+/**
+ * Checks if a score is directly finishable with a single double dart (D1-D20 or Bull 50).
+ */
+export function isDirectDoubleScore(score: number): boolean {
+  return (score <= 40 && score >= 2 && score % 2 === 0) || score === 50;
+}
+
+/**
+ * Accurately determines if a visit could mathematically have included at least 1 dart thrown at a double.
+ * If the visit is a checkout, it always has a double shot.
+ * If not a checkout, it can ONLY have a double shot if:
+ * 1) startScore was already on a double (D1-D20 or Bull 50), OR
+ * 2) pointsScored reduced a setup score down to an active double (e.g. 57 scored 17 -> leaves 40 / D20).
+ * If startScore > 50 and pointsScored was 0 or left a non-double (like 74 left), returns false!
+ */
+export function canVisitHaveDoubleShot(
+  startScore: number,
+  pointsScored: number,
+  isCheckout: boolean,
+  dartsThrownInVisit: number = 3
+): boolean {
+  if (isCheckout) return true;
+  if (isDirectDoubleScore(startScore)) return true;
+
+  // Check if points scored reduced from a multi-dart finish down to an active double
+  const remaining = startScore - pointsScored;
+  if (pointsScored > 0 && remaining >= 2 && isDirectDoubleScore(remaining) && dartsThrownInVisit >= 2) {
+    return true;
+  }
+
+  return false;
+}
+
 // Helper to determine dart type from string
 export function parseDartStep(targetStr: string, dartNum: number): DartStep {
   const trimmed = targetStr.trim().toUpperCase();
